@@ -7,7 +7,6 @@ int main(int argc, char** argv) {
     auto* CxApp = Calyx::CreateApplication();
     info("Running Calyx application...");
     CxApp->Run();
-    spdlog::level::
     info("Cleaning up Calyx application...");
     delete CxApp;
 }

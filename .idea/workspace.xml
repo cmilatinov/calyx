@@ -3,7 +3,7 @@
   <component name="CMakeRunConfigurationManager" shouldGenerate="true" shouldDeleteObsolete="true">
     <generated />
   </component>
-  <component name="CMakeSettings">
+  <component name="CMakeSettings" AUTO_RELOAD="true">
     <configurations>
       <configuration PROFILE_NAME="Debug" CONFIG_NAME="Debug" TOOLCHAIN_NAME="Visual Studio" GENERATION_OPTIONS="-DCMAKE_TOOLCHAIN_FILE=&quot;E:\vcpkg\scripts\buildsystems\vcpkg.cmake&quot;" />
       <configuration PROFILE_NAME="Release" CONFIG_NAME="Release" TOOLCHAIN_NAME="Visual Studio" GENERATION_OPTIONS="-DCMAKE_TOOLCHAIN_FILE=&quot;E:\vcpkg\scripts\buildsystems\vcpkg.cmake&quot;" />
@@ -57,7 +57,7 @@
   <component name="ClangdSettings">
     <option name="formatViaClangd" value="false" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Release" />
+  <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Debug" />
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
@@ -88,6 +88,7 @@
       <recent name="E:\Git2\calyx\cmake-build-debug\sandbox" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="E:\Git2\calyx\engine\include\render" />
       <recent name="E:\Git2\calyx\engine\include" />
       <recent name="E:\Git2\calyx\engine\include\core" />
       <recent name="E:\Git2\calyx\engine\include\assets" />
@@ -129,7 +130,7 @@
       <updated>1630195769766</updated>
       <workItem from="1630195771133" duration="720000" />
       <workItem from="1630196508266" duration="7769000" />
-      <workItem from="1630286316728" duration="18478000" />
+      <workItem from="1630286316728" duration="19344000" />
     </task>
     <servers />
   </component>
@@ -185,6 +186,10 @@
       <screen x="0" y="0" width="2752" height="1112" />
     </state>
     <state x="93" y="93" width="2566" height="926" key="com.intellij.history.integration.ui.views.DirectoryHistoryDialog/0.0.2752.1112@0.0.2752.1112" timestamp="1630374170382" />
+    <state x="1085" y="289" width="579" height="592" key="find.popup" timestamp="1630374623295">
+      <screen x="0" y="0" width="2752" height="1112" />
+    </state>
+    <state x="1085" y="289" width="579" height="592" key="find.popup/0.0.2752.1112@0.0.2752.1112" timestamp="1630374623295" />
     <state x="1033" y="259" key="run.anything.popup" timestamp="1630374165519">
       <screen x="0" y="0" width="2752" height="1112" />
     </state>

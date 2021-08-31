@@ -9,9 +9,9 @@ Sandbox::~Sandbox() {
 }
 
 void Sandbox::Run() {
-    while(true);
+    while (true);
 }
 
-Application * Calyx::CreateApplication() {
+Application* Calyx::CreateApplication() {
     return new Sandbox;
 }
