@@ -1,6 +1,8 @@
-#include "render/Renderer.h"
+#include "render/opengl/GLRenderer.h"
 
 namespace Calyx {
+
+    Renderer::API Renderer::s_api = OPENGL;
 
     void Renderer::Init() {
         s_renderer = Create();
@@ -9,14 +11,10 @@ namespace Calyx {
     Scope<Renderer> Renderer::Create() {
         switch (Renderer::GetAPI()) {
             case OPENGL:
-                return CreateScope<Renderer>();
-            case NONE:
-                break;
-            case DIRECTX:
-                break;
-            case VULKAN:
-                break;
+                return CreateScope<GLRenderer>();
         }
+        CX_CORE_ASSERT(false, "Renderer not supported!");
+        return nullptr;
     }
 
 }

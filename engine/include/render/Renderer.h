@@ -37,6 +37,4 @@ namespace Calyx {
 
     };
 
-    Scope<Renderer>
-
 }
