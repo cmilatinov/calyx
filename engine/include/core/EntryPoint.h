@@ -3,11 +3,15 @@
 #ifdef CX_PLATFORM_WINDOWS
 
 int main(int argc, char** argv) {
-    info("Creating Calyx application...");
+    Log::Init();
+
+    CX_CORE_INFO("Creating Calyx application...");
     auto* CxApp = Calyx::CreateApplication();
-    info("Running Calyx application...");
+
+    CX_CORE_INFO("Running Calyx application...");
     CxApp->Run();
-    info("Cleaning up Calyx application...");
+
+    CX_CORE_INFO("Cleaning up Calyx application...");
     delete CxApp;
 }
 

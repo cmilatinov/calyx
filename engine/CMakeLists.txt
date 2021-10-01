@@ -9,8 +9,8 @@ set(CMAKE_C_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DCX_DEBUG")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DCX_DEBUG")
 
 # Required libraries
-find_package(glew REQUIRED)
 find_package(glfw3 CONFIG REQUIRED)
+find_package(glad REQUIRED)
 find_package(imgui CONFIG REQUIRED)
 find_package(glm CONFIG REQUIRED)
 find_package(assimp CONFIG REQUIRED)
@@ -24,10 +24,7 @@ file(GLOB_RECURSE ENGINE_SRC "src/**.cpp")
 add_library("Engine" ${ENGINE_SRC})
 
 # Link target
-target_link_libraries("Engine" PRIVATE GLEW::GLEW glfw imgui::imgui glm assimp::assimp spdlog::spdlog spdlog::spdlog_header_only)
+target_link_libraries("Engine" PRIVATE glfw glad::glad imgui::imgui glm assimp::assimp spdlog::spdlog spdlog::spdlog_header_only)
 target_include_directories("Engine" PRIVATE include ${STB_INCLUDE_DIRS})
-
-# Preprocessor definitions
-if (WIN32)
-    target_compile_definitions("Engine" PRIVATE CX_PLATFORM_WINDOWS CX_BUILD_DLL)
-endif()
+target_compile_definitions("Engine" PRIVATE CX_BUILD_DLL)
+target_precompile_headers("Engine" PRIVATE include/core/Base.h include/core/Types.h)

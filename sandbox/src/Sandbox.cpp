@@ -1,17 +1,5 @@
-#include "Sandbox.h"
-
-Sandbox::Sandbox() {
-
-}
-
-Sandbox::~Sandbox() {
-
-}
-
-void Sandbox::Run() {
-    while (true);
-}
+#include <Calyx.h>
 
 Application* Calyx::CreateApplication() {
-    return new Sandbox;
+    return new Application;
 }
