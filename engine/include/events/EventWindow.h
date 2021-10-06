@@ -4,8 +4,6 @@
 
 namespace Calyx {
 
-    // WindowClose, WindowMove, WindowResize, WindowFocus, WindowLostFocus, WindowMinimize, WindowMaximize,
-
     class EventWindow : public Event {
 
     public:

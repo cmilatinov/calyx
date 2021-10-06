@@ -11,7 +11,6 @@ namespace Calyx {
                 : m_mouseX(x), m_mouseY(y) {}
 
         float GetX() const { return m_mouseX; }
-
         float GetY() const { return m_mouseY; }
 
         String ToString() const override {

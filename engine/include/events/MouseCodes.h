@@ -1,7 +1,5 @@
 #pragma once
 
-#include "core/Types.h"
-
 namespace Calyx {
 
     using MouseCode = uint16;
