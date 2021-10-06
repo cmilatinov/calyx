@@ -1,5 +1,4 @@
 #include "display/WindowGLFW.h"
-#include "render/Renderer.h"
 
 namespace Calyx {
 
@@ -19,6 +18,7 @@ namespace Calyx {
 
     void WindowGLFW::OnUpdate() {
         glfwPollEvents();
+        m_renderContext->SwapBuffers();
     }
 
     uvec2 WindowGLFW::GetCenter() const {
@@ -59,13 +59,10 @@ namespace Calyx {
         CX_CORE_ASSERT(vmode != nullptr, "Failed to retrieve primary monitor video mode!");
 
         // Create window
-#pragma clang diagnostic push
-#pragma ide diagnostic ignored "NullDereferences"
         m_windowMode.width = m_windowMode.width == CX_DISPLAY_MAX_SIZE ? vmode->width : m_windowMode.width;
         m_windowMode.height = m_windowMode.height == CX_DISPLAY_MAX_SIZE ? vmode->height : m_windowMode.height;
         m_windowMode.x = m_windowMode.x == CX_DISPLAY_CENTER ? (vmode->width / 2) - (m_windowMode.width / 2) : m_windowMode.x;
         m_windowMode.y = m_windowMode.y == CX_DISPLAY_CENTER ? (vmode->height / 2) - (m_windowMode.height / 2) : m_windowMode.y;
-#pragma clang diagnostic pop
         m_windowHandle = glfwCreateWindow(m_windowMode.width, m_windowMode.height, m_title.c_str(), nullptr, nullptr);
         CX_CORE_ASSERT(m_windowHandle != nullptr, "Failed to create GLFW window!");
 
@@ -239,7 +236,7 @@ namespace Calyx {
 
     void WindowGLFW::SetContextWindowHints() {
         switch (Renderer::GetAPI()) {
-            case Renderer::API::OPENGL:
+            case RendererAPI::OPENGL:
                 glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
                 glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
                 return;

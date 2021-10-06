@@ -5,9 +5,11 @@
     /* Windows x64/x86 */
     #ifdef _WIN64
         /* Windows x64  */
-        #define CX_PLATFORM_WINDOWS
+        #ifndef CX_PLATFORM_WINDOWS
+            #define CX_PLATFORM_WINDOWS
+        #endif
     #else
-    /* Windows x86 */
+        /* Windows x86 */
         #error "x86 Builds are not supported!"
     #endif
 #elif defined(__APPLE__) || defined(__MACH__)

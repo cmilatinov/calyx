@@ -10,7 +10,7 @@ namespace Calyx {
     class CALYX_API GLRenderContext : public RenderContext {
 
     public:
-        explicit GLRenderContext(GLFWwindow* window);
+        GLRenderContext(GLFWwindow* window);
 
         void Init() override;
         void SwapBuffers() override;

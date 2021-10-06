@@ -2,7 +2,8 @@
 
 namespace Calyx {
 
-    Renderer::API Renderer::s_api = OPENGL;
+    RendererAPI Renderer::s_api = OPENGL;
+    Scope<Renderer> Renderer::s_renderer = nullptr;
 
     void Renderer::Init() {
         s_renderer = Create();

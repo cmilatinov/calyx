@@ -1,10 +1,12 @@
 #pragma once
 
+#include <glad/glad.h>
+
 #include "render/Renderer.h"
 
 namespace Calyx {
 
-    class GLRenderer : public Renderer {
+    class CALYX_API GLRenderer : public Renderer {
 
     public:
         void Initialize() override;

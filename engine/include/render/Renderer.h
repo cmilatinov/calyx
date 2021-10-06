@@ -2,15 +2,14 @@
 
 namespace Calyx {
 
-    class CALYX_API Renderer {
+    enum RendererAPI {
+        NONE,
+        OPENGL,
+        DIRECTX,
+        VULKAN
+    };
 
-    public:
-        enum API {
-            NONE,
-            OPENGL,
-            DIRECTX,
-            VULKAN
-        };
+    class CALYX_API Renderer {
 
     public:
         virtual ~Renderer() = default;
@@ -22,16 +21,19 @@ namespace Calyx {
 
 //        virtual void DrawIndexed(const Ref<VertexArray>& vertexArray, uint32 indexCount = 0) override;
 
-        static API GetAPI() {
+        static inline RendererAPI GetAPI() {
             return s_api;
+        }
+
+        static inline Renderer& GetInstance() {
+            return *s_renderer;
         }
 
         static void Init();
 
-        static Scope<Renderer> s_renderer;
-
     private:
-        static API s_api;
+        static RendererAPI s_api;
+        static Scope<Renderer> s_renderer;
 
         static Scope<Renderer> Create();
 

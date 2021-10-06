@@ -1,5 +1,10 @@
 #pragma once
 
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+
+#include "render/Renderer.h"
+
 namespace Calyx {
 
     class CALYX_API RenderContext {
