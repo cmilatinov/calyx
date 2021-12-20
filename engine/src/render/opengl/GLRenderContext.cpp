@@ -14,9 +14,9 @@ namespace Calyx {
 
         CX_CORE_INFO("");
         CX_CORE_INFO("OpenGL Info:");
-        CX_CORE_INFO("\tVendor:           {0}", glGetString(GL_VENDOR));
-        CX_CORE_INFO("\tRenderer:         {0}", glGetString(GL_RENDERER));
-        CX_CORE_INFO("\tVersion:          {0}", glGetString(GL_VERSION));
+        CX_CORE_INFO("    Vendor:      {0}", glGetString(GL_VENDOR));
+        CX_CORE_INFO("    Renderer:    {0}", glGetString(GL_RENDERER));
+        CX_CORE_INFO("    Version:     {0}", glGetString(GL_VERSION));
         CX_CORE_INFO("");
 
         CX_CORE_ASSERT(GLVersion.major >= 4, "Calyx requires at least OpenGL version 4.0!");

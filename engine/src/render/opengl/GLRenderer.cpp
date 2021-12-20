@@ -27,4 +27,9 @@ namespace Calyx {
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
     }
 
+    void GLRenderer::DrawIndexed(const Ref<VertexArray>& vertexArray, uint32 indexCount) {
+        vertexArray->Bind();
+        glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, nullptr);
+    }
+
 }

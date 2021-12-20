@@ -50,7 +50,7 @@ namespace Calyx {
         GLFWwindow* m_windowHandle = nullptr;
         Scope<RenderContext> m_renderContext;
 
-        static int32 s_windowCount;
+        static uint32 s_windowCount;
 
         void Init();
         void Destroy();

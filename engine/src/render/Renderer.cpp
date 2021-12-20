@@ -2,7 +2,7 @@
 
 namespace Calyx {
 
-    RendererAPI Renderer::s_api = OPENGL;
+    RendererAPI Renderer::s_api = RendererAPI::OPENGL;
     Scope<Renderer> Renderer::s_renderer = nullptr;
 
     void Renderer::Init() {
@@ -11,7 +11,7 @@ namespace Calyx {
 
     Scope<Renderer> Renderer::Create() {
         switch (Renderer::GetAPI()) {
-            case OPENGL:
+            case RendererAPI::OPENGL:
                 return CreateScope<GLRenderer>();
         }
         CX_CORE_ASSERT(false, "Renderer not supported!");

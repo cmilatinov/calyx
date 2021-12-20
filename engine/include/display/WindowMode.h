@@ -10,18 +10,18 @@ namespace Calyx {
     /**
      * Dictates the way a display mode handles the mouse cursor.
      */
-    enum CursorMode {
+    enum class CursorMode {
         /**
-         * Cursor can freely move in and out of the window without restrictions.
-         */
+        * Cursor can freely move in and out of the window without restrictions.
+        */
         NORMAL,
         /**
-         * Cursor is hidden when the window is in focus but can still exit window bounds.
-         */
+        * Cursor is hidden when the window is in focus but can still exit window bounds.
+        */
         HIDDEN,
         /**
-         * Cursor is fully hidden and disabled (grabbed) while the window is in focus.
-         */
+        * Cursor is fully hidden and disabled (grabbed) while the window is in focus.
+        */
         DISABLED
     };
 

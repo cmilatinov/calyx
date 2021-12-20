@@ -13,7 +13,7 @@ namespace Calyx {
     using String = std::string;
 
     template<typename T>
-    using Array = std::vector<T>;
+    using List = std::vector<T>;
 
     template<typename K, typename V>
     using Map = std::unordered_map<K, V>;

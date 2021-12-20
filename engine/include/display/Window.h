@@ -26,9 +26,12 @@ namespace Calyx {
         void SetEventCallback(const EventCallbackFn& callback) { m_eventCallback = callback; }
 
         static Window* Create(const WindowMode& mode);
+        static const Window& GetMainWindow() { return *s_mainWindow; }
 
     protected:
         EventCallbackFn m_eventCallback;
+
+        static Window* s_mainWindow;
 
     };
 

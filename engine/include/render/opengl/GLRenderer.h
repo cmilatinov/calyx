@@ -14,6 +14,8 @@ namespace Calyx {
         void SetClearColor(const vec4& color) override;
         void Clear() override;
 
+        void DrawIndexed(const Ref<VertexArray>& vertexArray, uint32 indexCount) override;
+
     };
 
 }

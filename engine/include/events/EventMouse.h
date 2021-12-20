@@ -20,7 +20,7 @@ namespace Calyx {
         }
 
         EVENT_CLASS_TYPE(MouseMove)
-        EVENT_CLASS_CATEGORY(CategoryInput | CategoryMouse)
+        EVENT_CLASS_CATEGORY(EventCategory::CategoryInput | EventCategory::CategoryMouse)
 
     private:
         float m_mouseX, m_mouseY;
@@ -41,7 +41,7 @@ namespace Calyx {
         }
 
         EVENT_CLASS_TYPE(MouseScroll)
-        EVENT_CLASS_CATEGORY(CategoryInput | CategoryMouse)
+        EVENT_CLASS_CATEGORY(EventCategory::CategoryInput | EventCategory::CategoryMouse)
 
     private:
         float m_offsetX, m_offsetY;
@@ -51,7 +51,7 @@ namespace Calyx {
     public:
         MouseCode GetMouseButton() const { return m_button; }
 
-        EVENT_CLASS_CATEGORY(CategoryInput | CategoryMouse | CategoryMouseButton)
+        EVENT_CLASS_CATEGORY(EventCategory::CategoryInput | EventCategory::CategoryMouse | EventCategory::CategoryMouseButton)
 
     protected:
         EventMouseButton(MouseCode button)

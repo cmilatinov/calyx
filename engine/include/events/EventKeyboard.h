@@ -9,7 +9,7 @@ namespace Calyx {
     public:
         KeyCode GetKeyCode() { return m_keycode; }
 
-        EVENT_CLASS_CATEGORY(CategoryInput | CategoryKeyboard)
+        EVENT_CLASS_CATEGORY(EventCategory::CategoryInput | EventCategory::CategoryKeyboard)
 
     protected:
         explicit EventKey(KeyCode keycode)

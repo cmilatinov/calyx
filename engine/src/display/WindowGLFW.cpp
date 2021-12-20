@@ -2,7 +2,7 @@
 
 namespace Calyx {
 
-    int32 WindowGLFW::s_windowCount = 0;
+    uint32 WindowGLFW::s_windowCount = 0;
 
     WindowGLFW::Window * Window::Create(const WindowMode& mode) {
         return new WindowGLFW(mode);
@@ -54,7 +54,7 @@ namespace Calyx {
         SetContextWindowHints();
 
         // Get video mode
-        // TODO Exit app on null window handle or vmode
+        // TODO: Exit app on null window handle or vmode
         const GLFWvidmode* vmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
         CX_CORE_ASSERT(vmode != nullptr, "Failed to retrieve primary monitor video mode!");
 
@@ -93,7 +93,8 @@ namespace Calyx {
 
         // Show window
         glfwShowWindow(m_windowHandle);
-        s_windowCount++;
+        if (s_windowCount++ == 0)
+            s_mainWindow = this;
 
         // Create context
         glfwMakeContextCurrent(m_windowHandle);
@@ -116,11 +117,11 @@ namespace Calyx {
 
     int WindowGLFW::GetGLFWCursorMode(CursorMode cursorMode) {
         switch (cursorMode) {
-            case NORMAL:
+            case CursorMode::NORMAL:
                 return GLFW_CURSOR_NORMAL;
-            case HIDDEN:
+            case CursorMode::HIDDEN:
                 return GLFW_CURSOR_HIDDEN;
-            case DISABLED:
+            case CursorMode::DISABLED:
                 return GLFW_CURSOR_DISABLED;
             default:
                 return -1;
