@@ -64,8 +64,8 @@ namespace Calyx {
         // Set font
         const float fontSize = 24.0f;
         ImGuiIO& io = ImGui::GetIO(); (void)io;
-        io.Fonts->AddFontFromFileTTF("assets/fonts/open-sans/OpenSans-Bold.ttf", fontSize);
-        io.FontDefault = io.Fonts->AddFontFromFileTTF("assets/fonts/open-sans/OpenSans-Regular.ttf", fontSize);
+        io.Fonts->AddFontFromFileTTF("assets/fonts/inconsolata/Inconsolata-Bold.ttf", fontSize);
+        io.FontDefault = io.Fonts->AddFontFromFileTTF("assets/fonts/inconsolata/Inconsolata-Regular.ttf", fontSize);
 
         // Set dark theme
         ImGui::StyleColorsDark();

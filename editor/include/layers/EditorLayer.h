@@ -5,7 +5,7 @@
 
 namespace Calyx {
 
-    class TestLayer : public ILayer {
+    class EditorLayer : public ILayer {
 
     public:
         void OnAttach() override;

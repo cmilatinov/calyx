@@ -1,4 +1,4 @@
-#include "layers/TestLayer.h"
+#include "../../include/layers/EditorLayer.h"
 
 namespace Calyx {
 
@@ -14,7 +14,7 @@ namespace Calyx {
             -0.5f, 0.5f, 0.0f,      0.0f, 0.0f, 0.0f
     };
 
-    void TestLayer::OnAttach() {
+    void EditorLayer::OnAttach() {
         const Window& window = Application::GetInstance().GetWindow();
         shader = Shader::Create("./assets/shaders/basic.glsl");
 
@@ -57,7 +57,7 @@ namespace Calyx {
         RenderCommand::SetClearColor(vec4(0, 0.2, 0.2, 1));
     }
 
-    void TestLayer::OnUpdate() {
+    void EditorLayer::OnUpdate() {
         msaaFramebuffer->Bind();
 
         shader->Bind();
@@ -68,7 +68,7 @@ namespace Calyx {
         msaaFramebuffer->Unbind();
     };
 
-    void TestLayer::OnGUI() {
+    void EditorLayer::OnGUI() {
         // Setup parent window
         const Window& window = Application::GetInstance().GetWindow();
         int windowFlags =
@@ -118,7 +118,7 @@ namespace Calyx {
         ImGui::End();
     }
 
-    void TestLayer::OnEvent(Event& event) {
+    void EditorLayer::OnEvent(Event& event) {
 
     }
 
