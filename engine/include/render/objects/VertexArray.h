@@ -4,7 +4,7 @@
 
 namespace Calyx {
 
-    class VertexArray {
+    class CALYX_API VertexArray {
 
     public:
         virtual ~VertexArray() = default;

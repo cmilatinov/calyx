@@ -4,10 +4,15 @@
 
 #ifdef CX_PLATFORM_WINDOWS
     #ifdef CX_BUILD_DLL
-        #define CALYX_API __declspec(dllexport)
+        #ifdef CX_DLL_EXPORT
+            #define CALYX_API __declspec(dllexport)
+        #else
+            #define CALYX_API __declspec(dllimport)
+        #endif
     #else
-        #define CALYX_API __declspec(dllimport)
+        #define CALYX_API
     #endif
+
     #include <Windows.h>
 #else
     #error "Calyx only supports Windows!"

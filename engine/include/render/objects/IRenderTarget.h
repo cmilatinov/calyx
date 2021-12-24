@@ -6,7 +6,7 @@ namespace Calyx {
 
     class Framebuffer;
 
-    class IRenderTarget {
+    class CALYX_API IRenderTarget {
 
     public:
         enum class Type {

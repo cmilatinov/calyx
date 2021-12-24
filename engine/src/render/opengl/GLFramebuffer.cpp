@@ -31,10 +31,13 @@ namespace Calyx {
         Invalidate();
     }
 
-    void GLFramebuffer::ClearAttachment(uint32_t attachmentIndex, uint32 value) {
+    void GLFramebuffer::ClearColorAttachment(uint32_t attachmentIndex, uint32 value) {
 
     }
 
+    void GLFramebuffer::ClearDepthAttachment(uint32 value) {
+
+    }
 
     void GLFramebuffer::Blit(const Ref<Framebuffer>& other, uint32 srcAttachment, uint32 dstAttachment) {
         glBindFramebuffer(GL_READ_FRAMEBUFFER, m_framebufferID);
@@ -54,8 +57,12 @@ namespace Calyx {
         glBlitFramebuffer(0, 0, m_spec.width, m_spec.height, 0, 0, targetSize.x, targetSize.y, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_NEAREST);
     }
 
-    Ref<Framebuffer> GLFramebuffer::Create(const Framebuffer::Spec& spec) {
-        return Calyx::Ref<Framebuffer>();
+    const IRenderTarget& GLFramebuffer::GetColorAttachment(uint32 attachmentIndex) const {
+        return *m_colorAttachments[attachmentIndex];
+    }
+
+    const IRenderTarget& GLFramebuffer::GetDepthAttachment() const {
+        return *m_depthAttachment;
     }
 
     void GLFramebuffer::Init() {

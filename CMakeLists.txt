@@ -8,6 +8,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Print build commands
 # set(CMAKE_VERBOSE_MAKEFILE ON)
 
+# Includes
+include(build/include/utils.cmake)
+
 # Project name
 project("Calyx")
 

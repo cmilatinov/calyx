@@ -7,7 +7,7 @@ namespace Calyx {
     class EventWindow : public Event {
 
     public:
-        EVENT_CLASS_CATEGORY(EventCategory::CategoryWindow)
+        EVENT_CLASS_CATEGORY(EventCategory::Window)
 
     };
 

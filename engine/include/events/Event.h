@@ -20,12 +20,12 @@ namespace Calyx {
     namespace EventCategory {
         enum T {
             None = 0,
-            CategoryApplication =   BIT(0),
-            CategoryWindow =        BIT(1),
-            CategoryInput =         BIT(2),
-            CategoryMouse =         BIT(3),
-            CategoryMouseButton =   BIT(4),
-            CategoryKeyboard =      BIT(5),
+            Application =   BIT(0),
+            Window =        BIT(1),
+            Input =         BIT(2),
+            Mouse =         BIT(3),
+            MouseButton =   BIT(4),
+            Keyboard =      BIT(5),
         };
     }
 

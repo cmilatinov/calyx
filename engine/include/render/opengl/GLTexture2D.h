@@ -35,6 +35,7 @@ namespace Calyx {
         uint32 m_samples;
         TextureFormat m_format;
 
+        void Init();
     };
 
 }

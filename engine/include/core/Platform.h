@@ -29,16 +29,16 @@
 	#else
 		#error "Unknown Apple platform!"
 	#endif
-    /* We also have to check __ANDROID__ before __linux__
-     * since android is based on the linux kernel
-     * it has __linux__ defined */
-    #elif defined(__ANDROID__)
-        #define CX_PLATFORM_ANDROID
-        #error "Android is not supported!"
-    #elif defined(__linux__)
-        #define CX_PLATFORM_LINUX
-        #error "Linux is not supported!"
-    #else
-	/* Unknown compiler/platform */
+/* We also have to check __ANDROID__ before __linux__
+ * since android is based on the linux kernel
+ * it has __linux__ defined */
+#elif defined(__ANDROID__)
+    #define CX_PLATFORM_ANDROID
+    #error "Android is not supported!"
+#elif defined(__linux__)
+    #define CX_PLATFORM_LINUX
+    #error "Linux is not supported!"
+#else
+/* Unknown compiler/platform */
 	#error "Unknown platform!"
-#endif // End of platform detection
+#endif

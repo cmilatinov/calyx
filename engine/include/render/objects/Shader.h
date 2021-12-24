@@ -20,7 +20,7 @@ namespace Calyx {
         return ShaderType::NONE;
     }
 
-    class Shader {
+    class CALYX_API Shader {
 
     public:
         virtual ~Shader() = default;
@@ -45,7 +45,7 @@ namespace Calyx {
 
     };
 
-    class ShaderLibrary {
+    class CALYX_API ShaderLibrary {
 
     public:
         void Add(const String& name, const Ref<Shader>& shader);

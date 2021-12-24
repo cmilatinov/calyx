@@ -22,14 +22,16 @@ namespace Calyx {
         void Unbind() const override;
 
         void Resize(uint32_t width, uint32_t height) override;
-        void ClearAttachment(uint32_t attachmentIndex, uint32 value) override;
+        void ClearColorAttachment(uint32_t attachmentIndex, uint32 value) override;
+        void ClearDepthAttachment(uint32 value) override;
         void Blit(const Ref<Framebuffer>& other, uint32 srcAttachment, uint32 dstAttachment) override;
+
+        const IRenderTarget& GetColorAttachment(uint32 attachmentIndex) const override;
+        const IRenderTarget& GetDepthAttachment() const override;
 
         const Framebuffer::Spec& GetSpec() const override { return m_spec; }
         uint32 GetRendererID() const override { return m_framebufferID; }
         bool IsComplete() const override;
-
-        static Ref<Framebuffer> Create(const Framebuffer::Spec& spec);
 
     private:
         Framebuffer::Spec m_spec;

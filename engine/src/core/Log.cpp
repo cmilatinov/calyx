@@ -11,7 +11,7 @@ namespace Calyx {
     void Log::Init() {
         std::vector<spdlog::sink_ptr> logSinks;
         logSinks.emplace_back(std::make_shared<spdlog::sinks::stdout_color_sink_mt>());
-        logSinks.emplace_back(std::make_shared<spdlog::sinks::basic_file_sink_mt>("Hazel.log", true));
+        logSinks.emplace_back(std::make_shared<spdlog::sinks::basic_file_sink_mt>("Calyx.log", true));
 
         s_CoreLogger = std::make_shared<spdlog::logger>("CALYX", begin(logSinks), end(logSinks));
         spdlog::register_logger(s_CoreLogger);

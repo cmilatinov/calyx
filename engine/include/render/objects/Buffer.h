@@ -57,7 +57,7 @@ namespace Calyx {
         }
     };
 
-    class BufferLayout {
+    class CALYX_API BufferLayout {
 
     public:
         BufferLayout() {}
@@ -92,7 +92,7 @@ namespace Calyx {
 
     };
 
-    class VertexBuffer {
+    class CALYX_API VertexBuffer {
 
     public:
         virtual ~VertexBuffer() = default;
@@ -110,7 +110,7 @@ namespace Calyx {
 
     };
 
-    class IndexBuffer {
+    class CALYX_API IndexBuffer {
 
     public:
         virtual ~IndexBuffer() = default;

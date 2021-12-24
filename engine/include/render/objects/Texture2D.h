@@ -4,7 +4,7 @@
 
 namespace Calyx {
 
-    class Texture2D : public IRenderTarget {
+    class CALYX_API Texture2D : public IRenderTarget {
 
     public:
         virtual void Load(const String& file) const = 0;

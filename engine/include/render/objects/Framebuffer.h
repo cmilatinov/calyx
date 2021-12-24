@@ -4,7 +4,7 @@
 
 namespace Calyx {
 
-    class Framebuffer {
+    class CALYX_API Framebuffer {
 
     public:
         class Attachment {
@@ -36,8 +36,12 @@ namespace Calyx {
         virtual void Unbind() const = 0;
 
         virtual void Resize(uint32 width, uint32 height) = 0;
-        virtual void ClearAttachment(uint32 attachmentIndex, uint32 value) = 0;
+        virtual void ClearColorAttachment(uint32 attachmentIndex, uint32 value) = 0;
+        virtual void ClearDepthAttachment(uint32 value) = 0;
         virtual void Blit(const Ref<Framebuffer>& other, uint32 srcAttachment, uint32 dstAttachment) = 0;
+
+        virtual const IRenderTarget& GetColorAttachment(uint32 attachmentIndex) const = 0;
+        virtual const IRenderTarget& GetDepthAttachment() const = 0;
 
         virtual const Framebuffer::Spec& GetSpec() const = 0;
         virtual uint32 GetRendererID() const = 0;
