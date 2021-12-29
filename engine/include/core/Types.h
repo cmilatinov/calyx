@@ -7,6 +7,7 @@
 #include <unordered_set>
 
 #include <glm/glm.hpp>
+#include <entt/entt.hpp>
 
 namespace Calyx {
 

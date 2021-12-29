@@ -18,6 +18,7 @@ find_package(imguizmo CONFIG REQUIRED)
 find_package(glm CONFIG REQUIRED)
 find_package(assimp CONFIG REQUIRED)
 find_package(spdlog REQUIRED)
+find_package(EnTT CONFIG REQUIRED)
 find_path(STB_INCLUDE_DIRS "stb.h")
 
 # Clump source files from src
@@ -27,7 +28,7 @@ file(GLOB_RECURSE ENGINE_SRC "src/**.cpp")
 add_library("Engine" STATIC ${ENGINE_SRC})
 
 # Link target
-target_link_libraries("Engine" PUBLIC glfw glad::glad imgui::imgui imguizmo::imguizmo glm assimp::assimp spdlog::spdlog_header_only)
+target_link_libraries("Engine" PUBLIC glfw glad::glad imgui::imgui imguizmo::imguizmo glm assimp::assimp spdlog::spdlog_header_only EnTT::EnTT)
 target_include_directories("Engine" PUBLIC include ${STB_INCLUDE_DIRS})
 target_precompile_headers("Engine" PUBLIC include/pch.h)
 

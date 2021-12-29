@@ -25,7 +25,7 @@ namespace Calyx {
 
         const Window& GetWindow() const { return *m_window; }
 
-        static const Application& GetInstance() { return *s_instance; }
+        static Application& GetInstance() { return *s_instance; }
 
     private:
         bool m_running = true;

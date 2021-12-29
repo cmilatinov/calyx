@@ -95,13 +95,14 @@ namespace Calyx {
                 ImGui::MenuItem("New", "Ctrl+N");
                 ImGui::MenuItem("Open...", "Ctrl+O");
                 ImGui::MenuItem("Save As...", "Ctrl+Shift+S");
-                ImGui::MenuItem("Exit");
+                if (ImGui::MenuItem("Exit", "Alt+F4"))
+                    Application::GetInstance().Close();
                 ImGui::EndMenu();
             }
             ImGui::EndMenuBar();
         }
 
-        // Show example windwos
+        // Show example windows
         ImGui::ShowDemoWindow();
         ImGui::ShowMetricsWindow();
 
