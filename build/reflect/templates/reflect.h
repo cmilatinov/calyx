@@ -147,7 +147,7 @@ namespace reflect {
         virtual std::vector<std::unique_ptr<IMethod>> GetMethods() const = 0;
         virtual std::vector<std::unique_ptr<IMethod>> GetMethodsByName(const std::string& name) const = 0;
 
-        virtual std::vector<std::unique_ptr<IMethod>> GetStaticMethods() const = 0;
+        virtual std::vector<std::unique_ptr<IFunction>> GetStaticMethods() const = 0;
         virtual std::vector<std::unique_ptr<IFunction>> GetStaticMethodsByName(const std::string& name) const = 0;
 
     };

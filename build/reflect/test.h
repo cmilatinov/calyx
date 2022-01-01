@@ -10,7 +10,9 @@ namespace Calyx {
 
     };
 
-    REFLECT()
+    REFLECT(
+
+            )
     class ReflectTest : public Base {
     private:
 
@@ -19,7 +21,7 @@ namespace Calyx {
 
     public:
         CX_PROPERTY(asdas, asda)
-        void foo();
+        void foo(int, float);
 
         static void bar();
 
@@ -30,3 +32,18 @@ namespace Calyx {
     };
 
 }
+
+class AnotherTest {
+
+};
+
+struct asdk {
+
+    CX_PROPERTY(Cool  , Beans)
+    bool (*pFunc)();
+
+    CX_PROPERTY(    ANOTHER, ONE)
+    CX_PROPERTY(Hello, World)
+    static void AnActualFn() {}
+
+};
