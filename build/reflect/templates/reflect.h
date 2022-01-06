@@ -8,10 +8,6 @@
 #include <type_traits>
 #include <vector>
 
-#define TYPE_BASE           0
-#define TYPE_CLASS          1
-#define TYPE_CLASS_CUSTOM   2
-
 namespace reflect {
 
     // Object is a class similar in nature to std::any, only it does not require

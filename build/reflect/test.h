@@ -46,4 +46,6 @@ struct asdk {
     CX_PROPERTY(Hello, World)
     static void AnActualFn() {}
 
+    void (*hehe)();
+
 };

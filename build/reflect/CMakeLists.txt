@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Set source files
-set(REFLECT_SRC "src/main.cpp")
+set(REFLECT_SRC "src/reflect.cpp" "src/main.cpp")
 
 # Create executable from sources
 add_executable("Reflect" ${REFLECT_SRC})
