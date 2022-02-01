@@ -9,6 +9,7 @@ namespace Calyx {
      * Describes a window shown at the OS level.
      */
     class CALYX_API Window {
+        CX_BEGIN_REFLECT()
 
         using EventCallbackFn = std::function<void(Event&)>;
 

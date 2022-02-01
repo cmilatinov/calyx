@@ -29,8 +29,9 @@ add_library("Engine" STATIC ${ENGINE_SRC})
 
 # Link target
 target_link_libraries("Engine" PUBLIC glfw glad::glad imgui::imgui imguizmo::imguizmo glm assimp::assimp spdlog::spdlog_header_only EnTT::EnTT)
-target_include_directories("Engine" PUBLIC include ${STB_INCLUDE_DIRS})
+target_include_directories("Engine" PUBLIC include generated ${STB_INCLUDE_DIRS})
 target_precompile_headers("Engine" PUBLIC include/pch.h)
+add_reflected_headers("Engine" "include" "include/display/Window.h")
 
 # Compile definitions based on platform
 if(WIN32)

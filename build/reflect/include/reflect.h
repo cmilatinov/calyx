@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <atomic>
 #include <functional>
 #include <optional>
@@ -9,6 +10,16 @@
 #include <string>
 #include <type_traits>
 #include <vector>
+#include <unordered_map>
+
+#define CX_PROPERTY(...)
+#define CX_REFLECT_ENUM(...)
+
+#define CX_BEGIN_REFLECT()      \
+template<typename T>            \
+friend class reflect::Class;    \
+template<typename T, T t>       \
+friend class reflect::Method;
 
 namespace reflect {
 
@@ -22,6 +33,10 @@ namespace reflect {
         // Constructs an Object with a copy of T.
         template<typename T>
         explicit Object(T&& t);
+
+        // Constructs an Object with a reference to T.
+        template<typename T>
+        explicit Object(T& t);
 
         Object(Object&& o);
 
@@ -41,6 +56,8 @@ namespace reflect {
 
         bool IsVoid() const;
 
+        int GetTypeID() const;
+
     private:
         int id_;
         void* data_ = nullptr;
@@ -54,6 +71,8 @@ namespace reflect {
         template<typename T>
         Reference(T& t);
 
+        Reference(int typeID, void* data);
+
         Reference(const Reference& o);
 
         Reference& operator=(const Reference& o);
@@ -63,6 +82,8 @@ namespace reflect {
 
         template<typename T>
         T& GetT() const;
+
+        void* Ptr() const { return data_; }
 
     private:
         int id_;
@@ -77,6 +98,7 @@ namespace reflect {
     enum class TypeClass {
         PRIMITIVE,
         FUNCTION,
+        METHOD,
         CLASS,
         ENUM
     };
@@ -85,30 +107,35 @@ namespace reflect {
     public:
         virtual ~IType() = default;
 
-        virtual const std::string& GetName() const = 0;
-        virtual const std::string& GetFullName() const = 0;
-        virtual int GetID() const = 0;
+        virtual std::string GetName() const = 0;
+        virtual std::string GetFullName() const = 0;
+        virtual int GetTypeID() const = 0;
 
-        virtual TypeClass GetTypeClass() const { return TypeClass::PRIMITIVE; }
+        virtual TypeClass GetTypeClass() const = 0;
     };
 
     struct Parameter {
-        IType* type;
+        int typeID;
+        std::string typeName;
         std::string name;
+    };
+
+    struct ReturnType {
+        int typeID;
+        std::string typeName;
     };
 
     class IFunction : public IType {
     public:
-        virtual IType* GetReturnType() const = 0;
+        virtual ReturnType GetReturnType() const = 0;
         virtual std::vector<Parameter> GetParameterList() const = 0;
 
-        // Syntactic sugar for calling Invoke().
         template<typename... Ts>
         Object operator()(Ts&& ... ts);
 
-        virtual Object Invoke(const std::vector<Object>& args) = 0;
+        virtual Object Invoke(const std::vector<Object>& args) const = 0;
 
-        virtual TypeClass GetTypeClass() const { return TypeClass::FUNCTION; }
+        TypeClass GetTypeClass() const override { return TypeClass::FUNCTION; }
     };
 
     enum class AccessSpecifier {
@@ -127,56 +154,71 @@ namespace reflect {
         virtual AccessSpecifier GetAccessSpecifier() const = 0;
         virtual StorageType GetStorageType() const = 0;
 
-        // Syntactic sugar for calling Invoke().
         template<typename... Ts>
         Object operator()(const Reference& o, Ts&& ... ts);
 
-        virtual Object Invoke(const Reference& o, const std::vector<Object>& args) = 0;
+        Object Invoke(const std::vector<Object>& args) const override = 0;
+        virtual Object Invoke(const Reference& o, const std::vector<Object>& args) const = 0;
+
+        TypeClass GetTypeClass() const override { return TypeClass::METHOD; }
+    };
+
+    struct Annotation {
+        std::string name;
+        std::vector<std::string> arguments;
     };
 
     struct Field {
+        size_t offset;
         AccessSpecifier accessSpecifier;
         StorageType storageType;
-        const IType& type;
+        int typeID;
+        std::string typeName;
         std::string name;
+        std::vector<Annotation> annotations;
     };
 
     class IClass : public IType {
     public:
         virtual std::vector<Field> GetFields() const = 0;
-        virtual std::optional<Field> GetFieldByName(const std::string& name) const = 0;
-        virtual Reference GetField(const Reference& o, const std::string& name) const = 0;
-        virtual bool HasField(const std::string& name) const = 0;
+        virtual std::vector<IMethod*> GetMethods() const = 0;
 
-        virtual std::vector<const IMethod&> GetMethods() const = 0;
-        virtual std::vector<const IMethod&> GetMethodsByName(const std::string& name) const = 0;
-        virtual std::optional<const IMethod&> GetMethodByName(const std::string& name) const = 0;
-        virtual bool HasMethod(const std::string& name) const = 0;
+        Reference GetField(const Reference& o, const std::string& name) const;
+        std::optional<Field> GetFieldByName(const std::string& name) const;
+        bool HasField(const std::string& name) const;
 
-        virtual TypeClass GetTypeClass() const { return TypeClass::CLASS; }
+        std::vector<IMethod*> GetMethodsByName(const std::string& name) const;
+        IMethod* GetMethodByName(const std::string& name) const;
+        IFunction* GetFunctionByName(const std::string& name) const;
+        bool HasMethod(const std::string& name) const;
+
+        TypeClass GetTypeClass() const override { return TypeClass::CLASS; }
     };
 
     class IEnum : public IType {
     public:
+        virtual std::unordered_map<std::string, int> GetEnumValues() const = 0;
+
         virtual std::vector<std::string> GetStringValues() const = 0;
         virtual std::vector<int> GetIntValues() const = 0;
 
-        virtual bool TryTranslate(const std::string& value, int& out) const = 0;
-        virtual bool TryTranslate(int value, std::string& out) const = 0;
+        virtual bool Translate(const std::string& value, int& out) const = 0;
+        virtual bool Translate(int value, std::string& out) const = 0;
 
-        virtual TypeClass GetTypeClass() const { return TypeClass::ENUM; }
+        TypeClass GetTypeClass() const override { return TypeClass::ENUM; }
     };
 
     namespace registry {
+        IType* GetTypeById(int typeID);
         std::vector<IType*> GetTypesByName(const std::string& name);
         std::vector<IFunction*> GetFunctionsByName(const std::string& name);
         std::vector<IClass*> GetClassesByName(const std::string& name);
         std::vector<IEnum*> GetEnumsByName(const std::string& name);
 
         namespace internal {
-            void Register(std::unique_ptr<IFunction>&& f);
-            void Register(std::unique_ptr<IClass>&& c);
-            void Register(std::unique_ptr<IEnum>&& e);
+            void Register(IFunction* f);
+            void Register(IClass* c);
+            void Register(IEnum* e);
         }
     };
 
@@ -192,6 +234,23 @@ namespace reflect {
 
     // The following classes are specialized with reflection metadata and can
     // be used directly instead of going through the registry.
+    template<typename T>
+    class Type : public IType {
+
+    public:
+        static std::unique_ptr<Type<T>> s_instance;
+
+        virtual std::string GetName() const { return typeid(T).name(); }
+        virtual std::string GetFullName() const { return typeid(T).name(); }
+        virtual int GetID() const { return GetTypeId<T>(); }
+
+        virtual TypeClass GetTypeClass() const { return TypeClass::PRIMITIVE; };
+
+    };
+
+    template<typename T>
+    std::unique_ptr<Type<T>> Type<T>::s_instance = std::make_unique<Type<T>>();
+
     template<typename T>
     class Enum;
 
@@ -233,6 +292,15 @@ reflect::Object::Object(T&& t)
 }
 
 template<typename T>
+reflect::Object::Object(T& t)
+        : id_(GetTypeId<std::decay_t<T>>()),
+          data_((void*)&t) {
+    // This is not part of the initializer list because it
+    // doesn't compile on VC.
+    deleter_ = [](void* data) {};
+}
+
+template<typename T>
 bool reflect::Object::IsT() const {
     return GetTypeId<T>() == id_;
 }
@@ -262,16 +330,18 @@ T& reflect::Reference::GetT() const {
 
 template<typename... Ts>
 reflect::Object reflect::IMethod::operator()(const Reference& o, Ts&& ... ts) {
-    std::vector<Object> v({
-        Object(std::forward<Ts>(ts))...
-    });
-    return this->Invoke(o, v);
+    Object init[] = { Object(std::forward<Ts>(ts))... };
+    std::vector<Object> v(
+            std::make_move_iterator(std::begin(init)),
+            std::make_move_iterator(std::end(init)));
+    return this->Invoke(o, std::move(v));
 }
 
 template<typename... Ts>
 reflect::Object reflect::IFunction::operator()(Ts&& ... ts) {
-    std::vector<Object> v({
-        Object(std::forward<Ts>(ts))...
-    });
-    return this->Invoke(v);
+    Object init[] = { Object(std::forward<Ts>(ts))... };
+    std::vector<Object> v(
+            std::make_move_iterator(std::begin(init)),
+            std::make_move_iterator(std::end(init)));
+    return this->Invoke(std::move(v));
 }
