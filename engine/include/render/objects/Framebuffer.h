@@ -10,23 +10,23 @@ namespace Calyx {
         class Attachment {
 
         public:
-            struct Spec {
+            struct Specification {
                 Ref<IRenderTarget> target = nullptr;
                 IRenderTarget::Type type;
                 TextureFormat format;
 
-                Spec(IRenderTarget::Type type, TextureFormat format)
+                Specification(IRenderTarget::Type type, TextureFormat format)
                     : type(type), format(format) {}
-                Spec(const Ref<IRenderTarget>& target)
+                Specification(const Ref<IRenderTarget>& target)
                     : target(target), type(target->GetType()), format(target->GetTextureFormat()) {}
             };
 
         };
 
-        struct Spec {
+        struct Specification {
             uint32 width, height;
             uint32 samples;
-            List<Attachment::Spec> attachments;
+            List<Attachment::Specification> attachments;
         };
 
     public:
@@ -43,11 +43,11 @@ namespace Calyx {
         virtual const IRenderTarget& GetColorAttachment(uint32 attachmentIndex) const = 0;
         virtual const IRenderTarget& GetDepthAttachment() const = 0;
 
-        virtual const Framebuffer::Spec& GetSpec() const = 0;
+        virtual const Framebuffer::Specification& GetSpecification() const = 0;
         virtual uint32 GetRendererID() const = 0;
         virtual bool IsComplete() const = 0;
 
-        static Ref<Framebuffer> Create(const Framebuffer::Spec& spec);
+        static Ref<Framebuffer> Create(const Framebuffer::Specification& spec);
 
     };
 

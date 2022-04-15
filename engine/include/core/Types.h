@@ -8,6 +8,7 @@
 #include <unordered_set>
 
 #include <glm/glm.hpp>
+#include <glm/ext.hpp>
 #include <entt/entt.hpp>
 
 namespace Calyx {
@@ -31,6 +32,9 @@ namespace Calyx {
 
     template<typename T>
     using WeakRef = std::weak_ptr<T>;
+
+    template<typename T>
+    using Callback = std::function<T>;
 
     using uint8 = uint8_t;
     using uint16 = uint16_t;
@@ -57,6 +61,8 @@ namespace Calyx {
     using mat2 = glm::mat2;
     using mat3 = glm::mat3;
     using mat4 = glm::mat4;
+
+    using quat = glm::quat;
 
     template<typename T, typename ... Args>
     constexpr Scope<T> CreateScope(Args&& ... args) {

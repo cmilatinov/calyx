@@ -41,15 +41,15 @@ namespace Calyx {
 
         bool IsInCategory(EventCategory::T category) const { return GetCategoryFlags() & static_cast<uint32>(category); }
 
-    };
-
-    template<class T, typename F>
-    bool DispatchEvent(Event& event, const F& func) {
-        if (event.GetEventType() == T::GetStaticType()) {
-            event.handled |= func(static_cast<T&>(event));
-            return true;
+        template<class T, typename F>
+        bool Dispatch(const F& func) {
+            if (GetEventType() == T::GetStaticType()) {
+                handled |= func(static_cast<T&>(*this));
+                return true;
+            }
+            return false;
         }
-        return false;
-    }
+
+    };
 
 }

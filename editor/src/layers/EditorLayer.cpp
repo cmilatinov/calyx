@@ -1,4 +1,4 @@
-#include "../../include/layers/EditorLayer.h"
+#include "layers/EditorLayer.h"
 
 namespace Calyx {
 
@@ -66,6 +66,12 @@ namespace Calyx {
 
         msaaFramebuffer->Blit(framebuffer, 0, 0);
         msaaFramebuffer->Unbind();
+
+        if (Input::GetKeyDown(KEY_W))
+            CX_TRACE("PRESSED W!");
+
+//        if (Input::GetKeyUp(KEY_W))
+//            CX_TRACE("RELEASED W!");
     };
 
     void EditorLayer::OnGUI() {
@@ -107,6 +113,7 @@ namespace Calyx {
         ImGui::ShowMetricsWindow();
 
         // Show viewport
+        ImGui::SetNextWindowSize(ImVec2{ 1280, 720 }, ImGuiCond_FirstUseEver);
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 0.0f, 0.0f });
         ImGui::Begin("Viewport", nullptr, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
         ImGui::PopStyleVar();

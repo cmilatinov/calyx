@@ -5,7 +5,7 @@
 
 namespace Calyx {
 
-    GLFramebuffer::GLFramebuffer(const Framebuffer::Spec& spec)
+    GLFramebuffer::GLFramebuffer(const Framebuffer::Specification& spec)
         : m_spec(spec) {
         glGenFramebuffers(1, &m_framebufferID);
         Init();
@@ -50,8 +50,8 @@ namespace Calyx {
             glDrawBuffer(GL_BACK);
         } else {
             glBindFramebuffer(GL_DRAW_FRAMEBUFFER, other->GetRendererID());
-            targetSize.x = other->GetSpec().width;
-            targetSize.y = other->GetSpec().height;
+            targetSize.x = other->GetSpecification().width;
+            targetSize.y = other->GetSpecification().height;
             glDrawBuffer(GL_COLOR_ATTACHMENT0 + dstAttachment);
         }
         glBlitFramebuffer(0, 0, m_spec.width, m_spec.height, 0, 0, targetSize.x, targetSize.y, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_NEAREST);

@@ -543,12 +543,12 @@ def run():
     arg_parser.add_argument('input', metavar='IN', type=str, help='An input C++ header file.')
     arg_parser.add_argument('-o', '--output', dest='output', metavar='OUT', type=str,
                             help='An output directory for the generated source files.')
-    arg_parser.add_argument('-oh', '--output-header', dest='output_header', metavar='OUT', type=str,
+    arg_parser.add_argument('-oh', '--output-header', dest='output_header', metavar='OUT_HEADER', type=str,
                             help='An output directory for the generated headers.')
     arg_parser.add_argument('-inc', '--include-root', dest='include_root', metavar='INCLUDE', type=str,
                             help='The root include directory of the project. '
                                  'Will be used for preprocessor include directives.')
-    arg_parser.add_argument('-pch', '--precompiled-header', dest='pch', metavar='INCLUDE', type=str,
+    arg_parser.add_argument('-pch', '--precompiled-header', dest='pch', metavar='PCH', type=str,
                             help='A precompiled header file to use during parsing.')
     args, unknown = arg_parser.parse_known_args(sys.argv[1:])
 

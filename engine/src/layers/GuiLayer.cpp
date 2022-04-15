@@ -27,9 +27,9 @@ namespace Calyx {
     }
 
     void GuiLayer::OnEvent(Event& event) {
-        ImGuiIO& io = ImGui::GetIO();
-        event.handled |= event.IsInCategory(EventCategory::Mouse) & io.WantCaptureMouse;
-        event.handled |= event.IsInCategory(EventCategory::Keyboard) & io.WantCaptureKeyboard;
+//        ImGuiIO& io = ImGui::GetIO();
+//        event.handled |= event.IsInCategory(EventCategory::Mouse) & io.WantCaptureMouse;
+//        event.handled |= event.IsInCategory(EventCategory::Keyboard) & io.WantCaptureKeyboard;
     }
 
     void GuiLayer::Begin() {

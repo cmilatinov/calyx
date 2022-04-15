@@ -3,6 +3,8 @@
 #include <imgui.h>
 #include <Calyx.h>
 
+#include "input/Input.h"
+
 namespace Calyx {
 
     class EditorLayer : public ILayer {

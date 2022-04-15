@@ -15,7 +15,7 @@ namespace Calyx {
         static const uint32 s_maxColorAttachments = 4;
 
     public:
-        GLFramebuffer(const Framebuffer::Spec& spec);
+        GLFramebuffer(const Framebuffer::Specification& spec);
         ~GLFramebuffer() override;
 
         void Bind() const override;
@@ -29,12 +29,12 @@ namespace Calyx {
         const IRenderTarget& GetColorAttachment(uint32 attachmentIndex) const override;
         const IRenderTarget& GetDepthAttachment() const override;
 
-        const Framebuffer::Spec& GetSpec() const override { return m_spec; }
+        const Framebuffer::Specification& GetSpecification() const override { return m_spec; }
         uint32 GetRendererID() const override { return m_framebufferID; }
         bool IsComplete() const override;
 
     private:
-        Framebuffer::Spec m_spec;
+        Framebuffer::Specification m_spec;
         uint32 m_framebufferID;
         Ref<IRenderTarget> m_depthAttachment;
         List<Ref<IRenderTarget>> m_colorAttachments;

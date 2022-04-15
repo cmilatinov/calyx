@@ -3,6 +3,8 @@
 
 #include "render/Renderer.h"
 
+#include "input/Input.h"
+
 namespace Calyx {
 
     Application* Application::s_instance = nullptr;
@@ -19,6 +21,9 @@ namespace Calyx {
         // Initialize renderer
         Renderer::Init();
 
+        // Initialize input
+        Input::Init();
+
         // Gui layer
         m_guiLayer = new GuiLayer();
         m_layerStack.PushOverlay(m_guiLayer);
@@ -26,6 +31,8 @@ namespace Calyx {
 
     void Application::Run() {
         while (m_running) {
+            m_window->OnUpdate();
+
             for (auto* layer : m_layerStack) {
                 layer->OnUpdate();
             }
@@ -36,7 +43,7 @@ namespace Calyx {
             }
             m_guiLayer->End();
 
-            m_window->OnUpdate();
+            Input::OnFrameEnd();
         }
     }
 
@@ -47,6 +54,8 @@ namespace Calyx {
     void Application::OnEvent(Event& event) {
         CX_DISPATCH_EVENT(EventWindowClose, Application::OnWindowClose, event);
         CX_DISPATCH_EVENT(EventWindowResize, Application::OnWindowResize, event);
+
+        Input::OnEvent(event);
 
         for (auto it = m_layerStack.rbegin(); it != m_layerStack.rend(); ++it) {
             if (event.handled)
