@@ -1,4 +1,6 @@
 #include "core/Application.h"
+#include "core/Time.h"
+
 #include "layers/GuiLayer.h"
 
 #include "render/Renderer.h"
@@ -30,20 +32,31 @@ namespace Calyx {
     }
 
     void Application::Run() {
+        auto lastTime = high_resolution_clock::now();
         while (m_running) {
+            // Time measurements
+            auto currentTime = high_resolution_clock::now();
+            Time::s_deltaTime = duration_cast<seconds>(currentTime - lastTime).count();
+            Time::UpdateTime();
+
+            // Window events
             m_window->OnUpdate();
 
+            // Layers
             for (auto* layer : m_layerStack) {
                 layer->OnUpdate();
             }
 
+            // Layer GUIs
             m_guiLayer->Begin();
             for (auto* layer : m_layerStack) {
                 layer->OnGUI();
             }
             m_guiLayer->End();
 
+            // Input
             Input::OnFrameEnd();
+            lastTime = currentTime;
         }
     }
 

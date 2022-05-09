@@ -81,8 +81,8 @@ namespace Calyx {
                 case ShaderDataType::Mat2:
                 case ShaderDataType::Mat3:
                 case ShaderDataType::Mat4: {
-                    uint8_t count = element.GetComponentCount();
-                    for (uint8_t i = 0; i < count; i++) {
+                    uint32 count = element.GetComponentCount();
+                    for (uint32 i = 0; i < count; i++) {
                         glEnableVertexAttribArray(m_nextVertexAttribIndex);
                         glVertexAttribPointer(m_nextVertexAttribIndex,
                                               count,

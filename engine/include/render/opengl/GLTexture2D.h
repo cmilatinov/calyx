@@ -19,7 +19,7 @@ namespace Calyx {
         void AttachAsDepth() const override;
         void Resize(uint32 width, uint32 height) override;
 
-        void Load(const String& file) const override;
+        void Load(const String& file) override;
 
         uint32 GetRendererID() const override { return m_textureID; }
         uint32 GetWidth() const override { return m_width; }
@@ -36,6 +36,7 @@ namespace Calyx {
         TextureFormat m_format;
 
         void Init();
+
     };
 
 }

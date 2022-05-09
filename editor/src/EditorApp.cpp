@@ -12,3 +12,11 @@ namespace Calyx::Editor {
     }
 
 }
+
+namespace Calyx {
+
+    Application* CreateApplication() {
+        return new Editor::EditorApp();
+    }
+
+}

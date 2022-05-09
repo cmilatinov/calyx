@@ -6,6 +6,7 @@
 #include <vector>
 #include <unordered_map>
 #include <unordered_set>
+#include <chrono>
 
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
@@ -34,7 +35,7 @@ namespace Calyx {
     using WeakRef = std::weak_ptr<T>;
 
     template<typename T>
-    using Callback = std::function<T>;
+    using Function = std::function<T>;
 
     using uint8 = uint8_t;
     using uint16 = uint16_t;
@@ -63,6 +64,8 @@ namespace Calyx {
     using mat4 = glm::mat4;
 
     using quat = glm::quat;
+
+    using namespace std::chrono;
 
     template<typename T, typename ... Args>
     constexpr Scope<T> CreateScope(Args&& ... args) {

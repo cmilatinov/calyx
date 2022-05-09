@@ -54,7 +54,7 @@ namespace Calyx {
             glTexImage2D(GL_TEXTURE_2D,0, GLInternalTextureFormat(m_format), m_width, m_height, 0, GLTextureFormat(m_format), GL_UNSIGNED_INT, nullptr);
     }
 
-    void GLTexture2D::Load(const String& str) const {
+    void GLTexture2D::Load(const String& str) {
         // TODO: Load image data from file
     }
 

@@ -22,21 +22,21 @@ namespace Calyx {
     }
 
     vec3 Transform::TransformPosition(const vec3& position) const {
-        return vec3(m_matrix * vec4(position, 1));
+        return vec3(GetMatrix() * vec4(position, 1));
     }
 
     vec3 Transform::TransformDirection(const vec3& direction) const {
-        return mat3(m_matrix) * direction;
+        return mat3(GetMatrix()) * direction;
     }
 
     vec3 Transform::InverseTransformPosition(const vec3& position) const {
-        mat4 matrix = glm::inverse(m_matrix);
+        mat4 matrix = GetInverseMatrix();
         return vec3(matrix * vec4(position, 1));
     }
 
     vec3 Transform::InverseTransformDirection(const vec3& direction) const {
-        mat4 matrix = glm::inverse(m_matrix);
-        return mat3(m_matrix) * direction;
+        mat4 matrix = GetInverseMatrix();
+        return mat3(matrix) * direction;
     }
 
     void Transform::SetPosition(const vec3& position) {
@@ -57,6 +57,18 @@ namespace Calyx {
     void Transform::SetMatrix(const mat4& matrix) {
         m_matrix = matrix;
         UpdateComponents();
+    }
+
+    mat4 Transform::GetMatrix() const {
+        if (m_parent != nullptr)
+            return m_parent->GetMatrix() * m_matrix;
+        return m_matrix;
+    }
+
+    mat4 Transform::GetInverseMatrix() const {
+        if (m_parent != nullptr)
+            return glm::inverse(m_matrix) * m_parent->GetInverseMatrix();
+        return glm::inverse(m_matrix);
     }
 
     void Transform::UpdateMatrix() {

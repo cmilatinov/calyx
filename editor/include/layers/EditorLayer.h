@@ -4,12 +4,15 @@
 #include <Calyx.h>
 
 #include "input/Input.h"
+#include "render/CameraEditor.h"
 
 namespace Calyx {
 
     class EditorLayer : public ILayer {
 
     public:
+        EditorLayer();
+
         void OnAttach() override;
         void OnUpdate() override;
         void OnGUI() override;
@@ -24,6 +27,7 @@ namespace Calyx {
         Ref<VertexBuffer> vertexBuffer;
         Ref<Framebuffer> framebuffer;
         Ref<Framebuffer> msaaFramebuffer;
+        Scope<CameraEditor> m_editorCamera;
 
     };
 

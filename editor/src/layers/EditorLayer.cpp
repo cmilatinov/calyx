@@ -14,6 +14,10 @@ namespace Calyx {
             -0.5f, 0.5f, 0.0f,      0.0f, 0.0f, 0.0f
     };
 
+    EditorLayer::EditorLayer() {
+        m_editorCamera = CreateScope<CameraEditor>();
+    }
+
     void EditorLayer::OnAttach() {
         const Window& window = Application::GetInstance().GetWindow();
         shader = Shader::Create("./assets/shaders/basic.glsl");
