@@ -1,66 +1,76 @@
-#include "test.gen.h"
-#include "test2.gen.h"
+#include "serializers/HeaderSerializer.h"
 
-#include <iostream>
+using namespace reflect::tooling;
 
-using namespace reflect;
-using namespace Calyx;
+static cl::opt<std::string> IncludeRoot("include-root",
+                                        cl::desc("Specify the directory which to use as the root include directory"),
+                                        cl::value_desc("directory"));
 
-int main() {
+static cl::opt<std::string> OutputDir("output-dir",
+                                      cl::desc(
+                                          "Specify the directory in which the resulting reflection files will be generated"),
+                                      cl::value_desc("directory"));
 
-    std::cout << Class<Fields>().GetFullName() << std::endl;
+int main(int argc, const char** argv) {
+    cl::OptionCategory cat("Parsing Options", "");
+    auto optionsParser = CommonOptionsParser::create(argc, argv, cat);
+    auto inputHeader = optionsParser->getSourcePathList()[0];
+    std::vector<std::string> sourcePaths = { inputHeader };
+    auto& compilations = optionsParser->getCompilations();
+    ClangTool tool(compilations, sourcePaths);
 
-    std::cout << "Fields: " << std::endl;
-    for (auto& field : Class<Fields>().GetFields()) {
-        std::cout << field.typeName << " " <<  field.name << std::endl;
-    }
-    std::cout << std::endl;
+    HeaderSerializer serializer;
+    MatchFinder finder;
+    DeclarationMatcher classMatcher =
+        cxxRecordDecl(
+            has(
+                friendDecl(
+                    has(
+                        classTemplateDecl(
+                            has(
+                                cxxRecordDecl(
+                                    hasName("Class"))))))))
+            .bind("classes");
+    finder.addMatcher(classMatcher, &serializer);
 
-    std::cout << Class<Methods>().GetFullName() << std::endl;
-    std::cout << "Methods: " << std::endl;
-    for (auto& method : Class<Methods>().GetMethods()) {
-        std::cout << method->GetName() << std::endl;
-    }
-    std::cout << std::endl;
+//    DeclarationMatcher enumMatcher = enumDecl();
 
-    Methods methods;
-    IMethod* method = Class<Methods>().GetMethodByName("public_overload");
-    std::cout << method->GetReturnType().typeName << std::endl;
-    Object result = (*method)(methods, 5);
-    std::cout << result.GetT<int>() << std::endl << std::endl;
+    auto start = ch::high_resolution_clock::now();
+    tool.run(newFrontendActionFactory(&finder).get());
+    auto end = ch::high_resolution_clock::now();
 
-    (*Class<Methods>().GetFunctionByName("public_static_void_void"))();
-    std::cout << std::endl;
+    std::cerr << "Parsing - " << ch::duration_cast<ch::milliseconds>(end - start).count() << " ms" << std::endl;
 
-    (*Class<Methods>().GetMethodByName("private_void_void"))(methods);
-    std::cout << std::endl;
+    auto includeRoot = IncludeRoot.getValue();
+    auto outputDir = OutputDir.getValue();
+    auto relativeHeaderPath = fs::relative(fs::path(inputHeader), fs::path(includeRoot));
+    auto relativeHeaderDir = relativeHeaderPath.parent_path();
+    json data = json::object(
+        {
+            { "header", relativeHeaderPath.string() },
+            { "generatedHeader",
+                (relativeHeaderDir / fs::path(relativeHeaderPath.stem().string() + ".gen.h")).string() },
+            { "classes", serializer.GetJSONObject() }
+        }
+    );
 
-    (*Class<Methods>().GetMethodByName("public_void_int"))(methods, 24);
-    std::cout << std::endl;
+    // Load templates
+    inja::Environment env;
+    inja::Template commentTemplate = env.parse_template("./templates/comment.j2");
+    env.include_template("comment", commentTemplate);
 
-    std::cout << reflect::Enum<Calyx::Enum>().GetFullName() << std::endl;
-    std::cout << "Values: " << std::endl;
-    auto enumValues = reflect::Enum<Calyx::Enum>().GetEnumValues();
-    for (auto& it : enumValues) {
-        std::cout << it.first << " = " << it.second << std::endl;
-    }
-    int value;
-    std::string valueName;
-    reflect::Enum<Calyx::Enum>().Translate("ENUM5", value);
-    reflect::Enum<Calyx::Enum>().Translate(2, valueName);
-    std::cout << "ENUM5 -> " << value << std::endl;
-    std::cout << "2 -> " << valueName << std::endl << std::endl;
+    inja::Template headerTemplate = env.parse_template("./templates/header.j2");
+    inja::Template sourceTemplate = env.parse_template("./templates/source.j2");
 
-    std::cout << reflect::Enum<AnotherEnum>().GetFullName() << std::endl;
-    std::cout << "Values: " << std::endl;
-    enumValues = reflect::Enum<AnotherEnum>().GetEnumValues();
-    for (auto& it : enumValues) {
-        std::cout << it.first << " = " << it.second << std::endl;
-    }
-    reflect::Enum<AnotherEnum>().Translate("Z", value);
-    reflect::Enum<AnotherEnum>().Translate(3, valueName);
-    std::cout << "Z -> " << value << std::endl;
-    std::cout << "3 -> " << valueName << std::endl << std::endl;
+    fs::path outDirPath = fs::path(OutputDir.getValue()) / relativeHeaderDir;
+    fs::path outFilePath = outDirPath / relativeHeaderPath.stem();
+    fs::create_directories(outDirPath);
+
+    std::ofstream headerFile(outFilePath.string() + ".gen.h");
+    std::ofstream sourceFile(outFilePath.string() + ".gen.cpp");
+
+    env.render_to(headerFile, headerTemplate, data);
+    env.render_to(sourceFile, sourceTemplate, data);
 
     return 0;
 }

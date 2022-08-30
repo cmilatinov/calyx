@@ -1,5 +1,7 @@
 #pragma once
 
+#include "assets/Asset.h"
+
 namespace Calyx {
 
     enum class ShaderType {
@@ -20,10 +22,10 @@ namespace Calyx {
         return ShaderType::NONE;
     }
 
-    class CALYX_API Shader {
+    class CALYX_API Shader : public Asset<Shader> {
 
     public:
-        virtual ~Shader() = default;
+        ~Shader() override = default;
 
         virtual void Bind() const = 0;
         virtual void Unbind() const = 0;
@@ -40,8 +42,11 @@ namespace Calyx {
         virtual const String& GetName() const = 0;
         virtual bool IsFunctional() const = 0;
 
-        static Ref<Shader> Create(const String& filepath);
-        static Ref<Shader> Create(const String& name, const String& vertexSrc, const String& fragmentSrc);
+        bool Load(const String& path) override { return false; }
+        void Clear() override {}
+
+        static Scope<Shader> Create(const String& filepath);
+        static Scope<Shader> Create(const String& name, const String& vertexSrc, const String& fragmentSrc);
 
     };
 

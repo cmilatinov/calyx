@@ -5,19 +5,19 @@
 
 namespace Calyx {
 
-    Ref<Shader> Shader::Create(const String& filepath) {
+    Scope<Shader> Shader::Create(const String& filepath) {
         switch (Renderer::GetAPI()) {
             case RendererAPI::OPENGL:
-                return CreateRef<GLShader>(filepath);
+                return CreateScope<GLShader>(filepath);
         }
         CX_CORE_ASSERT(false, "Rendering API not supported!");
         return nullptr;
     }
 
-    Ref<Shader> Shader::Create(const String& name, const String& vertexSrc, const String& fragmentSrc) {
+    Scope<Shader> Shader::Create(const String& name, const String& vertexSrc, const String& fragmentSrc) {
         switch (Renderer::GetAPI()) {
             case RendererAPI::OPENGL:
-                return CreateRef<GLShader>(name, vertexSrc, fragmentSrc);
+                return CreateScope<GLShader>(name, vertexSrc, fragmentSrc);
         }
         CX_CORE_ASSERT(false, "Rendering API not supported!");
         return nullptr;

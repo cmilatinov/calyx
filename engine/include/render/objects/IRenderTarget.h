@@ -4,8 +4,6 @@
 
 namespace Calyx {
 
-    class Framebuffer;
-
     class CALYX_API IRenderTarget {
 
     public:

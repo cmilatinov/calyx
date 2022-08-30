@@ -1,14 +1,18 @@
 #type vertex
 #version 330 core
 
-layout (location = 0) in vec3 pos;
-layout (location = 1) in vec3 color;
+layout (location = 0) in vec3 vertex;
+layout (location = 1) in vec3 normal;
+layout (location = 2) in vec2 uv0;
 
 out vec3 pass_color;
 
+uniform mat4 view;
+uniform mat4 model;
+
 void main() {
-    pass_color = color;
-    gl_Position = vec4(pos, 1);
+    pass_color = abs(normal);
+    gl_Position = view * model * vec4(vertex, 1);
 }
 
 #type fragment

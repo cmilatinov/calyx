@@ -1,6 +1,6 @@
 #pragma once
 
-#include "reflect.h"
+//#include "reflect.h"
 
 #define CX_DISPLAY_CENTER   -1
 #define CX_DISPLAY_MAX_SIZE -2
@@ -10,7 +10,6 @@ namespace Calyx {
     /**
      * Dictates the way a display mode handles the mouse cursor.
      */
-    CX_REFLECT_ENUM()
     enum class CursorMode {
         /**
         * Cursor can freely move in and out of the window without restrictions.
@@ -30,7 +29,6 @@ namespace Calyx {
      * Describes the way a window is shown by the operating system.
      */
     struct WindowMode {
-        CX_BEGIN_REFLECT()
 
         static const WindowMode FULLSCREEN;
         static const WindowMode BORDERLESS_FULLSCREEN;

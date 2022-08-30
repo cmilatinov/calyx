@@ -19,7 +19,7 @@ find_package(glm CONFIG REQUIRED)
 find_package(assimp CONFIG REQUIRED)
 find_package(spdlog REQUIRED)
 find_package(EnTT CONFIG REQUIRED)
-find_path(STB_INCLUDE_DIRS "stb.h")
+find_path(STB_INCLUDE_DIRS "stb_image.h")
 
 # Clump source files from src
 file(GLOB_RECURSE ENGINE_SRC "src/**.cpp")
@@ -31,7 +31,11 @@ add_library("Engine" STATIC ${ENGINE_SRC})
 target_link_libraries("Engine" PUBLIC glfw glad::glad imgui::imgui imguizmo::imguizmo glm::glm assimp::assimp spdlog::spdlog_header_only EnTT::EnTT)
 target_include_directories("Engine" PUBLIC include generated ${STB_INCLUDE_DIRS})
 target_precompile_headers("Engine" PUBLIC include/pch.h)
-add_reflected_headers("Engine" "include" "include/display/Window.h")
+target_compile_definitions("Engine" PUBLIC "STB_IMAGE_IMPLEMENTATION")
+
+# Add reflection
+#add_reflected_target("Engine")
+#add_reflected_headers("Engine" "include" "include/display/Window.h")
 
 # Compile definitions based on platform
 if(WIN32)

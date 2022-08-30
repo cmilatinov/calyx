@@ -1,3 +1,4 @@
+import ctypes
 from argparse import ArgumentParser
 from clang.cindex import AccessSpecifier, StorageClass
 from clang.cindex import *
@@ -535,13 +536,17 @@ namespace reflect {{\n"""
 
             header.write('\n}')
             source.write('\n}')
+            header.close()
+            source.close()
             pass
 
 
 def run():
+    Config.set_library_file(os.getenv('LIBCLANG_PATH'))
+
     arg_parser = ArgumentParser(description="Generate reflection data for a header file.")
     arg_parser.add_argument('input', metavar='IN', type=str, help='An input C++ header file.')
-    arg_parser.add_argument('-o', '--output', dest='output', metavar='OUT', type=str,
+    arg_parser.add_argument('-o', '--output', dest='output', metavar='OUT_DIR', type=str,
                             help='An output directory for the generated source files.')
     arg_parser.add_argument('-oh', '--output-header', dest='output_header', metavar='OUT_HEADER', type=str,
                             help='An output directory for the generated headers.')
@@ -565,6 +570,7 @@ def run():
             temp_file.write(F'#include "{pch_path}"\n')
 
         temp_file.write(input_file.read())
+        temp_file.flush()
         temp_file.close()
 
         index = Index.create()
@@ -586,7 +592,7 @@ def run():
 
         serialize(header_dir, source_dir, relative_path, Path(filename).stem, enums, classes)
 
-        os.remove(temp_file.name)
+        # os.remove(temp_file.name)
 
 
 if __name__ == '__main__':

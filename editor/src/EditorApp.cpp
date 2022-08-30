@@ -4,6 +4,7 @@
 namespace Calyx::Editor {
 
     EditorApp::EditorApp() {
+        Window::GetMainWindow().SetTitle("Calyx Editor");
         PushUnderlay(new EditorLayer());
     }
 

@@ -43,7 +43,7 @@ namespace Calyx {
     }
 
     void GLVertexArray::AddVertexBuffer(const Ref<VertexBuffer>& vertexBuffer) {
-        CX_CORE_ASSERT(vertexBuffer->GetLayout().GetElements().size() > 0, "Vertex buffer has no layout!");
+        CX_CORE_ASSERT(!vertexBuffer->GetLayout().GetElements().empty(), "Vertex buffer has no layout!");
         glBindVertexArray(m_vertexArrayID);
         vertexBuffer->Bind();
 

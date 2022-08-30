@@ -1,0 +1,52 @@
+#pragma once
+
+#include "{{ header }}"
+
+{% include "comment" %}
+
+namespace reflect {
+
+## for class in classes
+    // Class '{{ class.fullName }}'
+    template<>
+    class Class<{{ class.fullName }}> : public IClass {
+
+    public:
+        static std::unique_ptr<Class<{{ class.fullName }}>> s_instance;
+
+        std::string GetName() const override { return "{{ class.name }}"; }
+        std::string GetFullName() const override { return "{{ class.fullName }}"; }
+        int GetTypeID() const override { return reflect::GetTypeId<{{ class.fullName }}>(); }
+
+        std::vector<Field> GetFields() const override;
+        std::vector<IMethod*> GetMethods() const override;
+
+    };
+
+    // Methods for class '{{ class.fullName }}'
+## for method in class.methods
+## set typename = "Method<" + method.pointerType + ", &" + method.fullName + ">"
+    template<>
+    class {{typename}} : public IMethod {
+
+    public:
+        static std::unique_ptr<{{typename}}> s_instance;
+
+        std::string GetName() const override { return "{{ method.name }}"; }
+        std::string GetFullName() const override { return "{{ method.fullName }}"; }
+        int GetTypeID() const override { return reflect::GetTypeId<{{ method.pointerType }}>(); }
+
+        ReturnType GetReturnType() const override { return { reflect::GetTypeId<{{ method.returnType }}>(), "{{ method.returnType }}" }; }
+        std::vector<Parameter> GetParameterList() const override;
+
+        AccessSpecifier GetAccessSpecifier() const override { return {{ method.access }}; }
+        StorageType GetStorageType() const override { return {{ method.storageType }}; }
+
+        Object Invoke(const std::vector<Object>& args) const override;
+        Object Invoke(const Reference& o, const std::vector<Object>& args) const override;
+
+    };
+
+## endfor
+## endfor
+}

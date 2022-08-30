@@ -41,6 +41,10 @@ namespace Calyx {
         return m_windowHandle;
     }
 
+    void WindowGLFW::SetTitle(const String& title) {
+        glfwSetWindowTitle(m_windowHandle, title.c_str());
+    }
+
     void WindowGLFW::Init() {
         // GLFW initialization
         int success = glfwInit();
@@ -209,7 +213,9 @@ namespace Calyx {
     }
 
     void WindowGLFW::OnWindowMouseMove(GLFWwindow* window, double xpos, double ypos) {
-        EventMouseMove event(static_cast<float>(xpos), static_cast<float>(ypos));
+        int xwinpos, ywinpos;
+        glfwGetWindowPos(window, &xwinpos, &ywinpos);
+        EventMouseMove event(static_cast<float>(xpos) + xwinpos, static_cast<float>(ypos) + ywinpos);
         GetWindow(window)->DispatchEvent(event);
     }
 

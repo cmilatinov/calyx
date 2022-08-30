@@ -30,6 +30,9 @@ namespace Calyx {
         uint32 GetHeight() const override;
         void* GetNativeWindow() const override;
 
+        // Setters
+        void SetTitle(const String& title) override;
+
         // Window callbacks
         static void OnWindowClose(GLFWwindow* window);
         static void OnWindowMove(GLFWwindow* window, int xpos, int ypos);

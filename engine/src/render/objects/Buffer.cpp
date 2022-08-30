@@ -15,10 +15,10 @@ namespace Calyx {
         return nullptr;
     }
 
-    Ref<VertexBuffer> VertexBuffer::Create(uint32 size, const float* vertices) {
+    Ref<VertexBuffer> VertexBuffer::Create(uint32 size, const void* data) {
         switch (Renderer::GetAPI()) {
             case RendererAPI::OPENGL:
-                return CreateRef<GLVertexBuffer>(size, vertices);
+                return CreateRef<GLVertexBuffer>(size, data);
         }
         CX_CORE_ASSERT(false, "Rendering API not supported!");
         return nullptr;

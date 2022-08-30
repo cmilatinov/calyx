@@ -30,7 +30,7 @@ namespace Calyx {
         void CalculateOffsets() {
             uint32 offset = 0;
             for (auto& element : m_elements) {
-                switch
+//                switch
             }
         }
 

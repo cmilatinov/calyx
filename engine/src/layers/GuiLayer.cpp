@@ -10,6 +10,7 @@ namespace Calyx {
         io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
         io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
+        io.ConfigWindowsMoveFromTitleBarOnly = true;
         //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
         // Setup Dear ImGui style
@@ -62,7 +63,7 @@ namespace Calyx {
 
     void GuiLayer::SetupImGuiTheme() {
         // Set font
-        const float fontSize = 24.0f;
+        const float fontSize = 21.0f;
         ImGuiIO& io = ImGui::GetIO(); (void)io;
         io.Fonts->AddFontFromFileTTF("assets/fonts/inconsolata/Inconsolata-Bold.ttf", fontSize);
         io.FontDefault = io.Fonts->AddFontFromFileTTF("assets/fonts/inconsolata/Inconsolata-Regular.ttf", fontSize);

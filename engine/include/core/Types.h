@@ -1,16 +1,21 @@
 #pragma once
 
+#include <chrono>
+#include <filesystem>
 #include <memory>
+#include <algorithm>
+
 #include <string>
 #include <sstream>
+#include <fstream>
 #include <vector>
 #include <unordered_map>
 #include <unordered_set>
-#include <chrono>
 
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
-#include <entt/entt.hpp>
+#include <entt/entity/registry.hpp>
+#include <entt/entity/runtime_view.hpp>
 
 namespace Calyx {
 
@@ -36,6 +41,8 @@ namespace Calyx {
 
     template<typename T>
     using Function = std::function<T>;
+
+    using Path = std::filesystem::path;
 
     using uint8 = uint8_t;
     using uint16 = uint16_t;
@@ -69,12 +76,12 @@ namespace Calyx {
 
     template<typename T, typename ... Args>
     constexpr Scope<T> CreateScope(Args&& ... args) {
-        return std::make_unique<T>(std::forward<Args>(args)...);
+        return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
     }
 
     template<typename T, typename ... Args>
     constexpr Ref<T> CreateRef(Args&& ... args) {
-        return std::make_shared<T>(std::forward<Args>(args)...);
+        return std::shared_ptr<T>(new T(std::forward<Args>(args)...));
     }
 
 }

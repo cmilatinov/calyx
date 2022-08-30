@@ -40,6 +40,7 @@ namespace Calyx {
     }
 
     void GLFramebuffer::Blit(const Ref<Framebuffer>& other, uint32 srcAttachment, uint32 dstAttachment) {
+        Bind();
         glBindFramebuffer(GL_READ_FRAMEBUFFER, m_framebufferID);
         glReadBuffer(GL_COLOR_ATTACHMENT0 + srcAttachment);
         ivec2 targetSize(0, 0);
@@ -91,13 +92,13 @@ namespace Calyx {
                         break;
                     }
                     default: {
-                        CX_CORE_ASSERT(false, "Invalid framebuffer attachment type!");
+                        CX_CORE_ASSERT(false, "Invalid m_framebuffer attachment type!");
                         break;
                     }
                 }
             }
 
-            // Add attachment to framebuffer
+            // Add attachment to m_framebuffer
             if (isDepthAttachment) {
                 CX_CORE_ASSERT(m_depthAttachment == nullptr, "Framebuffer specification contains more than one depth attachment!");
                 renderTarget->Bind();

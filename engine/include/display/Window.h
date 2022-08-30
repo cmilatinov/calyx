@@ -9,7 +9,6 @@ namespace Calyx {
      * Describes a window shown at the OS level.
      */
     class CALYX_API Window {
-        CX_BEGIN_REFLECT()
 
         using EventCallbackFn = std::function<void(Event&)>;
 
@@ -24,10 +23,12 @@ namespace Calyx {
         virtual uint32 GetHeight() const = 0;
         virtual void* GetNativeWindow() const = 0;
 
+        virtual void SetTitle(const String& title) = 0;
+
         void SetEventCallback(const EventCallbackFn& callback) { m_eventCallback = callback; }
 
         static Window* Create(const WindowMode& mode);
-        static const Window& GetMainWindow() { return *s_mainWindow; }
+        static Window& GetMainWindow() { return *s_mainWindow; }
 
     protected:
         EventCallbackFn m_eventCallback;

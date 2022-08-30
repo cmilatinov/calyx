@@ -4,20 +4,25 @@ namespace Calyx {
 
     Transform::Transform()
         : m_position(0, 0, 0),
-        m_rotation(0, 0, 0),
-        m_scale(1, 1, 1) {
+          m_rotation(0, 0, 0),
+          m_scale(1, 1, 1),
+          m_matrix() {
         UpdateMatrix();
     }
 
     Transform::Transform(const vec3& position, const vec3& rotation, const vec3& scale)
         : m_position(position),
-        m_rotation(rotation),
-        m_scale(scale) {
+          m_rotation(rotation),
+          m_scale(scale),
+          m_matrix() {
         UpdateMatrix();
     }
 
     Transform::Transform(const mat4& matrix)
-        : m_matrix(matrix) {
+        : m_position(),
+          m_rotation(),
+          m_scale(),
+          m_matrix(matrix) {
         UpdateComponents();
     }
 
@@ -39,6 +44,22 @@ namespace Calyx {
         return mat3(matrix) * direction;
     }
 
+    vec3 Transform::Forward() const {
+        return TransformDirection(vec3(0, 0, 1));
+    }
+
+    vec3 Transform::Left() const {
+        return TransformDirection(vec3(-1, 0, 0));
+    }
+
+    vec3 Transform::Right() const {
+        return TransformDirection(vec3(1, 0, 0));
+    }
+
+    void Transform::Reset() {
+        return SetWorldMatrix(glm::identity<mat4>());
+    }
+
     void Transform::SetPosition(const vec3& position) {
         m_position = position;
         UpdateMatrix();
@@ -54,51 +75,96 @@ namespace Calyx {
         UpdateMatrix();
     }
 
-    void Transform::SetMatrix(const mat4& matrix) {
+    void Transform::SetWorldMatrix(const mat4& matrix) {
+        if (m_parent == nullptr)
+            return SetLocalMatrix(matrix);
+        m_matrix = m_parent->GetInverseMatrix() * matrix;
+        UpdateComponents();
+    }
+
+    void Transform::SetLocalMatrix(const mat4& matrix) {
         m_matrix = matrix;
         UpdateComponents();
     }
 
+    void Transform::Translate(const vec3& translation) {
+        m_position += translation;
+        UpdateMatrix();
+    }
+
+    void Transform::Rotate(const vec3& rotation) {
+        m_rotation += rotation;
+        UpdateMatrix();
+    }
+
+    void Transform::Scale(const vec3& scale) {
+        m_scale *= scale;
+        UpdateMatrix();
+    }
+
+    mat4 Transform::GetParentMatrix() const {
+        if (m_parent == nullptr)
+            return glm::identity<mat4>();
+        return m_parent->GetMatrix();
+    }
+
     mat4 Transform::GetMatrix() const {
-        if (m_parent != nullptr)
-            return m_parent->GetMatrix() * m_matrix;
-        return m_matrix;
+        if (m_parent == nullptr)
+            return m_matrix;
+        return m_parent->GetMatrix() * m_matrix;
+    }
+
+    mat4 Transform::GetMatrix(Map<const Transform*, mat4>& cache) const {
+        // Root node in the transform hierarchy tree
+        if (m_parent == nullptr) {
+            cache[this] = m_matrix;
+            return m_matrix;
+        }
+
+        // Check cache contains matrix
+        auto entry = cache.find(this);
+        if (entry != cache.end()) {
+            return entry->second;
+        }
+
+        // Compute world transform recursively
+        mat4 transform = m_parent->GetMatrix(cache) * m_matrix;
+        cache[this] = transform;
+        return transform;
     }
 
     mat4 Transform::GetInverseMatrix() const {
-        if (m_parent != nullptr)
-            return glm::inverse(m_matrix) * m_parent->GetInverseMatrix();
-        return glm::inverse(m_matrix);
+        if (m_parent == nullptr)
+            return glm::inverse(m_matrix);
+        return glm::inverse(m_matrix) * m_parent->GetInverseMatrix();
+    }
+
+    mat4 Transform::GetInverseMatrix(Map<const Transform*, mat4>& cache) const {
+        // Root node in the transform hierarchy tree
+        if (m_parent == nullptr) {
+            mat4 inverseTransform = glm::inverse(m_matrix);
+            cache[this] = inverseTransform;
+            return inverseTransform;
+        }
+
+        // Check cache contains matrix
+        auto entry = cache.find(this);
+        if (entry != cache.end()) {
+            return entry->second;
+        }
+
+        // Compute inverse world transform recursively
+        mat4 inverseTransform = glm::inverse(m_matrix) * m_parent->GetInverseMatrix(cache);
+        cache[this] = inverseTransform;
+        return inverseTransform;
     }
 
     void Transform::UpdateMatrix() {
-        m_matrix = mat4();
-        glm::translate(m_matrix, m_position);
-        glm::rotate(m_matrix, m_rotation.x, vec3(1, 0, 0));
-        glm::rotate(m_matrix, m_rotation.y, vec3(0, 1, 0));
-        glm::rotate(m_matrix, m_rotation.z, vec3(0, 0, 1));
-        glm::scale(m_matrix, m_scale);
+        m_matrix = Math::ComposeTransform(m_position, m_rotation, m_scale);
     }
 
     void Transform::UpdateComponents() {
-        mat3 rotationMatrix(m_matrix);
-
-        // Position
-        m_position = vec3(m_matrix[3]);
-
-        // Scale
-        vec3 column0 = glm::column(rotationMatrix, 0);
-        vec3 column1 = glm::column(rotationMatrix, 1);
-        vec3 column2 = glm::column(rotationMatrix, 2);
-        float sx = column0.length();
-        float sy = column1.length();
-        float sz = column2.length();
-        m_scale = vec3(sx, sy, sz);
-
-        // Rotation
-        rotationMatrix = mat3(column0 / sx, column1 / sy, column2 / sz);
-        quat rotation = glm::quat_cast(rotationMatrix);
-        m_rotation = glm::eulerAngles(rotation);
+        Math::DecomposeTransform(m_matrix, m_position, m_rotation, m_scale);
     }
 
 }

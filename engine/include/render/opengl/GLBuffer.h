@@ -9,14 +9,14 @@ namespace Calyx {
     class GLVertexBuffer : public VertexBuffer {
 
     public:
-        GLVertexBuffer(uint32 size);
-        GLVertexBuffer(uint32 size, const float* vertices);
+        explicit GLVertexBuffer(uint32 size);
+        GLVertexBuffer(uint32 size, const void* data);
         ~GLVertexBuffer() override;
 
         void Bind() const override;
         void Unbind() const override;
 
-        void SetData(const void* data, uint32 size) override;
+        void SetData(uint32 size, const void* data) override;
 
         const BufferLayout& GetLayout() const override { return m_bufferLayout; };
         void SetLayout(const BufferLayout& layout) override { m_bufferLayout = layout; };
@@ -31,12 +31,14 @@ namespace Calyx {
 
     public:
         GLIndexBuffer(uint32 count, const uint32* indices);
-        virtual ~GLIndexBuffer();
+        ~GLIndexBuffer() override;
 
-        virtual void Bind() const;
-        virtual void Unbind() const;
+        void Bind() const override;
+        void Unbind() const override;
 
-        virtual uint32 GetCount() const { return m_count; };
+        void SetData(uint32 count, const uint32* indices) override;
+
+        uint32 GetCount() const override { return m_count; };
 
     private:
         uint32 m_bufferID;

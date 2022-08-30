@@ -49,12 +49,12 @@ Object::~Object() {
     deleter_(data_);
 }
 
-Object::Object(Object&& o)
+Object::Object(Object&& o) noexcept
         : deleter_(NoOp) {
     *this = move(o);
 }
 
-Object& Object::operator=(Object&& o) {
+Object& Object::operator=(Object&& o) noexcept {
     // Release existing resource if any.
     deleter_(data_);
 
@@ -152,15 +152,15 @@ vector<IEnum*> registry::GetEnumsByName(const string& name) {
 }
 
 void registry::internal::Register(IFunction* f) {
-    GetFunctionsMap().insert(make_pair(f->GetName(), move(f)));
+    GetFunctionsMap().insert(make_pair(f->GetName(), f));
 }
 
 void registry::internal::Register(IClass* c) {
-    GetClassesMap().insert(make_pair(c->GetName(), move(c)));
+    GetClassesMap().insert(make_pair(c->GetName(), c));
 }
 
 void registry::internal::Register(IEnum* e) {
-    GetEnumsMap().insert(make_pair(e->GetName(), move(e)));
+    GetEnumsMap().insert(make_pair(e->GetName(), e));
 }
 
 Exception::Exception(string error)
@@ -173,7 +173,7 @@ const char* Exception::what() const noexcept {
 Reference IClass::GetField(const Reference& o, const string& name) const {
     std::optional<Field> field = GetFieldByName(name);
     if (!field.has_value())
-        throw new Exception("No such field!");
+        throw Exception("No such field!");
 
     if (field.value().storageType == StorageType::STATIC) {
         return Reference(
@@ -214,7 +214,7 @@ std::vector<IMethod*> IClass::GetMethodsByName(const string& name) const {
 
 IMethod* IClass::GetMethodByName(const string& name) const {
     auto methods = GetMethodsByName(name);
-    return methods.size() > 0 ? methods[0] : nullptr;
+    return !methods.empty() ? methods[0] : nullptr;
 }
 
 IFunction* IClass::GetFunctionByName(const string& name) const {
@@ -223,5 +223,5 @@ IFunction* IClass::GetFunctionByName(const string& name) const {
 
 bool IClass::HasMethod(const string& name) const {
     auto methods = GetMethodsByName(name);
-    return methods.size() > 0;
+    return !methods.empty();
 }

@@ -7,6 +7,7 @@ namespace Calyx {
 
     void Renderer::Init() {
         s_renderer = Create();
+        s_renderer->Initialize();
     }
 
     Scope<Renderer> Renderer::Create() {

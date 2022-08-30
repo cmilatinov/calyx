@@ -7,8 +7,41 @@ namespace Calyx {
     class Camera {
 
     public:
-        virtual Transform& GetTransform() = 0;
-        virtual mat4 GetProjectionViewMatrix() const = 0;
+        explicit Camera(
+            float fov = 70.0f,
+            float aspect = 16.0f / 9.0f,
+            float nearPlane = 0.01f,
+            float farPlane = 100.0f
+        );
+
+        mat4 GetProjectionMatrix() const { return m_projectionMatrix; }
+
+        float GetFOV() const { return m_fov; }
+        float GetAspect() const { return m_aspect; }
+        float GetNearPlane() const { return m_nearPlane; }
+        float GetFarPlane() const { return m_farPlane; }
+
+        float* GetFOVPtr() { return &m_fov; }
+        float* GetAspectPtr() { return &m_aspect; }
+        float* GetNearPlanePtr() { return &m_nearPlane; }
+        float* GetFarPlanePtr() { return &m_farPlane;}
+
+        void SetFOV(float fov);
+        void SetAspect(float aspect);
+        void SetNearPlane(float nearPlane);
+        void SetFarPlane(float farPlane);
+
+        void Update() { return UpdateProjectionMatrix(); }
+
+    protected:
+        float m_fov;
+        float m_aspect;
+        float m_nearPlane;
+        float m_farPlane;
+        mat4 m_projectionMatrix;
+
+    private:
+        void UpdateProjectionMatrix();
 
     };
 

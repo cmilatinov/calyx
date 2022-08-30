@@ -10,16 +10,6 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DCX_DEBUG")
 # Includes
 include(../build/include/utils.cmake)
 
-# Required libraries
-find_package(glfw3 CONFIG REQUIRED)
-find_package(glad REQUIRED)
-find_package(imgui CONFIG REQUIRED)
-find_package(imguizmo CONFIG REQUIRED)
-find_package(glm CONFIG REQUIRED)
-find_package(assimp CONFIG REQUIRED)
-find_package(spdlog REQUIRED)
-find_path(STB_INCLUDE_DIRS "stb.h")
-
 # Clump source files from src
 file(GLOB_RECURSE EDITOR_SRC "src/**.cpp")
 

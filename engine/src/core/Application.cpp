@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "core/Application.h"
 #include "core/Time.h"
 
@@ -6,6 +8,8 @@
 #include "render/Renderer.h"
 
 #include "input/Input.h"
+
+#include "assets/AssetRegistry.h"
 
 namespace Calyx {
 
@@ -26,6 +30,9 @@ namespace Calyx {
         // Initialize input
         Input::Init();
 
+        // Initialize asset registry
+        AssetRegistry::Init();
+
         // Gui layer
         m_guiLayer = new GuiLayer();
         m_layerStack.PushOverlay(m_guiLayer);
@@ -36,7 +43,7 @@ namespace Calyx {
         while (m_running) {
             // Time measurements
             auto currentTime = high_resolution_clock::now();
-            Time::s_deltaTime = duration_cast<seconds>(currentTime - lastTime).count();
+            Time::s_deltaTime = duration_cast<microseconds>(currentTime - lastTime).count() / 1e6;
             Time::UpdateTime();
 
             // Window events

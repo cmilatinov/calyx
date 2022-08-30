@@ -1,22 +1,40 @@
 #pragma once
 
+#include <string>
 #include <iostream>
 
 #include "reflect.h"
 
+class Test {
+    CX_BEGIN_REFLECT()
+};
+
 namespace Calyx {
+
+    class Base1 {};
 
     CX_PROPERTY(Cool, Beans)
     class Base {
         CX_BEGIN_REFLECT()
 
+        class Inner {
+            CX_BEGIN_REFLECT()
+
+        protected:
+            std::string pog;
+        };
+
+    public:
         int base;
+        int another_one;
+        static const int yay = 123;
     };
 
     CX_PROPERTY(Nice, Man)
-    class Derived : public Base {
+    class Derived : public Base, public Base1 {
         CX_BEGIN_REFLECT()
 
+    public:
         int derived;
     };
 
@@ -26,16 +44,16 @@ namespace Calyx {
 
     private:
         int private_simple;
-        const int private_constSimple;
+        const int private_constSimple = 0;
         int* private_pointer;
-        Base private_complex;
+        std::string private_complex;
         Base* private_complexPointer;
         const Base private_constComplex;
         int bing_bong;
 
     protected:
         int protected_simple;
-        const int protected_constSimple;
+        const int protected_constSimple = 0;
         int* protected_pointer;
         Base protected_complex;
         Base* protected_complexPointer;
@@ -43,7 +61,7 @@ namespace Calyx {
 
     public:
         int public_simple;
-        const int public_constSimple;
+        const int public_constSimple = 0;
         int* public_pointer;
         Base public_complex;
         Base* public_complexPointer;
@@ -53,7 +71,7 @@ namespace Calyx {
         int public_annotated_simple;
 
         CX_PROPERTY(Annotated)
-        const int public_annotated_constSimple;
+        const int public_annotated_constSimple = 0;
 
         CX_PROPERTY(Annotation1, Annotation2, )
         int* public_annotated_pointer;

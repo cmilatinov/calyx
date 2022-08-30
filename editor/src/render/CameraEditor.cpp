@@ -2,34 +2,23 @@
 #include "core/Time.h"
 #include "input/Input.h"
 
-namespace Calyx {
+namespace Calyx::Editor {
 
     void CameraEditor::Update() {
-        float forward = Input::GetKey(KEY_W) - Input::GetKey(KEY_S);
+        // Translation
+        float forward = Input::GetKey(KEY_S) - Input::GetKey(KEY_W);
         float lateral = Input::GetKey(KEY_D) - Input::GetKey(KEY_A);
-        float vertical = (Input::GetKey(KEY_LEFT_SHIFT) || Input::GetKey(KEY_RIGHT_SHIFT)) - Input::GetKey(KEY_SPACE);
-        vec3 movement(lateral, vertical, forward);
-    }
+        float vertical = Input::GetKey(KEY_SPACE) - (Input::GetKey(KEY_LEFT_SHIFT) || Input::GetKey(KEY_RIGHT_SHIFT));
+        float speed = (Input::GetKey(KEY_LEFT_CONTROL) || Input::GetKey(KEY_RIGHT_CONTROL)) ? 7.0f : 2.0f;
+        vec3 movement = forward * m_transform.Forward() + lateral * m_transform.Right() + vec3(0, vertical, 0);
+        m_transform.Translate(Time::DeltaTime() * speed * movement);
 
-    void CameraEditor::SetFOV(float fov) {
-        m_fovX = fov;
-        UpdateProjectionMatrix();
-    }
-
-    void CameraEditor::SetNearPlane(float nearPlane) {
-        m_nearPlane = nearPlane;
-        UpdateProjectionMatrix();
-    }
-
-    void CameraEditor::SetFarPlane(float farPlane) {
-        m_farPlane = farPlane;
-        UpdateProjectionMatrix();
-    }
-
-    void CameraEditor::UpdateProjectionMatrix() {
-        float aspect = (float)Window::GetMainWindow().GetWidth() / (float)Window::GetMainWindow().GetHeight();
-        float fovY = 2.0f * std::atan(std::tan(m_fovX / 2.0f) / aspect);
-        m_projectionMatrix = glm::perspective(fovY, aspect, m_nearPlane, m_farPlane);
+        // Rotation
+        if (Input::GetMouseButton(MOUSE_BUTTON_1)) {
+            float rotationSpeed = 0.25f;
+            vec2 mouseVel = Input::GetMouseVelocity();
+            m_transform.Rotate(rotationSpeed * vec3(-mouseVel.y, -mouseVel.x, 0));
+        }
     }
 
 }

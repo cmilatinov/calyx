@@ -100,13 +100,13 @@ namespace Calyx {
         virtual void Bind() const = 0;
         virtual void Unbind() const = 0;
 
-        virtual void SetData(const void* data, uint32 size) = 0;
+        virtual void SetData(uint32 size, const void* data) = 0;
 
         virtual const BufferLayout& GetLayout() const = 0;
         virtual void SetLayout(const BufferLayout& layout) = 0;
 
         static Ref<VertexBuffer> Create(uint32 size);
-        static Ref<VertexBuffer> Create(uint32 size, const float* vertices);
+        static Ref<VertexBuffer> Create(uint32 size, const void* data);
 
     };
 
@@ -119,6 +119,8 @@ namespace Calyx {
         virtual void Unbind() const = 0;
 
         virtual uint32 GetCount() const = 0;
+
+        virtual void SetData(uint32 count, const uint32* indices) = 0;
 
         static Ref<IndexBuffer> Create(uint32 count, const uint32* indices);
 

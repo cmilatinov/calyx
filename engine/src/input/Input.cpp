@@ -13,17 +13,15 @@ namespace Calyx {
         CX_DISPATCH_EVENT(EventKeyRelease, Input::HandleKeyReleaseEvent, event);
         CX_DISPATCH_EVENT(EventMouseButtonPress, Input::HandleMouseButtonPressEvent, event);
         CX_DISPATCH_EVENT(EventMouseButtonRelease, Input::HandleMouseButtonReleaseEvent, event);
+        CX_DISPATCH_EVENT(EventMouseMove, Input::HandleMouseMoveEvent, event);
     }
 
     void Input::_OnFrameEnd() {
-        for (auto& [_, v] : m_keyDown)
-            v = false;
-        for (auto& [_, v] : m_keyUp)
-            v = false;
-        for (auto& [_, v] : m_mouseButtonDown)
-            v = false;
-        for (auto& [_, v] : m_mouseButtonUp)
-            v = false;
+        m_keyDown.clear();
+        m_keyUp.clear();
+        m_mouseButtonDown.clear();
+        m_mouseButtonUp.clear();
+        memset(&m_mouseVelocity, 0, sizeof(vec2));
     }
 
     bool Input::HandleKeyPressEvent(EventKeyPress& event) {
@@ -51,6 +49,13 @@ namespace Calyx {
         MouseCode button = event.GetMouseButton();
         m_mouseButtonUp[button] = m_mouseButton[button];
         m_mouseButton[button] = false;
+        return false;
+    }
+
+    bool Input::HandleMouseMoveEvent(EventMouseMove& event) {
+        vec2 mouseCoords(event.GetX(), event.GetY());
+        m_mouseVelocity = mouseCoords - m_mouseCoords;
+        m_mouseCoords = mouseCoords;
         return false;
     }
 

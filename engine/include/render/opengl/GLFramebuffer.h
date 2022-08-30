@@ -25,6 +25,7 @@ namespace Calyx {
         void ClearColorAttachment(uint32_t attachmentIndex, uint32 value) override;
         void ClearDepthAttachment(uint32 value) override;
         void Blit(const Ref<Framebuffer>& other, uint32 srcAttachment, uint32 dstAttachment) override;
+//        void BlitDepth(const Ref<Framebuffer>& other) override;
 
         const IRenderTarget& GetColorAttachment(uint32 attachmentIndex) const override;
         const IRenderTarget& GetDepthAttachment() const override;
