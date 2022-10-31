@@ -9,7 +9,8 @@ namespace Calyx {
     public:
         virtual void Load(const String& file) = 0;
 
-        static Ref<Texture2D> Create(uint32 width, uint32 height, uint32 samples = 1, TextureFormat format = TextureFormat::RGBA8);
+        static Ref<Texture2D>
+        Create(uint32 width, uint32 height, uint32 samples = 1, TextureFormat format = TextureFormat::RGBA8);
 
     };
 

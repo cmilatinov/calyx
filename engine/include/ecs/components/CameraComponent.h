@@ -5,7 +5,8 @@
 
 namespace Calyx {
 
-    class CameraComponent : public Component<CameraComponent>  {
+    class CameraComponent : public Component<CameraComponent> {
+        CX_BEGIN_REFLECT();
 
     public:
         Camera& GetCamera() { return m_camera; }

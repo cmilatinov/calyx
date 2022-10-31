@@ -11,6 +11,8 @@
 
 #include "assets/AssetRegistry.h"
 
+#include "ecs/Component.h"
+
 namespace Calyx {
 
     Application* Application::s_instance = nullptr;
@@ -39,24 +41,24 @@ namespace Calyx {
     }
 
     void Application::Run() {
-        auto lastTime = high_resolution_clock::now();
+        auto lastTime = Clock::now();
         while (m_running) {
             // Time measurements
-            auto currentTime = high_resolution_clock::now();
-            Time::s_deltaTime = duration_cast<microseconds>(currentTime - lastTime).count() / 1e6;
+            auto currentTime = Clock::now();
+            Time::s_deltaTime = DurationCast<Microseconds>(currentTime - lastTime).count() / 1e6;
             Time::UpdateTime();
 
             // Window events
             m_window->OnUpdate();
 
             // Layers
-            for (auto* layer : m_layerStack) {
+            for (auto* layer: m_layerStack) {
                 layer->OnUpdate();
             }
 
             // Layer GUIs
             m_guiLayer->Begin();
-            for (auto* layer : m_layerStack) {
+            for (auto* layer: m_layerStack) {
                 layer->OnGUI();
             }
             m_guiLayer->End();

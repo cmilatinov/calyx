@@ -24,7 +24,7 @@ namespace Calyx {
         float* GetFOVPtr() { return &m_fov; }
         float* GetAspectPtr() { return &m_aspect; }
         float* GetNearPlanePtr() { return &m_nearPlane; }
-        float* GetFarPlanePtr() { return &m_farPlane;}
+        float* GetFarPlanePtr() { return &m_farPlane; }
 
         void SetFOV(float fov);
         void SetAspect(float aspect);

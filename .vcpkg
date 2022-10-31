@@ -1,0 +1,13 @@
+assimp
+entt
+glfw3
+glad
+glm
+imgui[docking-experimental,glfw-binding,opengl3-binding]
+imguizmo
+inja
+llvm[clang,clang-tools-extra]
+nameof
+nlohmann-json
+spdlog
+stb

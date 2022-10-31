@@ -49,7 +49,7 @@ namespace Calyx {
     }
 
     bool ShaderLibrary::Exists(const String& name) const {
-        return m_shaders.contains(name);
+        return m_shaders.find(name) != m_shaders.end();
     }
 
 }

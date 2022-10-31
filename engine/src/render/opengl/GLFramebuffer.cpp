@@ -55,7 +55,10 @@ namespace Calyx {
             targetSize.y = other->GetSpecification().height;
             glDrawBuffer(GL_COLOR_ATTACHMENT0 + dstAttachment);
         }
-        glBlitFramebuffer(0, 0, m_spec.width, m_spec.height, 0, 0, targetSize.x, targetSize.y, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+        glBlitFramebuffer(
+            0, 0, m_spec.width, m_spec.height, 0, 0, targetSize.x, targetSize.y,
+            GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_NEAREST
+        );
     }
 
     const IRenderTarget& GLFramebuffer::GetColorAttachment(uint32 attachmentIndex) const {
@@ -68,7 +71,7 @@ namespace Calyx {
 
     void GLFramebuffer::Init() {
         GLFramebuffer::Bind();
-        for (const auto& attachment : m_spec.attachments) {
+        for (const auto& attachment: m_spec.attachments) {
 
             // Render target (can be a renderbuffer or texture)
             Ref<IRenderTarget> renderTarget = nullptr;
@@ -80,15 +83,21 @@ namespace Calyx {
             if (attachment.target != nullptr) {
                 renderTarget = attachment.target;
 
-            // Otherwise, create new render target
+                // Otherwise, create new render target
             } else {
                 switch (attachment.type) {
                     case IRenderTarget::Type::RENDERBUFFER: {
-                        renderTarget = Renderbuffer::Create(m_spec.width, m_spec.height, m_spec.samples, attachment.format);
+                        renderTarget = Renderbuffer::Create(
+                            m_spec.width, m_spec.height, m_spec.samples,
+                            attachment.format
+                        );
                         break;
                     }
                     case IRenderTarget::Type::TEXTURE: {
-                        renderTarget = Texture2D::Create(m_spec.width, m_spec.height, m_spec.samples, attachment.format);
+                        renderTarget = Texture2D::Create(
+                            m_spec.width, m_spec.height, m_spec.samples,
+                            attachment.format
+                        );
                         break;
                     }
                     default: {
@@ -100,12 +109,14 @@ namespace Calyx {
 
             // Add attachment to m_framebuffer
             if (isDepthAttachment) {
-                CX_CORE_ASSERT(m_depthAttachment == nullptr, "Framebuffer specification contains more than one depth attachment!");
+                CX_CORE_ASSERT(m_depthAttachment == nullptr,
+                               "Framebuffer specification contains more than one depth attachment!");
                 renderTarget->Bind();
                 renderTarget->AttachAsDepth();
                 m_depthAttachment = renderTarget;
             } else {
-                CX_CORE_ASSERT(m_colorAttachments.size() < s_maxColorAttachments, "Framebuffer specification contains too many color attachments!");
+                CX_CORE_ASSERT(m_colorAttachments.size() < s_maxColorAttachments,
+                               "Framebuffer specification contains too many color attachments!");
                 renderTarget->AttachAsColor(m_colorAttachments.size());
                 m_colorAttachments.push_back(renderTarget);
             }
@@ -115,12 +126,14 @@ namespace Calyx {
 
     void GLFramebuffer::Invalidate() {
         if (m_depthAttachment != nullptr) {
-            CX_CORE_ASSERT(m_depthAttachment->GetSamples() == m_spec.samples, "Framebuffer attachments must all have the same sample count!");
+            CX_CORE_ASSERT(m_depthAttachment->GetSamples() == m_spec.samples,
+                           "Framebuffer attachments must all have the same sample count!");
             m_depthAttachment->Resize(m_spec.width, m_spec.height);
         }
 
-        for (auto& attachment : m_colorAttachments) {
-            CX_CORE_ASSERT(attachment->GetSamples() == m_spec.samples, "Framebuffer attachments must all have the same sample count!");
+        for (auto& attachment: m_colorAttachments) {
+            CX_CORE_ASSERT(attachment->GetSamples() == m_spec.samples,
+                           "Framebuffer attachments must all have the same sample count!");
             attachment->Resize(m_spec.width, m_spec.height);
         }
     }

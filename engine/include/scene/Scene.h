@@ -3,6 +3,10 @@
 #include "assets/AssetRegistry.h"
 #include "math/Transform.h"
 
+namespace Calyx::Editor {
+    class EditorLayer;
+}
+
 namespace Calyx {
 
     class GameObject;
@@ -12,6 +16,7 @@ namespace Calyx {
 
         friend class GameObject;
         friend class SceneRenderer;
+        friend class Editor::EditorLayer;
 
     public:
         ~Scene() override;
@@ -19,15 +24,21 @@ namespace Calyx {
         bool Load(const String& path) override;
         void Clear() override;
 
-        GameObject* CreateGameObject(const String& name = "Game Object");
+        GameObject* CreateGameObject(const String& name = "Game Object", GameObject* parent = nullptr);
         void DeleteGameObject(GameObject* gameObject);
 
-        const List<GameObject*>& GetRootGameObjects() const { return m_rootGameObjects; }
+        const Set<GameObject*>& GetRootGameObjects() const { return m_rootGameObjects; }
 
     private:
         entt::registry m_entityRegistry;
         Map<entt::entity, Scope<GameObject>> m_gameObjects;
-        List<GameObject*> m_rootGameObjects;
+        Set<GameObject*> m_rootGameObjects;
+        Set<entt::entity> m_objectsToDelete;
+
+        bool Exists(entt::entity id);
+        void DeleteGameObjectInternal(entt::entity id, bool eraseFromParent);
+        void DeleteGameObjects();
+
 
     };
 

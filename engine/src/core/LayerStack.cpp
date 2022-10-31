@@ -3,7 +3,7 @@
 namespace Calyx {
 
     LayerStack::~LayerStack() {
-        for (auto* layer : m_layers) {
+        for (auto* layer: m_layers) {
             layer->OnDetach();
             delete layer;
         }

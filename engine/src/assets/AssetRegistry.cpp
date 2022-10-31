@@ -57,15 +57,15 @@ namespace Calyx::AssetRegistry {
         assets["quad"] = CreateScope<Mesh>();
         auto* mesh = reinterpret_cast<Mesh*>(assets["quad"].get());
         mesh->SetIndices({
-            0, 1, 2,
-            1, 0, 3
-        });
+                             0, 1, 2,
+                             1, 0, 3
+                         });
         mesh->SetVertices({
-            vec3(-1, -1, 0),
-            vec3(1, 1, 0),
-            vec3(-1, 1, 0),
-            vec3(1, -1, 0)
-        });
+                              vec3(-1, -1, 0),
+                              vec3(1, 1, 0),
+                              vec3(-1, 1, 0),
+                              vec3(1, -1, 0)
+                          });
         return mesh;
     }
 

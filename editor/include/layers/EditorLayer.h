@@ -10,6 +10,7 @@
 #include "render/CameraEditor.h"
 #include "scene/SceneRenderer.h"
 #include "windows/SceneHierarchyPanel.h"
+#include "inspector/Inspector.h"
 
 namespace Calyx::Editor {
 
@@ -46,6 +47,9 @@ namespace Calyx::Editor {
 
         // Gizmos
         int m_gizmoType = ImGuizmo::OPERATION::TRANSLATE;
+
+        // Components
+        List<entt::meta_type> m_reflectedComponents;
 
         // TODO: Remove
         GameObject* m_cube;

@@ -4,7 +4,7 @@
 namespace Calyx {
 
     Scope<RenderContext> RenderContext::Create(void* window) {
-        switch(Renderer::GetAPI()) {
+        switch (Renderer::GetAPI()) {
             case RendererAPI::OPENGL:
                 return CreateScope<GLRenderContext>(static_cast<GLFWwindow*>(window));
         }

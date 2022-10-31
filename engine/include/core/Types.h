@@ -4,18 +4,25 @@
 #include <filesystem>
 #include <memory>
 #include <algorithm>
+#include <variant>
+#include <type_traits>
 
 #include <string>
 #include <sstream>
 #include <fstream>
+#include <array>
 #include <vector>
 #include <unordered_map>
 #include <unordered_set>
 
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
-#include <entt/entity/registry.hpp>
-#include <entt/entity/runtime_view.hpp>
+#include <entt/entt.hpp>
+#include <nameof.hpp>
+
+#include "reflect.h"
+#include "core/Utils.h"
+#include "core/Macros.h"
 
 namespace Calyx {
 
@@ -31,6 +38,9 @@ namespace Calyx {
     using Set = std::unordered_set<T>;
 
     template<typename T>
+    using OrderedSet = std::set<T>;
+
+    template<typename T>
     using Scope = std::unique_ptr<T>;
 
     template<typename T>
@@ -44,35 +54,56 @@ namespace Calyx {
 
     using Path = std::filesystem::path;
 
-    using uint8 = uint8_t;
-    using uint16 = uint16_t;
-    using uint32 = uint32_t;
-    using uint64 = uint64_t;
+    namespace Integer {
+        using uint8 = uint8_t;
+        using uint16 = uint16_t;
+        using uint32 = uint32_t;
+        using uint64 = uint64_t;
 
-    using int8 = int8_t;
-    using int16 = int16_t;
-    using int32 = int32_t;
-    using int64 = int64_t;
+        using int8 = int8_t;
+        using int16 = int16_t;
+        using int32 = int32_t;
+        using int64 = int64_t;
+    }
 
-    using vec2 = glm::vec2;
-    using vec3 = glm::vec3;
-    using vec4 = glm::vec4;
+    namespace Math {
+        using vec2 = glm::vec2;
+        using vec3 = glm::vec3;
+        using vec4 = glm::vec4;
 
-    using ivec2 = glm::ivec2;
-    using ivec3 = glm::ivec3;
-    using ivec4 = glm::ivec4;
+        using ivec2 = glm::ivec2;
+        using ivec3 = glm::ivec3;
+        using ivec4 = glm::ivec4;
 
-    using uvec2 = glm::uvec2;
-    using uvec3 = glm::uvec3;
-    using uvec4 = glm::uvec4;
+        using uvec2 = glm::uvec2;
+        using uvec3 = glm::uvec3;
+        using uvec4 = glm::uvec4;
 
-    using mat2 = glm::mat2;
-    using mat3 = glm::mat3;
-    using mat4 = glm::mat4;
+        using mat2 = glm::mat2;
+        using mat3 = glm::mat3;
+        using mat4 = glm::mat4;
 
-    using quat = glm::quat;
+        using quat = glm::quat;
+    }
 
-    using namespace std::chrono;
+    namespace Chrono {
+        using Hours = std::chrono::hours;
+        using Minutes = std::chrono::minutes;
+        using Seconds = std::chrono::seconds;
+        using Milliseconds = std::chrono::milliseconds;
+        using Microseconds = std::chrono::microseconds;
+        using Nanoseconds = std::chrono::nanoseconds;
+        using Clock = std::chrono::high_resolution_clock;
+
+        template<class ToDuration, class Rep, class Period>
+        constexpr ToDuration DurationCast(const std::chrono::duration<Rep, Period>& d) {
+            return std::chrono::duration_cast<ToDuration>(d);
+        }
+    }
+
+    namespace Reflect {
+        using TypeID = entt::id_type;
+    }
 
     template<typename T, typename ... Args>
     constexpr Scope<T> CreateScope(Args&& ... args) {
@@ -87,3 +118,7 @@ namespace Calyx {
 }
 
 using namespace Calyx;
+using namespace Calyx::Integer;
+using namespace Calyx::Math;
+using namespace Calyx::Chrono;
+using namespace Calyx::Reflect;

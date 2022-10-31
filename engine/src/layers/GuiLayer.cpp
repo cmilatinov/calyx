@@ -6,7 +6,8 @@ namespace Calyx {
         // ImGui Setup
         IMGUI_CHECKVERSION();
         m_context = ImGui::CreateContext();
-        ImGuiIO& io = ImGui::GetIO(); (void)io;
+        ImGuiIO& io = ImGui::GetIO();
+        (void) io;
         io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
         io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
@@ -17,7 +18,8 @@ namespace Calyx {
         SetupImGuiTheme();
 
         // Init ImGui for OpenGL 3.0
-        ImGui_ImplGlfw_InitForOpenGL(static_cast<GLFWwindow*>(Application::GetInstance().GetWindow().GetNativeWindow()), true);
+        ImGui_ImplGlfw_InitForOpenGL(static_cast<GLFWwindow*>(Application::GetInstance().GetWindow().GetNativeWindow()),
+                                     true);
         ImGui_ImplOpenGL3_Init("#version 400");
     }
 
@@ -27,7 +29,7 @@ namespace Calyx {
         ImGui::DestroyContext();
     }
 
-    void GuiLayer::OnEvent(Event& event) {
+    void GuiLayer::OnEvent(Event & event) {
 //        ImGuiIO& io = ImGui::GetIO();
 //        event.handled |= event.IsInCategory(EventCategory::Mouse) & io.WantCaptureMouse;
 //        event.handled |= event.IsInCategory(EventCategory::Keyboard) & io.WantCaptureKeyboard;
@@ -45,15 +47,14 @@ namespace Calyx {
         ImGui::SetCurrentContext(m_context);
         ImGuiIO& io = ImGui::GetIO();
         const Application& app = Application::GetInstance();
-        io.DisplaySize = ImVec2((float)app.GetWindow().GetWidth(), (float)app.GetWindow().GetHeight());
+        io.DisplaySize = ImVec2((float) app.GetWindow().GetWidth(), (float) app.GetWindow().GetHeight());
 
         // Rendering
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         // Update viewports and reset context
-        if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-        {
+        if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
             GLFWwindow* currentContext = glfwGetCurrentContext();
             ImGui::UpdatePlatformWindows();
             ImGui::RenderPlatformWindowsDefault();
@@ -64,7 +65,8 @@ namespace Calyx {
     void GuiLayer::SetupImGuiTheme() {
         // Set font
         const float fontSize = 21.0f;
-        ImGuiIO& io = ImGui::GetIO(); (void)io;
+        ImGuiIO& io = ImGui::GetIO();
+        (void) io;
         io.Fonts->AddFontFromFileTTF("assets/fonts/inconsolata/Inconsolata-Bold.ttf", fontSize);
         io.FontDefault = io.Fonts->AddFontFromFileTTF("assets/fonts/inconsolata/Inconsolata-Regular.ttf", fontSize);
 

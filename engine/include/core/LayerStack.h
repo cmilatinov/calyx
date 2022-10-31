@@ -21,7 +21,7 @@ namespace Calyx {
         List<ILayer*>::reverse_iterator rend() { return m_layers.rend(); }
 
         List<ILayer*>::const_iterator begin() const { return m_layers.begin(); }
-        List<ILayer*>::const_iterator end()	const { return m_layers.end(); }
+        List<ILayer*>::const_iterator end() const { return m_layers.end(); }
         List<ILayer*>::const_reverse_iterator rbegin() const { return m_layers.rbegin(); }
         List<ILayer*>::const_reverse_iterator rend() const { return m_layers.rend(); }
 

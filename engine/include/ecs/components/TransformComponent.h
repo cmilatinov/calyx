@@ -6,12 +6,14 @@
 namespace Calyx {
 
     class TransformComponent : public Component<TransformComponent> {
+        CX_BEGIN_REFLECT();
 
     public:
+        String GetName() const override { return "Transform"; }
         Transform& GetTransform() { return m_transform; }
 
     private:
-        Transform m_transform;
+        CX_REFLECT_SERIALIZE Transform m_transform;
 
     };
 

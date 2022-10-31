@@ -56,7 +56,8 @@ namespace Calyx {
     }
 
     void GLShader::SetMat4(const String& name, const mat4& value) {
-        glUniformMatrix4fv(glGetUniformLocation(m_shaderProgramID, name.c_str()), 1, GL_FALSE, reinterpret_cast<const GLfloat*>(&value));
+        glUniformMatrix4fv(glGetUniformLocation(m_shaderProgramID, name.c_str()), 1, GL_FALSE,
+                           reinterpret_cast<const GLfloat*>(&value));
     }
 
     bool GLShader::IsFunctional() const {
@@ -71,17 +72,17 @@ namespace Calyx {
 
     void GLShader::LoadShader(const String& vertexSrc, const String& fragmentSrc) {
         Map<GLenum, String> shaderSources = {
-                { GL_VERTEX_SHADER, vertexSrc },
-                { GL_FRAGMENT_SHADER, fragmentSrc }
+            { GL_VERTEX_SHADER, vertexSrc },
+            { GL_FRAGMENT_SHADER, fragmentSrc }
         };
         CreateShaderProgram(shaderSources);
     }
 
     void GLShader::LoadShader(const String& vertexSrc, const String& geometrySrc, const String& fragmentSrc) {
         Map<GLenum, String> shaderSources = {
-                { GL_VERTEX_SHADER, vertexSrc },
-                { GL_GEOMETRY_SHADER, geometrySrc },
-                { GL_FRAGMENT_SHADER, fragmentSrc }
+            { GL_VERTEX_SHADER, vertexSrc },
+            { GL_GEOMETRY_SHADER, geometrySrc },
+            { GL_FRAGMENT_SHADER, fragmentSrc }
         };
         CreateShaderProgram(shaderSources);
     }
@@ -101,11 +102,14 @@ namespace Calyx {
             GLenum shaderType = GLShaderType(type);
             CX_CORE_ASSERT(shaderType, "Invalid shader type specified");
 
-            size_t nextLinePos = source.find_first_not_of("\r\n", eol); // Start of shader code after shader type declaration line
+            size_t nextLinePos = source.find_first_not_of("\r\n",
+                                                          eol); // Start of shader code after shader type declaration line
             CX_CORE_ASSERT(nextLinePos != String::npos, "Syntax error");
 
             pos = source.find(typeToken, nextLinePos); // Start of next shader type declaration line
-            shaderSources[shaderType] = (pos == String::npos) ? source.substr(nextLinePos) : source.substr(nextLinePos, pos - nextLinePos);
+            shaderSources[shaderType] = (pos == String::npos) ? source.substr(nextLinePos) : source.substr(nextLinePos,
+                                                                                                           pos -
+                                                                                                           nextLinePos);
         }
 
         return shaderSources;
@@ -129,7 +133,7 @@ namespace Calyx {
         CX_CORE_ASSERT(numShaders >= 2 && numShaders <= 3, "Invalid number of shader sources!");
 
         // Create shaders
-        for (auto& entry : shaderSources) {
+        for (auto& entry: shaderSources) {
             uint32 shader = CreateShader(entry.first, entry.second);
             glAttachShader(m_shaderProgramID, shader);
         }
@@ -147,7 +151,7 @@ namespace Calyx {
         }
 
         // Delete shaders
-        for (auto shader : m_shaderIDs)
+        for (auto shader: m_shaderIDs)
             glDeleteShader(shader);
     }
 

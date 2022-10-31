@@ -22,7 +22,8 @@ namespace Calyx {
     }
 
     void GLRenderbuffer::AttachAsColor(uint32 attachmentIndex) const {
-        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GLColorAttachment(attachmentIndex), GL_RENDERBUFFER, m_renderbufferID);
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GLColorAttachment(attachmentIndex), GL_RENDERBUFFER,
+                                  m_renderbufferID);
     }
 
     void GLRenderbuffer::AttachAsDepth() const {
@@ -34,7 +35,8 @@ namespace Calyx {
         m_width = width;
         m_height = height;
         if (m_samples > 1)
-            glRenderbufferStorageMultisample(GL_RENDERBUFFER, m_samples, GLInternalTextureFormat(m_format), m_width, m_height);
+            glRenderbufferStorageMultisample(GL_RENDERBUFFER, m_samples, GLInternalTextureFormat(m_format), m_width,
+                                             m_height);
         else
             glRenderbufferStorage(GL_RENDERBUFFER, GLInternalTextureFormat(m_format), m_width, m_height);
     }

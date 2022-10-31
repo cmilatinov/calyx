@@ -1,15 +1,4 @@
-set(UTILS_DIR ${CMAKE_CURRENT_LIST_DIR})
-
-# Find clang
-find_program(CLANG_EXECUTABLE clang)
-
-# Find libclang
-find_file(LIBCLANG_PATH NAMES libclang.dll libclang.so)
-if (NOT EXISTS "${LIBCLANG_PATH}")
-    message(FATAL_ERROR "libclang not found")
-endif ()
-
-# Copy a single file to a target build folder
+# Copy a set of files to a target build folder
 function(add_file_copy target dest)
     set(files "${ARGN}")
     set(target_files "")
@@ -21,68 +10,53 @@ function(add_file_copy target dest)
 
     # Copy new files
     add_custom_command(
-            TARGET "${target}" POST_BUILD
+            TARGET "${target}" PRE_LINK
             COMMAND ${CMAKE_COMMAND} -E copy_if_different
             ${files}
             "${dest}"
+            COMMENT "Copying file ''"
     )
 endfunction()
 
 # Copy an entire directory to a target build folder
 function(add_dir_copy target dest dir)
     add_custom_command(
-            TARGET "${target}" POST_BUILD
+            TARGET "${target}" PRE_LINK
             COMMAND ${CMAKE_COMMAND} -E copy_directory
             "${CMAKE_CURRENT_SOURCE_DIR}/${dir}"
             "${dest}/${dir}"
     )
 endfunction()
 
-function(add_reflected_target target)
-    get_target_property(pch "${target}" PRECOMPILE_HEADERS)
-    foreach (header ${pch})
-        get_filename_component(filename "${header}" NAME_WE)
-        add_custom_command(
-                COMMAND "${CLANG_EXECUTABLE}" -xc++-header
-                -Xclang -std=c++${CMAKE_CXX_STANDARD} "${header}"
-                -o "${CMAKE_CURRENT_BINARY_DIR}/${filename}.pch"
-                COMMENT "Generating precompiled header '${header}' using clang"
-                OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${filename}.pch"
-        )
-    endforeach ()
-    target_sources("${target}" PRIVATE "${UTILS_DIR}/../reflect/src/reflect.cpp")
+# Add an element to a list if it is not already present in the list
+function(list_add_if_not_present list elem)
+    list(FIND "${list}" "${elem}" exists)
+    if (exists EQUAL -1)
+        list(APPEND "${list}" "${elem}")
+        set("${list}" "${${list}}" PARENT_SCOPE)
+    endif ()
 endfunction()
 
-# Add a header to the reflection tool
-function(add_reflected_headers target root_include)
-    set(headers ${ARGN})
-    target_include_directories("${target}" PUBLIC "${UTILS_DIR}/../reflect/include")
+# Retrieve library interface directories recursively for the given target
+function(_get_library_include_directories output_list target)
+    get_target_property(_inc "${target}" INTERFACE_INCLUDE_DIRECTORIES)
+    list(APPEND "${output_list}" "${_inc}")
+    get_target_property(libraries "${target}" LINK_LIBRARIES)
+    foreach (lib ${libraries})
+        if (TARGET ${lib})
+            _get_library_include_directories("${output_list}" "${lib}")
+        endif ()
+    endforeach ()
+    set("${output_list}" "${${output_list}}" PARENT_SCOPE)
+endfunction()
+
+# Retrieve all include directories for target, including interface directories from dependencies
+function(get_target_include_directories output_list target)
     get_target_property(includes "${target}" INCLUDE_DIRECTORIES)
-
-    get_target_property(pch "${target}" PRECOMPILE_HEADERS)
-    set(pch_compiled "")
-    set(pch_flags "")
-    foreach (header ${pch})
-        get_filename_component(filename "${header}" NAME_WE)
-        list(APPEND pch_compiled "${CMAKE_CURRENT_BINARY_DIR}/${filename}.pch")
-        list(APPEND pch_flags "-include-pch")
-        list(APPEND pch_flags "${CMAKE_CURRENT_BINARY_DIR}/${filename}.pch")
+    get_target_property(libraries "${target}" LINK_LIBRARIES)
+    foreach (lib ${libraries})
+        _get_library_include_directories(includes "${lib}")
     endforeach ()
-
-    list(TRANSFORM includes PREPEND "-I")
-    foreach (header ${headers})
-        get_filename_component(filename "${header}" NAME_WE)
-        add_custom_command(
-                COMMAND "Reflect" ${header}
-                -output-dir "${CMAKE_CURRENT_SOURCE_DIR}/generated"
-                -include-root "${root_include}"
-                -- -xc++ -std=c++${CMAKE_CXX_STANDARD} -Wno-pragma-once-outside-header
-                ${includes} ${pch_flags}
-                WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-                DEPENDS ${header} ${pch_compiled}
-                OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/generated/${filename}.gen.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/generated/${filename}.gen.h"
-                COMMENT "Running reflection code generation for '${header}'"
-        )
-        target_sources("${target}" PRIVATE "generated/${filename}.gen.cpp")
-    endforeach ()
+    list(REMOVE_DUPLICATES includes)
+    set("${output_list}" "${includes}" PARENT_SCOPE)
 endfunction()

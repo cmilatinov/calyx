@@ -8,7 +8,7 @@ namespace Calyx {
         s_instance = CreateScope<Input>();
     }
 
-    void Input::_OnEvent(Event& event) {
+    void Input::_OnEvent(Event & event) {
         CX_DISPATCH_EVENT(EventKeyPress, Input::HandleKeyPressEvent, event);
         CX_DISPATCH_EVENT(EventKeyRelease, Input::HandleKeyReleaseEvent, event);
         CX_DISPATCH_EVENT(EventMouseButtonPress, Input::HandleMouseButtonPressEvent, event);

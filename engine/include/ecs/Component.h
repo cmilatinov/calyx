@@ -5,26 +5,35 @@ namespace Calyx {
     class GameObject;
 
     class IComponent {
+        CX_BEGIN_REFLECT();
 
     public:
-        virtual bool IsScriptable() const { return false; }
         virtual String GetName() const = 0;
-        virtual size_t GetTypeId() const = 0;
+        virtual TypeID GetTypeId() const = 0;
 
     };
 
     template<typename T>
     class Component : public IComponent {
-
         friend class GameObject;
 
     public:
         String GetName() const override {
-            return typeid(T).name();
+            const char* name = NAMEOF_SHORT_TYPE(T).data();
+            return name;
         }
 
-        size_t GetTypeId() const override {
-            return typeid(T).hash_code();
+        TypeID GetTypeId() const override {
+            auto type = entt::resolve<T>();
+            if (!type) {
+                CX_CORE_WARN(
+                    "Script '{}' is not registered as reflected, its hook methods will not work correctly.\n"
+                    "Make sure to run the reflection tool on its header file.", NAMEOF_SHORT_TYPE(T).data()
+                );
+                entt::meta<T>().type(entt::hashed_string(NAMEOF_SHORT_TYPE(T).data()));
+                type = entt::resolve<T>();
+            }
+            return type.id();
         }
 
         template<typename C>
@@ -32,23 +41,6 @@ namespace Calyx {
 
     protected:
         GameObject* m_gameObject = nullptr;
-
-    };
-
-    class IScript {
-    public:
-        virtual void Reset() {}
-        virtual void Start() {}
-        virtual void Update() {}
-        virtual void DrawGizmos() {}
-        virtual void Destroy() {}
-    };
-
-    template<typename T>
-    class ScriptableComponent: public Component<T>, public IScript {
-
-    public:
-        bool IsScriptable() const { return true; }
 
     };
 

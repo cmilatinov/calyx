@@ -3,7 +3,6 @@
 namespace Calyx {
 
 
-
     class InputActionMap {
 
     private:

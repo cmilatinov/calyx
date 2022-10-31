@@ -9,6 +9,8 @@ namespace Calyx {
     class GameObject {
 
         friend class Scene;
+        friend class Editor::EditorLayer;
+
         template<typename T, typename ... Args>
         friend constexpr Scope<T> Calyx::CreateScope(Args&& ... args);
 
@@ -18,45 +20,37 @@ namespace Calyx {
     public:
         template<typename T, typename ...Ts>
         T* AddComponent(Ts ...args) {
-            T& component = m_scene->m_entityRegistry.emplace<T>(m_entityID, args...);
+            T& component = m_scene->m_entityRegistry.emplace<T>(m_entityID, std::forward<Ts>(args)...);
             component.m_gameObject = this;
-            m_components.push_back(&component);
             return &component;
         }
 
         template<typename T>
-        bool RemoveComponent() {
-            size_t typeId = typeid(T).hash_code();
-            auto component = std::erase_if(m_components, [typeId](IComponent* comp) {
-                return comp->GetTypeId() == typeId;
-            });
-            return component != m_components.end();
+        void RemoveComponent() {
+            m_scene->m_entityRegistry.erase<T>(m_entityID);
         }
 
         template<typename T>
         T* GetComponent() {
-            size_t typeId = typeid(T).hash_code();
-            auto component = std::find_if(m_components.begin(), m_components.end(),
-                                          [typeId](IComponent* comp) {
-                                              return comp->GetTypeId() == typeId;
-                                          });
-            if (component != m_components.end())
-                return reinterpret_cast<T*>(*component);
+            if (HasComponent<T>())
+                return &m_scene->m_entityRegistry.template get<T>(m_entityID);
             return nullptr;
         }
 
         template<typename T>
         bool HasComponent() {
-            return GetComponent<T>() != nullptr;
+            return m_scene->m_entityRegistry.template all_of<T>(m_entityID);
         }
 
         void AddChild(GameObject* child);
         void SetParent(GameObject* parent);
+        void DetachFromParent();
 
-        const Scene* GetScene() { return m_scene; }
+        const Scene* GetScene() const { return m_scene; }
         String GetName() const { return m_name; }
         String& GetNameRef() { return m_name; }
-        const List<GameObject*>& GetChildren() { return m_children; }
+        const Set<GameObject*>& GetChildren() const { return m_children; }
+        GameObject* GetParent() const { return m_parent; }
 
         Transform& GetTransform();
 
@@ -67,8 +61,8 @@ namespace Calyx {
         Scene* m_scene;
         entt::entity m_entityID = entt::null;
         String m_name;
-        List<IComponent*> m_components;
-        List<GameObject*> m_children;
+        GameObject* m_parent = nullptr;
+        Set<GameObject*> m_children;
 
     };
 

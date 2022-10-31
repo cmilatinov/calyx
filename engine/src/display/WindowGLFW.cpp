@@ -4,7 +4,7 @@ namespace Calyx {
 
     uint32 WindowGLFW::s_windowCount = 0;
 
-    WindowGLFW::Window * Window::Create(const WindowMode& mode) {
+    WindowGLFW::Window* Window::Create(const WindowMode& mode) {
         return new WindowGLFW(mode);
     }
 
@@ -65,14 +65,17 @@ namespace Calyx {
         // Create window
         m_windowMode.width = m_windowMode.width == CX_DISPLAY_MAX_SIZE ? vmode->width : m_windowMode.width;
         m_windowMode.height = m_windowMode.height == CX_DISPLAY_MAX_SIZE ? vmode->height : m_windowMode.height;
-        m_windowMode.x = m_windowMode.x == CX_DISPLAY_CENTER ? (vmode->width / 2) - (m_windowMode.width / 2) : m_windowMode.x;
-        m_windowMode.y = m_windowMode.y == CX_DISPLAY_CENTER ? (vmode->height / 2) - (m_windowMode.height / 2) : m_windowMode.y;
+        m_windowMode.x =
+            m_windowMode.x == CX_DISPLAY_CENTER ? (vmode->width / 2) - (m_windowMode.width / 2) : m_windowMode.x;
+        m_windowMode.y =
+            m_windowMode.y == CX_DISPLAY_CENTER ? (vmode->height / 2) - (m_windowMode.height / 2) : m_windowMode.y;
         m_windowHandle = glfwCreateWindow(m_windowMode.width, m_windowMode.height, m_title.c_str(), nullptr, nullptr);
         CX_CORE_ASSERT(m_windowHandle != nullptr, "Failed to create GLFW window!");
 
         // Set fullscreen or position
         if (m_windowMode.fullscreen)
-            glfwSetWindowMonitor(m_windowHandle, glfwGetPrimaryMonitor(), m_windowMode.x, m_windowMode.y, m_windowMode.width, m_windowMode.height, GLFW_DONT_CARE);
+            glfwSetWindowMonitor(m_windowHandle, glfwGetPrimaryMonitor(), m_windowMode.x, m_windowMode.y,
+                                 m_windowMode.width, m_windowMode.height, GLFW_DONT_CARE);
         else
             glfwSetWindowPos(m_windowHandle, m_windowMode.x, m_windowMode.y);
 
@@ -113,7 +116,7 @@ namespace Calyx {
             glfwTerminate();
     }
 
-    inline void WindowGLFW::DispatchEvent(Event& event) {
+    inline void WindowGLFW::DispatchEvent(Event & event) {
         if (m_eventCallback == nullptr)
             return;
         m_eventCallback(event);

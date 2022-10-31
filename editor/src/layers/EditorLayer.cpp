@@ -3,14 +3,16 @@
 namespace Calyx::Editor {
 
     void EditorLayer::OnAttach() {
+        m_reflectedComponents = Reflect::Core::GetDerivedClasses<IComponent>();
+
         const Window& window = Application::GetInstance().GetWindow();
 
         m_msaaFramebuffer = Framebuffer::Create(
             {
-                .width = window.GetWidth(),
-                .height = window.GetHeight(),
-                .samples = 32,
-                .attachments = {
+                window.GetWidth(),
+                window.GetHeight(),
+                32,
+                {
                     { IRenderTarget::Type::RENDERBUFFER, TextureFormat::DEPTH32 },
                     { IRenderTarget::Type::TEXTURE, TextureFormat::RGBA8 },
                 }
@@ -20,10 +22,10 @@ namespace Calyx::Editor {
 
         m_framebuffer = Framebuffer::Create(
             {
-                .width = window.GetWidth(),
-                .height = window.GetHeight(),
-                .samples = 1,
-                .attachments = {
+                window.GetWidth(),
+                window.GetHeight(),
+                1,
+                {
                     { IRenderTarget::Type::RENDERBUFFER, TextureFormat::DEPTH32 },
                     { IRenderTarget::Type::TEXTURE, TextureFormat::RGBA8 },
                 }
@@ -58,6 +60,7 @@ namespace Calyx::Editor {
     }
 
     void EditorLayer::OnUpdate() {
+        // Update Camera
         if (m_viewportPressed && !ImGuizmo::IsUsing()) {
             m_editorCamera->Update();
         }
@@ -81,6 +84,9 @@ namespace Calyx::Editor {
         // Blit and resolve MSAA samples
         m_msaaFramebuffer->Blit(m_framebuffer, 0, 0);
         m_msaaFramebuffer->Unbind();
+
+        // Delete scene objects pending deletion
+        m_scene->DeleteGameObjects();
     }
 
     void EditorLayer::OnGUI() {
@@ -95,7 +101,7 @@ namespace Calyx::Editor {
         EndDockspace();
     }
 
-    void EditorLayer::OnEvent(Event& event) {
+    void EditorLayer::OnEvent(Event & event) {
         if (event.GetEventType() == EventType::MouseButtonPress &&
             dynamic_cast<EventMouseButtonPress&>(event).GetMouseButton() == MOUSE_BUTTON_1 &&
             m_viewportHovered &&
@@ -147,13 +153,17 @@ namespace Calyx::Editor {
         // Show viewport
         ImGui::SetNextWindowSize(ImVec2{ 1280, 720 }, ImGuiCond_FirstUseEver);
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 0.0f, 0.0f });
-        ImGui::Begin("Viewport", nullptr,
-                     ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse);
+        ImGui::Begin(
+            "Viewport", nullptr,
+            ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse
+        );
         ImGui::PopStyleVar();
 
         uint32 textureID = m_framebuffer->GetColorAttachment(0).GetRendererID();
-        ImGui::Image(reinterpret_cast<void*>(static_cast<size_t>(textureID)), ImGui::GetContentRegionAvail(),
-                     { 0.0f, 1.0f }, { 1.0f, 0.0f });
+        ImGui::Image(
+            reinterpret_cast<void*>(static_cast<size_t>(textureID)), ImGui::GetContentRegionAvail(),
+            { 0.0f, 1.0f }, { 1.0f, 0.0f }
+        );
 
         // Resize viewport frame buffers if needed
         ImVec2 viewportSize = ImGui::GetWindowSize();
@@ -180,9 +190,11 @@ namespace Calyx::Editor {
         if (selected != nullptr) {
             ImGuizmo::SetOrthographic(false);
             ImGuizmo::SetDrawlist();
-            ImGuizmo::SetRect(m_viewportBounds.x, m_viewportBounds.y,
-                              m_viewportBounds.z - m_viewportBounds.x,
-                              m_viewportBounds.w - m_viewportBounds.y);
+            ImGuizmo::SetRect(
+                m_viewportBounds.x, m_viewportBounds.y,
+                m_viewportBounds.z - m_viewportBounds.x,
+                m_viewportBounds.w - m_viewportBounds.y
+            );
 
             mat4 projection = m_editorCamera->GetProjectionMatrix();
             mat4 view = m_editorCamera->GetTransform().GetInverseMatrix();
@@ -190,7 +202,8 @@ namespace Calyx::Editor {
             if (ImGuizmo::Manipulate(
                 glm::value_ptr(view), glm::value_ptr(projection),
                 static_cast<ImGuizmo::OPERATION>(m_gizmoType), ImGuizmo::MODE::LOCAL,
-                glm::value_ptr(transform), nullptr, nullptr)) {
+                glm::value_ptr(transform), nullptr, nullptr
+            )) {
                 selected->GetTransform().SetWorldMatrix(transform);
             }
         }
@@ -224,27 +237,28 @@ namespace Calyx::Editor {
         auto* selected = m_sceneHierarchyPanel->GetSelectedObject();
         if (selected != nullptr) {
             // Name
-            if (ImGui::CollapsingHeader("Game Object", ImGuiTreeNodeFlags_DefaultOpen)) {
-                ImGui::InputText("Name", &selected->GetNameRef(), ImGuiInputTextFlags_AutoSelectAll);
+            if (ImGui::BeginTable(
+                "GameObject", 2,
+                ImGuiTableFlags_BordersInnerV | ImGuiTableFlags_RowBg | ImGuiTableFlags_Resizable
+            )) {
+                ImGui::TableNextRow();
+                ImGui::TableNextColumn();
+                ImGui::Text("Name");
+                ImGui::TableNextColumn();
+                ImGui::SetNextItemWidth(-FLT_MIN);
+                ImGui::PushStyleColor(ImGuiCol_FrameBg, 0);
+                ImGui::InputText("##name", &selected->GetNameRef(), ImGuiInputTextFlags_AutoSelectAll);
+                ImGui::PopStyleColor();
+                ImGui::EndTable();
             }
 
-            // Transform
-            bool headerOpen = ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen);
-            if (ImGui::BeginPopupContextItem()) {
-                if (ImGui::MenuItem("Reset")) {
-                    selected->GetTransform().Reset();
-                }
-                ImGui::EndPopup();
-            }
-            if (headerOpen) {
-                Transform& transform = selected->GetTransform();
-                vec3 translation, rotation, scale;
-                Math::DecomposeTransform(transform.GetMatrix(), translation, rotation, scale);
-                bool changed = ImGui::DragFloat3("Position", glm::value_ptr(translation), 0.05f);
-                changed |= ImGui::DragFloat3("Rotation", glm::value_ptr(rotation));
-                changed |= ImGui::DragFloat3("Scale", glm::value_ptr(scale), 0.05f);
-                if (changed) {
-                    transform.SetWorldMatrix(Math::ComposeTransform(translation, rotation, scale));
+            // Components
+            for (auto& component: m_reflectedComponents) {
+                auto storage = m_scene->m_entityRegistry.storage(component.info().hash());
+                if (storage != nullptr) {
+                    if (storage->contains(selected->m_entityID)) {
+                        Inspector::DrawComponentInspector(component, storage->get(selected->m_entityID));
+                    }
                 }
             }
         }

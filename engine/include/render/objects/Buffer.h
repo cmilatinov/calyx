@@ -3,33 +3,33 @@
 namespace Calyx {
 
     enum class ShaderDataType {
-        Float   = 0,
-        Float2  = 1,
-        Float3  = 2,
-        Float4  = 3,
-        Int     = 4,
-        Int2    = 5,
-        Int3    = 6,
-        Int4    = 7,
-        Mat2    = 8,
-        Mat3    = 9,
-        Mat4    = 10,
-        Bool    = 11,
+        Float = 0,
+        Float2 = 1,
+        Float3 = 2,
+        Float4 = 3,
+        Int = 4,
+        Int2 = 5,
+        Int3 = 6,
+        Int4 = 7,
+        Mat2 = 8,
+        Mat3 = 9,
+        Mat4 = 10,
+        Bool = 11,
         None
     };
 
     static const uint32 s_shaderTypeSizes[] = {
-            4, 8, 12, 16,
-            4, 8, 12, 16,
-            16, 36, 64,
-            1
+        4, 8, 12, 16,
+        4, 8, 12, 16,
+        16, 36, 64,
+        1
     };
 
     static const uint32 s_shaderTypeComponentCounts[] = {
-            1, 2, 3, 4,
-            1, 2, 3, 4,
-            2, 3, 4,
-            1
+        1, 2, 3, 4,
+        1, 2, 3, 4,
+        2, 3, 4,
+        1
     };
 
     inline static uint32 ShaderDataTypeSize(ShaderDataType type) {
@@ -78,7 +78,7 @@ namespace Calyx {
     private:
         void CalculateOffsets() {
             uint32 offset = 0;
-            for (auto& element : m_elements) {
+            for (auto& element: m_elements) {
                 element.offset = offset;
                 uint32 elementSize = element.GetSize();
                 offset += elementSize;

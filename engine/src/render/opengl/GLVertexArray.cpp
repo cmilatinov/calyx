@@ -3,21 +3,21 @@
 namespace Calyx {
 
     static const uint32 s_openglShaderTypes[] = {
-            GL_FLOAT,
-            GL_FLOAT,
-            GL_FLOAT,
-            GL_FLOAT,
+        GL_FLOAT,
+        GL_FLOAT,
+        GL_FLOAT,
+        GL_FLOAT,
 
-            GL_INT,
-            GL_INT,
-            GL_INT,
-            GL_INT,
+        GL_INT,
+        GL_INT,
+        GL_INT,
+        GL_INT,
 
-            GL_FLOAT,
-            GL_FLOAT,
-            GL_FLOAT,
+        GL_FLOAT,
+        GL_FLOAT,
+        GL_FLOAT,
 
-            GL_BOOL
+        GL_BOOL
     };
 
     inline static GLenum ShaderDataTypeToOpenGLType(ShaderDataType type) {
@@ -48,7 +48,7 @@ namespace Calyx {
         vertexBuffer->Bind();
 
         auto layout = vertexBuffer->GetLayout();
-        for (auto& element : layout) {
+        for (auto& element: layout) {
             switch (element.type) {
                 case ShaderDataType::Float:
                 case ShaderDataType::Float2:
@@ -89,7 +89,7 @@ namespace Calyx {
                                               ShaderDataTypeToOpenGLType(element.type),
                                               element.normalized ? GL_TRUE : GL_FALSE,
                                               layout.GetStride(),
-                                              (const void*)(element.offset + sizeof(float) * count * i));
+                                              (const void*) (element.offset + sizeof(float) * count * i));
                         glVertexAttribDivisor(m_nextVertexAttribIndex, 1);
                         m_nextVertexAttribIndex++;
                     }

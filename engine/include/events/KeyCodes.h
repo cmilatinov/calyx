@@ -11,7 +11,7 @@ namespace Calyx {
         KEY_MINUS = 45,
         KEY_PERIOD = 46,
         KEY_SLASH = 47,
-        
+
         KEY_0 = 48,
         KEY_1 = 49,
         KEY_2 = 50,
@@ -22,10 +22,10 @@ namespace Calyx {
         KEY_7 = 55,
         KEY_8 = 56,
         KEY_9 = 57,
-        
+
         KEY_SEMICOLON = 59,
         KEY_EQUALS = 61,
-        
+
         KEY_A = 65,
         KEY_B = 66,
         KEY_C = 67,
@@ -52,15 +52,15 @@ namespace Calyx {
         KEY_X = 88,
         KEY_Y = 89,
         KEY_Z = 90,
-        
+
         KEY_LEFT_BRACKET = 91,
         KEY_BACKSLASH = 92,
         KEY_RIGHT_BRACKET = 93,
         KEY_GRAVE_ACCENT = 96,
-        
+
         KEY_WORLD1 = 161,
         KEY_WORLD2 = 162,
-        
+
         KEY_ESCAPE = 256,
         KEY_ENTER = 257,
         KEY_TAB = 258,
@@ -105,7 +105,7 @@ namespace Calyx {
         KEY_F23 = 312,
         KEY_F24 = 313,
         KEY_F25 = 314,
-        
+
         /* Keypad */
         KEY_NUMPAD0 = 320,
         KEY_NUMPAD1 = 321,
@@ -124,7 +124,7 @@ namespace Calyx {
         KEY_NUMPAD_ADD = 334,
         KEY_NUMPAD_ENTER = 335,
         KEY_NUMPAD_EQUAL = 336,
-        
+
         KEY_LEFT_SHIFT = 340,
         KEY_LEFT_CONTROL = 341,
         KEY_LEFT_ALT = 342,

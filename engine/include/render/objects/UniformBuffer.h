@@ -5,8 +5,8 @@
 namespace Calyx {
 
     static const uint32 s_shaderTypeAlignments[] = {
-            4, 8, 16, 16,
-            4, 8, 16, 16
+        4, 8, 16, 16,
+        4, 8, 16, 16
     };
 
     class UniformBufferLayout {
@@ -29,7 +29,7 @@ namespace Calyx {
     private:
         void CalculateOffsets() {
             uint32 offset = 0;
-            for (auto& element : m_elements) {
+            for (auto& element: m_elements) {
 //                switch
             }
         }

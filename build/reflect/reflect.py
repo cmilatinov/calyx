@@ -259,7 +259,7 @@ def get_method_type(m, clazz):
     #
     replacement = \
         F"(*)\\1" if m['storage_class'] == StorageClass.STATIC else \
-        F"({clazz['full_name']}::*)\\1"
+            F"({clazz['full_name']}::*)\\1"
     return re.sub(r'(\(.*?\))', replacement, m['node'].type.spelling)
 
 
@@ -387,10 +387,10 @@ def serialize_class(clazz, header, source):
         comma = ",\n"
         return F"""{{
                 {
-                    F"(size_t)&{clazz['full_name']}::{f['name']}"
-                    if f['storage_class'] == StorageClass.STATIC
-                    else F"offsetof({clazz['full_name']}, {f['name']})"
-                },
+        F"(size_t)&{clazz['full_name']}::{f['name']}"
+        if f['storage_class'] == StorageClass.STATIC
+        else F"offsetof({clazz['full_name']}, {f['name']})"
+        },
                 {get_access_specifier(f)}, 
                 {get_storage_type(f)}, 
                 reflect::GetTypeId<{f['var_type']}>(),
@@ -415,12 +415,12 @@ def serialize_class(clazz, header, source):
 
         if m['storage_class'] == StorageClass.STATIC:
             invoke_instance = \
-F"""Object {typename}::Invoke(const Reference& o, const std::vector<Object>& args) const {{
+                F"""Object {typename}::Invoke(const Reference& o, const std::vector<Object>& args) const {{
         throw Exception("Static method cannot be invoked on an instance!");
     }}"""
             invocation = F"""{clazz["full_name"]}::{m["name"]}({", ".join(list(map(lambda enum: F"args[{enum[0]}].GetT<std::decay_t<{enum[1]['var_type']}>>()", enumerate(m['parameters']))))})"""
             invoke_static = \
-F"""Object {typename}::Invoke(const std::vector<Object>& args) const {{ 
+                F"""Object {typename}::Invoke(const std::vector<Object>& args) const {{ 
         auto params = GetParameterList();
         if (params.size() != args.size())
             throw Exception("Argument count does not match!");
@@ -436,7 +436,7 @@ F"""Object {typename}::Invoke(const std::vector<Object>& args) const {{
         else:
             invocation = F"""o.GetT<{clazz['full_name']}>().{m['name']}({', '.join(list(map(lambda enum: F"args[{enum[0]}].GetT<std::decay_t<{enum[1]['var_type']}>>()", enumerate(m['parameters']))))})"""
             invoke_instance = \
-F"""Object {typename}::Invoke(const Reference& o, const std::vector<Object>& args) const {{
+                F"""Object {typename}::Invoke(const Reference& o, const std::vector<Object>& args) const {{
         auto params = GetParameterList();
         if (params.size() != args.size())
             throw Exception("Argument count does not match!");
@@ -450,7 +450,7 @@ F"""Object {typename}::Invoke(const Reference& o, const std::vector<Object>& arg
         {F'return Object({invocation});' if m['return_type'] != 'void' else 'return Object();'}
     }}"""
             invoke_static = \
-F"""Object {typename}::Invoke(const std::vector<Object>& args) const {{
+                F"""Object {typename}::Invoke(const std::vector<Object>& args) const {{
         throw Exception("Instance method cannot be invoked statically!");
     }}"""
 
