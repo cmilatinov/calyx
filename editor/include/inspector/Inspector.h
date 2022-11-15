@@ -1,8 +1,7 @@
 #pragma once
 
-#include <imgui.h>
-
 #include "inspector/TypeInspector.h"
+#include "inspector/InspectorGUI.h"
 #include "ecs/Component.h"
 
 namespace Calyx::Editor {
@@ -22,22 +21,15 @@ namespace Calyx::Editor {
             DrawComponentInspector(Reflect::Core::CreateReference(instance));
         }
 
-        static void DrawPropertyInspector(const entt::meta_type& type, void* instance) {
-            DrawPropertyInspector(type.from_void(instance));
-        }
-
-        template<typename T>
-        static void DrawPropertyInspector(T* instance) {
-            DrawPropertyInspector(Reflect::Core::CreateReference(instance));
-        }
-
     private:
         static InspectorMap s_inspectorClasses;
 
         static String GetName(const entt::meta_any& instance);
 
         static void DrawComponentInspector(entt::meta_any&& instance);
-        static void DrawPropertyInspector(entt::meta_any&& instance, const char* label = nullptr);
+        static void DrawPropertyInspector(const String& propertyName, entt::meta_any&& instance);
+
+        static void DrawTypeInspector(entt::id_type typeId, entt::meta_any&& instance);
 
         static void DrawDefaultComponentInspector(entt::meta_any&& component);
 

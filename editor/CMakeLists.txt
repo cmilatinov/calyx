@@ -6,6 +6,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_C_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DCX_DEBUG")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DCX_DEBUG")
+set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -Wno-invalid-offsetof")
 
 # Includes
 include(../build/include/utils.cmake)
@@ -25,6 +26,9 @@ target_precompile_headers("Editor" PUBLIC "../engine/include/Calyx.h")
 add_reflected_target("Editor")
 add_reflected_headers("Editor" "include"
         "include/inspector/TypeInspector.h"
+        "include/inspector/types/StringInspector.h"
+        "include/inspector/types/Vec2Inspector.h"
+        "include/inspector/types/Vec3Inspector.h"
         "include/inspector/components/TransformComponentInspector.h")
 
 # Copy assets

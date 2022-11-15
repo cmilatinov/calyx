@@ -36,6 +36,7 @@ namespace Calyx::Editor {
         m_sceneRenderer = CreateScope<SceneRenderer>();
         m_scene = CreateScope<Scene>();
         m_sceneHierarchyPanel = CreateScope<SceneHierarchyPanel>(m_scene.get());
+        m_contentBrowserPanel = CreateScope<ContentBrowserPanel>("./");
 
         m_editorCamera = CreateScope<CameraEditor>();
         m_editorCamera->GetTransform().SetPosition(vec3(1, 1, 1));
@@ -101,7 +102,7 @@ namespace Calyx::Editor {
         EndDockspace();
     }
 
-    void EditorLayer::OnEvent(Event & event) {
+    void EditorLayer::OnEvent(Event& event) {
         if (event.GetEventType() == EventType::MouseButtonPress &&
             dynamic_cast<EventMouseButtonPress&>(event).GetMouseButton() == MOUSE_BUTTON_1 &&
             m_viewportHovered &&
@@ -237,19 +238,10 @@ namespace Calyx::Editor {
         auto* selected = m_sceneHierarchyPanel->GetSelectedObject();
         if (selected != nullptr) {
             // Name
-            if (ImGui::BeginTable(
-                "GameObject", 2,
-                ImGuiTableFlags_BordersInnerV | ImGuiTableFlags_RowBg | ImGuiTableFlags_Resizable
-            )) {
-                ImGui::TableNextRow();
-                ImGui::TableNextColumn();
-                ImGui::Text("Name");
-                ImGui::TableNextColumn();
-                ImGui::SetNextItemWidth(-FLT_MIN);
-                ImGui::PushStyleColor(ImGuiCol_FrameBg, 0);
-                ImGui::InputText("##name", &selected->GetNameRef(), ImGuiInputTextFlags_AutoSelectAll);
-                ImGui::PopStyleColor();
-                ImGui::EndTable();
+            if (InspectorGUI::BeginPropertyTable("GameObject")) {
+                InspectorGUI::Property("Name");
+                InspectorGUI::TextControl("##name", selected->GetNameRef());
+                InspectorGUI::EndPropertyTable();
             }
 
             // Components
@@ -266,8 +258,7 @@ namespace Calyx::Editor {
     }
 
     void EditorLayer::ContentBrowser() {
-        ImGui::Begin("Content Browser");
-        ImGui::End();
+        m_contentBrowserPanel->Draw();
     }
 
     void EditorLayer::EndDockspace() {

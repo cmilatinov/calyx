@@ -1,7 +1,7 @@
 assimp
-entt
-glfw3
+entt[experimental]
 glad
+glfw3
 glm
 imgui[docking-experimental,glfw-binding,opengl3-binding]
 imguizmo

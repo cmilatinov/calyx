@@ -1,14 +1,25 @@
 #include "inspector/InspectorGUI.h"
+
+#include <imgui.h>
+#include <imgui_stdlib.h>
 #include <imgui_internal.h>
 
 namespace Calyx::Editor {
 
-    bool InspectorGUI::DrawVec3Control(const String& name, vec3& value, float speed) {
+    bool InspectorGUI::TextControl(const String& name, String& value) {
+        return ImGui::InputText(name.c_str(), &value, ImGuiInputTextFlags_AutoSelectAll);
+    }
+
+    bool InspectorGUI::Vec3Control(const String& name, vec3& value, float speed) {
         return DragFloatN_Colored(name.c_str(), glm::value_ptr(value), 3, speed);
     }
 
-    bool InspectorGUI::DrawVec2Control(const String& name, vec2& value, float speed) {
+    bool InspectorGUI::Vec2Control(const String& name, vec2& value, float speed) {
         return DragFloatN_Colored(name.c_str(), glm::value_ptr(value), 2, speed);
+    }
+
+    bool InspectorGUI::SliderControl(const String& name, float& value, float min, float max) {
+        return ImGui::SliderFloat(name.c_str(), &value, min, max);
     }
 
     bool InspectorGUI::BeginPropertyTable(const String& name) {
@@ -22,7 +33,7 @@ namespace Calyx::Editor {
         ImGui::EndTable();
     }
 
-    void InspectorGUI::PropertyRow(const String& label) {
+    void InspectorGUI::Property(const String& label) {
         ImGui::TableNextRow();
         ImGui::TableNextColumn();
         ImGui::Text(label.c_str());
@@ -71,5 +82,6 @@ namespace Calyx::Editor {
 
         return value_changed;
     }
+
 
 }

@@ -1,5 +1,6 @@
 #include "inspector/Inspector.h"
-#include "math/Transform.h"
+
+#include <imgui.h>
 
 namespace Calyx::Editor {
 
@@ -37,18 +38,24 @@ namespace Calyx::Editor {
         if (!DrawComponentInspectorHeader(std::forward<entt::meta_any>(instance)))
             return;
 
-        if (!CheckInspectorTypeExists(instance))
+        entt::id_type typeId;
+        if (!CheckInspectorTypeExists(instance, &typeId))
             return DrawDefaultComponentInspector(std::forward<entt::meta_any>(instance));
 
-        DrawPropertyInspector(std::forward<entt::meta_any>(instance));
+        DrawTypeInspector(typeId, std::forward<entt::meta_any>(instance));
     }
 
-    void Inspector::DrawPropertyInspector(entt::meta_any&& instance, const char* label) {
-        using namespace entt::literals;
-
+    void Inspector::DrawPropertyInspector(const String& propertyName, entt::meta_any&& instance) {
         entt::id_type typeId;
         if (!CheckInspectorTypeExists(instance, &typeId))
             return;
+
+        InspectorGUI::Property(propertyName);
+        DrawTypeInspector(typeId, std::forward<entt::meta_any>(instance));
+    }
+
+    void Inspector::DrawTypeInspector(entt::id_type typeId, entt::meta_any&& instance) {
+        using namespace entt::literals;
 
         auto& inspector = s_inspectorClasses[typeId];
         entt::meta_func fn;
@@ -59,14 +66,19 @@ namespace Calyx::Editor {
     }
 
     void Inspector::DrawDefaultComponentInspector(entt::meta_any&& instance) {
-        auto type = instance.type();
-        for (auto [id, data]: type.data()) {
-            String label = Reflect::Core::GetFieldName(type, id);
-            auto member = Reflect::Core::CreateOpaqueReference(
-                data.type(),
-                Reflect::Core::GetFieldPointer(instance, id)
-            );
-            DrawPropertyInspector(std::forward<entt::meta_any>(member), label.c_str());
+        if (InspectorGUI::BeginPropertyTable("Default Inspector")) {
+            auto type = instance.type();
+            for (auto [id, data]: type.data()) {
+                String label = Reflect::Core::GetFieldName(type, id);
+                DrawPropertyInspector(
+                    label,
+                    Reflect::Core::CreateOpaqueReference(
+                        data.type(),
+                        Reflect::Core::GetFieldPointer(instance, id)
+                    )
+                );
+            }
+            InspectorGUI::EndPropertyTable();
         }
     }
 

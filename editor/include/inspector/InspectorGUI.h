@@ -1,19 +1,19 @@
 #pragma once
 
-#include <imgui.h>
-
 namespace Calyx::Editor {
 
     class InspectorGUI {
 
     public:
-        static bool DrawVec3Control(const String& name, vec3& value, float speed = 1.0f);
-        static bool DrawVec2Control(const String& name, vec2& value, float speed = 1.0f);
+        static bool TextControl(const String& name, String& value);
+        static bool Vec3Control(const String& name, vec3& value, float speed = 1.0f);
+        static bool Vec2Control(const String& name, vec2& value, float speed = 1.0f);
+        static bool SliderControl(const String& name, float& value, float min = 0.0f, float max = 0.0f);
 
         static bool BeginPropertyTable(const String& name);
         static void EndPropertyTable();
 
-        static void PropertyRow(const String& label);
+        static void Property(const String& label);
 
     private:
         static bool DragFloatN_Colored(

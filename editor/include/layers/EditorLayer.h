@@ -10,7 +10,9 @@
 #include "render/CameraEditor.h"
 #include "scene/SceneRenderer.h"
 #include "windows/SceneHierarchyPanel.h"
+#include "windows/ContentBrowserPanel.h"
 #include "inspector/Inspector.h"
+#include "inspector/InspectorGUI.h"
 
 namespace Calyx::Editor {
 
@@ -30,6 +32,7 @@ namespace Calyx::Editor {
         Scope<Scene> m_scene;
         Scope<CameraEditor> m_editorCamera;
         Scope<SceneHierarchyPanel> m_sceneHierarchyPanel;
+        Scope<ContentBrowserPanel> m_contentBrowserPanel;
 
         // Grid
         Mesh* m_grid;

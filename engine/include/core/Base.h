@@ -14,9 +14,10 @@
 #endif
 
 #include <Windows.h>
-
+#elif defined(CX_PLATFORM_LINUX)
+#define CALYX_API
 #else
-#error "Calyx only supports Windows!"
+#error "Calyx only supports Windows or Linux!"
 #endif
 
 #ifdef CX_DEBUG

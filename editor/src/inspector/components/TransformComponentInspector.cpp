@@ -1,5 +1,7 @@
 #include "inspector/components/TransformComponentInspector.h"
 
+#include <imgui.h>
+
 namespace Calyx::Editor {
 
     void TransformComponentInspector::CX_ON_INSPECTOR_CONTEXT_GUI(TransformComponent& tc) {
@@ -16,19 +18,14 @@ namespace Calyx::Editor {
 
         bool changed = false;
         if (InspectorGUI::BeginPropertyTable("Transform")) {
-            if (ImGui::BeginPopupContextWindow("Transform Popup")) {
-                CX_ON_INSPECTOR_CONTEXT_GUI(tc);
-                ImGui::EndPopup();
-            }
+            InspectorGUI::Property("Position");
+            changed |= InspectorGUI::Vec3Control("pos", translation, 0.05f);
 
-            InspectorGUI::PropertyRow("Position");
-            changed |= InspectorGUI::DrawVec3Control("pos", translation, 0.05f);
+            InspectorGUI::Property("Rotation");
+            changed |= InspectorGUI::Vec3Control("rot", rotation);
 
-            InspectorGUI::PropertyRow("Rotation");
-            changed |= InspectorGUI::DrawVec3Control("rot", rotation);
-
-            InspectorGUI::PropertyRow("Scale");
-            changed |= InspectorGUI::DrawVec3Control("scale", scale, 0.05f);
+            InspectorGUI::Property("Scale");
+            changed |= InspectorGUI::Vec3Control("scale", scale, 0.05f);
 
             InspectorGUI::EndPropertyTable();
         }

@@ -18,7 +18,10 @@ namespace Calyx::Editor {
         }
 
         if (ImGui::BeginTable(
-            "Scene Objects", 1, ImGuiTableFlags_BordersV | ImGuiTableFlags_BordersOuterH | ImGuiTableFlags_RowBg
+            "Scene Objects", 1,
+            ImGuiTableFlags_BordersOuterH |
+            ImGuiTableFlags_RowBg |
+            ImGuiTableFlags_NoPadInnerX
         )) {
             ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_NoHide);
             ImGui::TableHeadersRow();

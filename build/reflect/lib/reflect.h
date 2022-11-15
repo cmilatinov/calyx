@@ -4,6 +4,7 @@
 #include <vector>
 #include <unordered_map>
 #include <entt/meta/meta.hpp>
+#include <entt/meta/resolve.hpp>
 
 #include "utils.h"
 #include "registration.h"
