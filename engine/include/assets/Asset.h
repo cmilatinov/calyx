@@ -11,9 +11,6 @@ namespace Calyx {
     public:
         virtual ~IAsset() = default;
 
-        virtual void Clear() = 0;
-        virtual bool Load(const String& path) = 0;
-
         virtual AssetT GetAssetType() = 0;
 
     };

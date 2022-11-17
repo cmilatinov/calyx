@@ -9,9 +9,20 @@ namespace Calyx {
         switch (Renderer::GetAPI()) {
             case RendererAPI::OPENGL:
                 return CreateRef<GLTexture2D>(width, height, samples, format);
+            default:
+                CX_CORE_ASSERT(false, "Rendering API not supported!");
+                return nullptr;
         }
-        CX_CORE_ASSERT(false, "Rendering API not supported!");
-        return nullptr;
+    }
+
+    Texture2D* Texture2D::Create(const String& file) {
+        switch (Renderer::GetAPI()) {
+            case RendererAPI::OPENGL:
+                return new GLTexture2D(file);
+            default:
+                CX_CORE_ASSERT(false, "Rendering API not supported!");
+                return nullptr;
+        }
     }
 
 }

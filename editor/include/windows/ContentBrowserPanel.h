@@ -1,21 +1,27 @@
 #pragma once
 
-#include <imgui.h>
+#include "assets/AssetRegistry.h"
+#include "render/objects/Texture2D.h"
 
 namespace Calyx::Editor {
 
     class ContentBrowserPanel {
 
     public:
-        ContentBrowserPanel(const String& basePath);
+        explicit ContentBrowserPanel(const String& basePath);
 
         void Draw();
 
     private:
+        Texture2D* m_objFileTexture;
+        Texture2D* m_folderTexture;
         Path m_currentDirectory;
-        float m_thumbnailSize = 128;
+        Path m_currentRelativePath;
+        float m_thumbnailSize = 120;
         float m_padding = 8;
         float m_zoomScale = 1.0f;
+
+        void SetDirectory(const Path& path);
 
     };
 

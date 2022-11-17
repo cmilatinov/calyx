@@ -1,5 +1,6 @@
 #pragma once
 
+#include "render/objects/Shader.h"
 #include "render/objects/Framebuffer.h"
 #include "render/Camera.h"
 

@@ -182,4 +182,11 @@ namespace Calyx {
         UpdateVAO();
     }
 
+    Mesh* Mesh::Create(const String& file) {
+        auto* mesh = new Mesh();
+        if (!mesh->Load(file))
+            return nullptr;
+        return mesh;
+    }
+
 }

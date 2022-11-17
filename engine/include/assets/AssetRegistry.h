@@ -1,8 +1,14 @@
 #pragma once
 
 #include "assets/Asset.h"
-#include "assets/Mesh.h"
-#include "render/objects/Shader.h"
+
+#define CX_ASSET_REGISTRY_FRIEND()                          \
+template<typename T>                                        \
+friend T* ::Calyx::AssetRegistry::LoadAsset(const String&)
+
+namespace Calyx {
+    class Mesh;
+}
 
 namespace Calyx::AssetRegistry {
 
@@ -34,17 +40,14 @@ namespace Calyx::AssetRegistry {
         }
 
         // Load asset from file
-        assets[path] = CreateScope<T>();
-        if (!assets[path]->Load(path)) {
-            assets.erase(path);
+        T* asset = T::Create(path);
+        if (asset == nullptr) {
             return nullptr;
         }
 
-        return reinterpret_cast<T*>(assets[path].get());
+        assets[path] = Scope<T>(asset);
+        return asset;
     }
-
-    template<>
-    Shader* LoadAsset<Shader>(const String& path);
 
     template<typename T, typename ...Ts>
     void RegisterAssetType(Ts... extensions);

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "assets/Asset.h"
+#include "assets/AssetRegistry.h"
 
 namespace Calyx {
 
@@ -22,7 +22,11 @@ namespace Calyx {
         return ShaderType::NONE;
     }
 
+    class ShaderLibrary;
+
     class CALYX_API Shader : public Asset<Shader> {
+        CX_ASSET_REGISTRY_FRIEND();
+        friend class ShaderLibrary;
 
     public:
         ~Shader() override = default;
@@ -42,11 +46,10 @@ namespace Calyx {
         virtual const String& GetName() const = 0;
         virtual bool IsFunctional() const = 0;
 
-        bool Load(const String& path) override { return false; }
-        void Clear() override {}
-
-        static Scope<Shader> Create(const String& filepath);
         static Scope<Shader> Create(const String& name, const String& vertexSrc, const String& fragmentSrc);
+
+    private:
+        static Shader* Create(const String& file);
 
     };
 

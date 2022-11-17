@@ -64,11 +64,17 @@ namespace Calyx {
 
     void GuiLayer::SetupImGuiTheme() {
         // Set font
-        const float fontSize = 21.0f;
+        const float fontSizeNormal = 22.0f;
+        const float fontSizeSmall = 18.0f;
+        const float fontSizeLarge = 30.0f;
         ImGuiIO& io = ImGui::GetIO();
-        (void) io;
-        io.Fonts->AddFontFromFileTTF("assets/fonts/inconsolata/Inconsolata-Bold.ttf", fontSize);
-        io.FontDefault = io.Fonts->AddFontFromFileTTF("assets/fonts/inconsolata/Inconsolata-Regular.ttf", fontSize);
+        io.Fonts->AddFontFromFileTTF("assets/fonts/inconsolata/Inconsolata-Regular.ttf", fontSizeSmall);
+        io.Fonts->AddFontFromFileTTF("assets/fonts/inconsolata/Inconsolata-Regular.ttf", fontSizeNormal);
+        io.Fonts->AddFontFromFileTTF("assets/fonts/inconsolata/Inconsolata-Regular.ttf", fontSizeLarge);
+        io.Fonts->AddFontFromFileTTF("assets/fonts/inconsolata/Inconsolata-Bold.ttf", fontSizeSmall);
+        io.Fonts->AddFontFromFileTTF("assets/fonts/inconsolata/Inconsolata-Bold.ttf", fontSizeNormal);
+        io.Fonts->AddFontFromFileTTF("assets/fonts/inconsolata/Inconsolata-Bold.ttf", fontSizeNormal);
+        io.FontDefault = io.Fonts->Fonts[1];
 
         // Set dark theme
         ImGui::StyleColorsDark();

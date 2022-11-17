@@ -1,6 +1,4 @@
 #include "scene/SceneRenderer.h"
-#include "assets/AssetRegistry.h"
-#include "render/objects/Shader.h"
 
 namespace Calyx {
 

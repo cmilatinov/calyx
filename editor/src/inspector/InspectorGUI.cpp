@@ -24,8 +24,10 @@ namespace Calyx::Editor {
 
     bool InspectorGUI::BeginPropertyTable(const String& name) {
         bool visible = ImGui::BeginTable(
-            name.c_str(), 2, ImGuiTableFlags_BordersInnerV | ImGuiTableFlags_Resizable
+            name.c_str(), 2, ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_BordersInnerV | ImGuiTableFlags_Resizable
         );
+        ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthFixed);
+        ImGui::TableSetupColumn("Control", ImGuiTableColumnFlags_WidthStretch);
         return visible;
     }
 

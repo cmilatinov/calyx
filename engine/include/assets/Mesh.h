@@ -1,15 +1,16 @@
 #pragma once
 
 #include "render/objects/VertexArray.h"
-#include "assets/Asset.h"
+#include "assets/AssetRegistry.h"
 
 namespace Calyx {
 
     class Mesh : public Asset<Mesh> {
+        CX_ASSET_REGISTRY_FRIEND();
 
     public:
-        void Clear() override;
-        bool Load(const String& path) override;
+        void Clear();
+        bool Load(const String& file);
         bool Load(const List<uint32>& indices, const List<vec3>& vertices);
 
         void Draw() const;
@@ -33,8 +34,9 @@ namespace Calyx {
         Ref<VertexArray> m_vertexArray;
 
         void CreateVAO();
-
         void UpdateVAO();
+
+        static Mesh* Create(const String& file);
 
     };
 

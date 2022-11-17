@@ -21,9 +21,6 @@ namespace Calyx {
     public:
         ~Scene() override;
 
-        bool Load(const String& path) override;
-        void Clear() override;
-
         GameObject* CreateGameObject(const String& name = "Game Object", GameObject* parent = nullptr);
         void DeleteGameObject(GameObject* gameObject);
 
@@ -39,6 +36,8 @@ namespace Calyx {
         void DeleteGameObjectInternal(entt::entity id, bool eraseFromParent);
         void DeleteGameObjects();
 
+        bool Load(const String& path);
+        void Clear();
 
     };
 

@@ -5,22 +5,24 @@
 
 namespace Calyx {
 
-    Scope<Shader> Shader::Create(const String& filepath) {
+    Shader* Shader::Create(const String& file) {
         switch (Renderer::GetAPI()) {
             case RendererAPI::OPENGL:
-                return CreateScope<GLShader>(filepath);
+                return new GLShader(file);
+            default:
+                CX_CORE_ASSERT(false, "Rendering API not supported!");
+                return nullptr;
         }
-        CX_CORE_ASSERT(false, "Rendering API not supported!");
-        return nullptr;
     }
 
     Scope<Shader> Shader::Create(const String& name, const String& vertexSrc, const String& fragmentSrc) {
         switch (Renderer::GetAPI()) {
             case RendererAPI::OPENGL:
                 return CreateScope<GLShader>(name, vertexSrc, fragmentSrc);
+            default:
+                CX_CORE_ASSERT(false, "Rendering API not supported!");
+                return nullptr;
         }
-        CX_CORE_ASSERT(false, "Rendering API not supported!");
-        return nullptr;
     }
 
     void ShaderLibrary::Add(const String& name, const Ref<Shader>& shader) {
@@ -32,13 +34,13 @@ namespace Calyx {
     }
 
     Ref<Shader> ShaderLibrary::Load(const String& filepath) {
-        Ref<Shader> shader = Shader::Create(filepath);
+        Ref<Shader> shader = Ref<Shader>(Shader::Create(filepath));
         Add(shader);
         return shader;
     }
 
     Ref<Shader> ShaderLibrary::Load(const String& name, const String& filepath) {
-        Ref<Shader> shader = Shader::Create(filepath);
+        Ref<Shader> shader = Ref<Shader>(Shader::Create(filepath));
         shader->SetName(name);
         Add(name, shader);
         return shader;
