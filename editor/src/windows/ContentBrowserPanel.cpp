@@ -10,7 +10,7 @@ namespace Calyx::Editor {
           m_folderTexture(AssetRegistry::LoadAsset<Texture2D>("assets/icons/folder-grey.png")) {}
 
     void ContentBrowserPanel::Draw() {
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 0, m_padding });
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 8, 0 });
         ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, { m_padding, m_padding });
 
         ImGui::Begin("Content Browser", nullptr, ImGuiWindowFlags_MenuBar);
