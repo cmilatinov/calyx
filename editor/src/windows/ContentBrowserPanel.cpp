@@ -5,9 +5,10 @@
 namespace Calyx::Editor {
 
     ContentBrowserPanel::ContentBrowserPanel(const String& basePath)
-        : m_currentDirectory(std::filesystem::absolute(basePath)),
-          m_objFileTexture(AssetRegistry::LoadAsset<Texture2D>("assets/icons/block.png")),
-          m_folderTexture(AssetRegistry::LoadAsset<Texture2D>("assets/icons/folder-grey.png")) {}
+        : m_objFileTexture(AssetRegistry::LoadAsset<Texture2D>("assets/icons/block.png")),
+          m_folderTexture(AssetRegistry::LoadAsset<Texture2D>("assets/icons/folder-grey.png")) {
+        SetDirectory(std::filesystem::absolute(basePath));
+    }
 
     void ContentBrowserPanel::Draw() {
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 8, 0 });
