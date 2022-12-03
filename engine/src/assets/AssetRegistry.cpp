@@ -1,64 +1,63 @@
 #include "assets/AssetRegistry.h"
 
-#include "assets/Mesh.h"
-#include "render/objects/Shader.h"
-#include "render/objects/Texture2D.h"
+namespace Calyx {
 
-namespace Calyx::AssetRegistry {
+    CX_SINGLETON_INSTANCE(AssetRegistry);
 
-    Map<String, AssetT>& GetAssetTypes() {
-        static Map<String, AssetT> assetTypes;
-        return assetTypes;
+    AssetRegistry::AssetRegistry()
+        : m_rootAssetDirectory("./GameAssets"),
+          m_assetWatcher(CreateScope<efsw::FileWatcher>()) {
+        FileSystem::create_directories(m_rootAssetDirectory);
+        String rootAssetDir = m_rootAssetDirectory.string();
+        _AddSearchPath(rootAssetDir);
+        m_assetWatcher->addWatch(rootAssetDir, this);
+        m_assetWatcher->watch();
     }
 
-    Map<String, Scope<IAsset>>& GetAssets() {
-        static Map<String, Scope<IAsset>> assets;
-        return assets;
-    }
-
-    template<typename T>
-    AssetT AssetType() {
-        return typeid(T).hash_code();
-    }
-
-    template<typename T, typename ...Ts>
-    void RegisterAssetType(Ts... extensions) {
-        auto& assetTypes = GetAssetTypes();
-        List<String> exts = { extensions... };
-        for (const auto& ext: exts) {
-            assetTypes[ext] = AssetType<T>();
+    void AssetRegistry::handleFileAction(
+        efsw::WatchID watchID,
+        const std::string& dir,
+        const std::string& filename,
+        efsw::Action action,
+        std::string oldFilename
+    ) {
+        switch (action) {
+            case efsw::Actions::Add:
+                CX_CORE_TRACE("DIR ({}) FILE ({}) has event ADD", dir, filename);
+                break;
+            case efsw::Actions::Delete:
+                CX_CORE_TRACE("DIR ({}) FILE ({}) has event DELETE", dir, filename);
+                break;
+            case efsw::Actions::Modified:
+                CX_CORE_TRACE("DIR ({}) FILE ({}) has event MODIFIED", dir, filename);
+                break;
+            case efsw::Actions::Moved:
+                CX_CORE_TRACE("DIR ({}) FILE ({}) has event MOVED from ({})", dir, filename, oldFilename);
+                break;
+            default:
+                break;
         }
     }
 
-    Mesh* LoadScreenSpaceQuad() {
-        auto& assets = GetAssets();
-        assets["quad"] = CreateScope<Mesh>();
-        auto* mesh = reinterpret_cast<Mesh*>(assets["quad"].get());
-        mesh->SetIndices(
-            {
-                0, 1, 2,
-                1, 0, 3
-            }
-        );
-        mesh->SetVertices(
-            {
-                vec3(-1, -1, 0),
-                vec3(1, 1, 0),
-                vec3(-1, 1, 0),
-                vec3(1, -1, 0)
-            }
-        );
-        return mesh;
+    void AssetRegistry::_UnloadAll() {
+        m_loadedAssets.clear();
     }
 
-    void Init() {
-        RegisterAssetType<Mesh>(".obj", ".fbx", ".3ds", ".blend", ".ply");
-        RegisterAssetType<Shader>(".glsl");
-        RegisterAssetType<Texture2D>(".png", ".jpg", ".bmp");
+    void AssetRegistry::_AddSearchPath(const String& path) {
+        m_searchPaths.insert(m_searchPaths.begin(), path);
     }
 
-    void UnloadAll() {
-        GetAssets().clear();
+    void AssetRegistry::_RemoveSearchPath(const String& path) {
+        m_searchPaths.erase(path);
+    }
+
+    String AssetRegistry::FindAssetFile(const String& asset) {
+        for (const auto& path: m_searchPaths) {
+            Path file = path / asset;
+            if (FileSystem::exists(file) && FileSystem::is_regular_file(file))
+                return file.string();
+        }
+        return asset;
     }
 
 }

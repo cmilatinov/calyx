@@ -8,8 +8,10 @@ namespace Calyx {
         LoadShader(vertexSrc, fragmentSrc);
     }
 
-    GLShader::GLShader(const String& name, const String& vertexSrc, const String& geometrySrc,
-                       const String& fragmentSrc) {
+    GLShader::GLShader(
+        const String& name, const String& vertexSrc, const String& geometrySrc,
+        const String& fragmentSrc
+    ) {
         m_name = name;
         LoadShader(vertexSrc, geometrySrc, fragmentSrc);
     }
@@ -56,8 +58,9 @@ namespace Calyx {
     }
 
     void GLShader::SetMat4(const String& name, const mat4& value) {
-        glUniformMatrix4fv(glGetUniformLocation(m_shaderProgramID, name.c_str()), 1, GL_FALSE,
-                           reinterpret_cast<const GLfloat*>(&value));
+        glUniformMatrix4fv(
+            glGetUniformLocation(m_shaderProgramID, name.c_str()), 1, GL_FALSE,
+            reinterpret_cast<const GLfloat*>(&value));
     }
 
     bool GLShader::IsFunctional() const {
@@ -102,14 +105,18 @@ namespace Calyx {
             GLenum shaderType = GLShaderType(type);
             CX_CORE_ASSERT(shaderType, "Invalid shader type specified");
 
-            size_t nextLinePos = source.find_first_not_of("\r\n",
-                                                          eol); // Start of shader code after shader type declaration line
+            size_t nextLinePos = source.find_first_not_of(
+                "\r\n",
+                eol
+            ); // Start of shader code after shader type declaration line
             CX_CORE_ASSERT(nextLinePos != String::npos, "Syntax error");
 
             pos = source.find(typeToken, nextLinePos); // Start of next shader type declaration line
-            shaderSources[shaderType] = (pos == String::npos) ? source.substr(nextLinePos) : source.substr(nextLinePos,
-                                                                                                           pos -
-                                                                                                           nextLinePos);
+            shaderSources[shaderType] = (pos == String::npos) ? source.substr(nextLinePos) : source.substr(
+                nextLinePos,
+                pos -
+                nextLinePos
+            );
         }
 
         return shaderSources;

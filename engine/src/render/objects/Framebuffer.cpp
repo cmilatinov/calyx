@@ -12,9 +12,11 @@ namespace Calyx {
         switch (Renderer::GetAPI()) {
             case RendererAPI::OPENGL:
                 return CreateRef<GLFramebuffer>(spec);
+            default:
+                CX_CORE_ASSERT(false, "Rendering API not supported!");
+                return nullptr;
         }
-        CX_CORE_ASSERT(false, "Rendering API not supported!");
-        return nullptr;
+
     }
 
 }

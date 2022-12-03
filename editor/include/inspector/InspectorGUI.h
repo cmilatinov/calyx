@@ -1,5 +1,7 @@
 #pragma once
 
+#include "assets/Asset.h"
+
 namespace Calyx::Editor {
 
     class InspectorGUI {
@@ -14,6 +16,8 @@ namespace Calyx::Editor {
         static void EndPropertyTable();
 
         static void Property(const String& label);
+
+        static void AssetSelector(AssetT assetType);
 
     private:
         static bool DragFloatN_Colored(

@@ -43,6 +43,10 @@ namespace Calyx::Editor {
         ImGui::SetNextItemWidth(-FLT_MIN);
     }
 
+    void InspectorGUI::AssetSelector(AssetT assetType) {
+
+    }
+
     bool InspectorGUI::DragFloatN_Colored(
         const char* label, float* v, int components, float v_speed, float v_min, float v_max,
         const char* display_format, float power
@@ -84,6 +88,5 @@ namespace Calyx::Editor {
 
         return value_changed;
     }
-
 
 }

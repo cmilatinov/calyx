@@ -23,6 +23,7 @@
       <option name="BLANK_LINES_AROUND_METHOD" value="0" />
       <option name="BLANK_LINES_AROUND_METHOD_IN_INTERFACE" value="0" />
       <option name="SPACE_WITHIN_ARRAY_INITIALIZER_BRACES" value="true" />
+      <option name="SPACE_AFTER_TYPE_CAST" value="false" />
       <option name="ARRAY_INITIALIZER_LBRACE_ON_NEXT_LINE" value="true" />
       <option name="ARRAY_INITIALIZER_RBRACE_ON_NEXT_LINE" value="true" />
       <indentOptions>

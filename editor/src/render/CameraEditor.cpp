@@ -11,7 +11,7 @@ namespace Calyx::Editor {
         float vertical = Input::GetKey(KEY_SPACE) - (Input::GetKey(KEY_LEFT_SHIFT) || Input::GetKey(KEY_RIGHT_SHIFT));
         float speed = (Input::GetKey(KEY_LEFT_CONTROL) || Input::GetKey(KEY_RIGHT_CONTROL)) ? 7.0f : 2.0f;
         vec3 movement = forward * m_transform.Forward() + lateral * m_transform.Right() + vec3(0, vertical, 0);
-        m_transform.Translate(Time::DeltaTime() * speed * movement);
+        m_transform.Translate(Time::DeltaTime<float>() * speed * movement);
 
         // Rotation
         if (Input::GetMouseButton(MOUSE_BUTTON_1)) {

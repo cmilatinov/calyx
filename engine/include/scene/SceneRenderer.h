@@ -19,7 +19,7 @@ namespace Calyx {
         void RenderScene(const Camera& camera, const Transform& cameraTransform, const Scene& scene);
 
     private:
-        Shader* m_shader;
+        WeakRef<Shader> m_shader;
 
         Map<const Transform*, mat4> m_transformCache;
         Map<const Transform*, mat4> m_inverseTransformCache;

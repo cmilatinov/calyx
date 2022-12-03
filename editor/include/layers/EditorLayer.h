@@ -3,7 +3,8 @@
 #include <imgui.h>
 #include <imgui_stdlib.h>
 #include <ImGuizmo.h>
-#include <Calyx.h>
+#include <implot.h>
+#include <efsw/efsw.hpp>
 
 #include "math/ScreenSpaceUtils.h"
 #include "input/Input.h"
@@ -11,10 +12,19 @@
 #include "scene/SceneRenderer.h"
 #include "windows/SceneHierarchyPanel.h"
 #include "windows/ContentBrowserPanel.h"
+#include "windows/StatisticsPanel.h"
 #include "inspector/Inspector.h"
 #include "inspector/InspectorGUI.h"
+#include "assets/Assets.h"
 
 namespace Calyx::Editor {
+
+    struct Viewport {
+        vec2 size;
+        vec4 bounds;
+        bool pressed;
+        bool hovered;
+    };
 
     class EditorLayer : public ILayer {
 
@@ -33,20 +43,18 @@ namespace Calyx::Editor {
         Scope<CameraEditor> m_editorCamera;
         Scope<SceneHierarchyPanel> m_sceneHierarchyPanel;
         Scope<ContentBrowserPanel> m_contentBrowserPanel;
+        Scope<StatisticsPanel> m_statsPanel;
 
         // Grid
-        Mesh* m_grid;
-        Shader* m_gridShader;
+        WeakRef<Mesh> m_grid;
+        WeakRef<Shader> m_gridShader;
 
         // Framebuffers
         Ref<Framebuffer> m_framebuffer;
         Ref<Framebuffer> m_msaaFramebuffer;
 
         // Viewport
-        bool m_viewportPressed;
-        bool m_viewportHovered;
-        ImVec2 m_viewportSize;
-        vec4 m_viewportBounds;
+        Viewport m_viewport{};
 
         // Gizmos
         int m_gizmoType = ImGuizmo::OPERATION::TRANSLATE;

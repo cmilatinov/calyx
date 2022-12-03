@@ -5,6 +5,7 @@
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 #include <ImGuizmo.h>
+#include <implot.h>
 
 #include "core/ILayer.h"
 #include "core/Application.h"

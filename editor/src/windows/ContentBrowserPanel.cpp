@@ -4,11 +4,17 @@
 
 namespace Calyx::Editor {
 
+    ContentBrowserPanel::ContentBrowserPanel(const Path& basePath)
+        : m_objFileTexture(AssetRegistry::LoadAsset<Texture2D>("icons/block.png")),
+          m_folderTexture(AssetRegistry::LoadAsset<Texture2D>("icons/folder-grey.png")),
+          m_rootDirectory(basePath),
+          m_currentDirectory(m_rootDirectory) {}
+
     ContentBrowserPanel::ContentBrowserPanel(const String& basePath)
-        : m_objFileTexture(AssetRegistry::LoadAsset<Texture2D>("assets/icons/block.png")),
-          m_folderTexture(AssetRegistry::LoadAsset<Texture2D>("assets/icons/folder-grey.png")) {
-        SetDirectory(std::filesystem::absolute(basePath));
-    }
+        : m_objFileTexture(AssetRegistry::LoadAsset<Texture2D>("icons/block.png")),
+          m_folderTexture(AssetRegistry::LoadAsset<Texture2D>("icons/folder-grey.png")),
+          m_rootDirectory(std::filesystem::absolute(basePath)),
+          m_currentDirectory(m_rootDirectory) {}
 
     void ContentBrowserPanel::Draw() {
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 8, 0 });
@@ -26,7 +32,7 @@ namespace Calyx::Editor {
         float cellSize = m_thumbnailSize + 2 * m_padding;
         float contentRegionWidth = ImGui::GetContentRegionAvail().x;
         ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[0]);
-        if (ImGui::BeginTable("Files", std::max(1, (int) (contentRegionWidth / cellSize)), 0)) {
+        if (ImGui::BeginTable("Files", std::max(1, (int)(contentRegionWidth / cellSize)), 0)) {
             for (const auto& entry: std::filesystem::directory_iterator(m_currentDirectory)) {
                 ImGui::TableNextColumn();
                 auto& path = entry.path();
@@ -34,9 +40,11 @@ namespace Calyx::Editor {
 
                 ImGui::PushStyleColor(ImGuiCol_Button, 0);
                 ImGui::PushID(filename.c_str());
+                CX_LOCK_PTR(m_folderTexture, folderTexture);
+                CX_LOCK_PTR(m_objFileTexture, objFileTexture);
                 auto textureID = entry.is_directory() ?
-                                 reinterpret_cast<void*>(m_folderTexture->GetRendererID()) :
-                                 reinterpret_cast<void*>(m_objFileTexture->GetRendererID());
+                                 reinterpret_cast<void*>(folderTexture->GetRendererID()) :
+                                 reinterpret_cast<void*>(objFileTexture->GetRendererID());
                 if (ImGui::ImageButton(textureID, { m_thumbnailSize, m_thumbnailSize }) && entry.is_directory()) {
                     SetDirectory(entry.path());
                 }
@@ -70,8 +78,6 @@ namespace Calyx::Editor {
 
     void ContentBrowserPanel::SetDirectory(const Path& path) {
         m_currentDirectory = path;
-        m_currentRelativePath = std::filesystem::relative(path, Path("."));
-        CX_CORE_TRACE("{}", m_currentRelativePath.string());
     }
 
 }

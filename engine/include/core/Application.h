@@ -1,5 +1,6 @@
 #pragma once
 
+#include "core/Time.h"
 #include "core/LayerStack.h"
 #include "events/Event.h"
 #include "events/EventWindow.h"
@@ -28,15 +29,13 @@ namespace Calyx {
         static Application& GetInstance() { return *s_instance; }
 
     private:
+        static Application* s_instance;
+
         bool m_running = true;
         Scope<Window> m_window;
         LayerStack m_layerStack;
         GuiLayer* m_guiLayer;
 
-        // Singleton instance
-        static Application* s_instance;
-
-        // Events
         void OnEvent(Event& event);
         bool OnWindowClose(EventWindowClose& event);
         bool OnWindowResize(EventWindowResize& event);

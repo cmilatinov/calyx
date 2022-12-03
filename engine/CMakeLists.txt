@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 3.20)
 
 # C++ standard
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Compiler flags
@@ -20,6 +20,7 @@ find_package(glfw3 CONFIG REQUIRED)
 find_package(glad REQUIRED)
 find_package(imgui CONFIG REQUIRED)
 find_package(imguizmo CONFIG REQUIRED)
+find_package(implot CONFIG REQUIRED)
 find_package(glm CONFIG REQUIRED)
 find_package(assimp CONFIG REQUIRED)
 find_package(spdlog REQUIRED)
@@ -34,7 +35,7 @@ file(GLOB_RECURSE ENGINE_SRC "src/**.cpp")
 add_library("Engine" STATIC ${ENGINE_SRC})
 
 # Link target
-target_link_libraries("Engine" PUBLIC glfw glad::glad imgui::imgui imguizmo::imguizmo glm::glm assimp::assimp spdlog::spdlog_header_only EnTT::EnTT nameof::nameof)
+target_link_libraries("Engine" PUBLIC glfw glad::glad imgui::imgui imguizmo::imguizmo implot::implot glm::glm assimp::assimp spdlog::spdlog_header_only EnTT::EnTT nameof::nameof)
 target_include_directories("Engine" PUBLIC include ${STB_INCLUDE_DIRS})
 target_precompile_headers("Engine" PUBLIC include/pch.h)
 target_compile_definitions("Engine" PUBLIC "STB_IMAGE_IMPLEMENTATION")

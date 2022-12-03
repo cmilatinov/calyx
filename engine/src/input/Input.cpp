@@ -2,13 +2,9 @@
 
 namespace Calyx {
 
-    Scope<Input> Input::s_instance = nullptr;
+    CX_SINGLETON_INSTANCE(Input);
 
-    void Input::Init() {
-        s_instance = CreateScope<Input>();
-    }
-
-    void Input::_OnEvent(Event & event) {
+    void Input::_OnEvent(Event& event) {
         CX_DISPATCH_EVENT(EventKeyPress, Input::HandleKeyPressEvent, event);
         CX_DISPATCH_EVENT(EventKeyRelease, Input::HandleKeyReleaseEvent, event);
         CX_DISPATCH_EVENT(EventMouseButtonPress, Input::HandleMouseButtonPressEvent, event);

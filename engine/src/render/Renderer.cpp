@@ -14,9 +14,10 @@ namespace Calyx {
         switch (Renderer::GetAPI()) {
             case RendererAPI::OPENGL:
                 return CreateScope<GLRenderer>();
+            default:
+                CX_CORE_ASSERT(false, "Renderer not supported!");
+                return nullptr;
         }
-        CX_CORE_ASSERT(false, "Renderer not supported!");
-        return nullptr;
     }
 
 }

@@ -6,26 +6,26 @@
 namespace Calyx {
 
     class Input {
+    CX_SINGLETON(Input);
 
     public:
-        static void Init();
+        CX_SINGLETON_EXPOSE_METHOD(_OnEvent, void OnEvent(Event& event), event);
+        CX_SINGLETON_EXPOSE_METHOD(_OnFrameEnd, void OnFrameEnd());
 
-        static void OnEvent(Event& event) { s_instance->_OnEvent(event); }
-        static void OnFrameEnd() { s_instance->_OnFrameEnd(); };
+        CX_SINGLETON_EXPOSE_METHOD(_GetKey, bool GetKey(KeyCode key), key);
+        CX_SINGLETON_EXPOSE_METHOD(_GetKeyUp, bool GetKeyUp(KeyCode key), key);
+        CX_SINGLETON_EXPOSE_METHOD(_GetKeyDown, bool GetKeyDown(KeyCode key), key);
 
-        static bool GetKey(KeyCode key) { return s_instance->_GetKey(key); }
-        static bool GetKeyUp(KeyCode key) { return s_instance->_GetKeyDown(key); }
-        static bool GetKeyDown(KeyCode key) { return s_instance->_GetKeyUp(key); }
+        CX_SINGLETON_EXPOSE_METHOD(_GetMouseButton, bool GetMouseButton(MouseCode button), button);
+        CX_SINGLETON_EXPOSE_METHOD(_GetMouseButtonDown, bool GetMouseButtonDown(MouseCode button), button);
+        CX_SINGLETON_EXPOSE_METHOD(_GetMouseButtonUp, bool GetMouseButtonUp(MouseCode button), button);
+        CX_SINGLETON_EXPOSE_METHOD(_GetMousePosition, vec2 GetMousePosition());
+        CX_SINGLETON_EXPOSE_METHOD(_GetMouseVelocity, vec2 GetMouseVelocity());
 
-        static bool GetMouseButton(MouseCode button) { return s_instance->_GetMouseButton(button); }
-        static bool GetMouseButtonDown(MouseCode button) { return s_instance->_GetMouseButtonDown(button); }
-        static bool GetMouseButtonUp(MouseCode button) { return s_instance->_GetMouseButtonUp(button); }
-        static vec2 GetMousePosition() { return s_instance->_GetMousePosition(); }
-        static vec2 GetMouseVelocity() { return s_instance->_GetMouseVelocity(); }
+    public:
+        Input() = default;
 
     private:
-        static Scope<Input> s_instance;
-
         Map<KeyCode, bool> m_key;
         Map<KeyCode, bool> m_keyDown;
         Map<KeyCode, bool> m_keyUp;
@@ -34,8 +34,8 @@ namespace Calyx {
         Map<MouseCode, bool> m_mouseButtonDown;
         Map<MouseCode, bool> m_mouseButtonUp;
 
-        vec2 m_mouseCoords;
-        vec2 m_mouseVelocity;
+        vec2 m_mouseCoords{};
+        vec2 m_mouseVelocity{};
 
         void _OnEvent(Event& event);
         void _OnFrameEnd();
@@ -48,15 +48,15 @@ namespace Calyx {
 
         bool HandleMouseMoveEvent(EventMouseMove& event);
 
+        bool _GetKey(KeyCode key) { return m_key[key]; }
+        bool _GetKeyUp(KeyCode key) { return m_keyDown[key]; }
+        bool _GetKeyDown(KeyCode key) { return m_keyUp[key]; }
+
         bool _GetMouseButton(MouseCode button) { return m_mouseButton[button]; }
         bool _GetMouseButtonDown(MouseCode button) { return m_mouseButtonDown[button]; }
         bool _GetMouseButtonUp(MouseCode button) { return m_mouseButtonUp[button]; }
         vec2 _GetMousePosition() { return m_mouseCoords; }
         vec2 _GetMouseVelocity() { return m_mouseVelocity; }
-
-        bool _GetKey(KeyCode key) { return m_key[key]; }
-        bool _GetKeyUp(KeyCode key) { return m_keyDown[key]; }
-        bool _GetKeyDown(KeyCode key) { return m_keyUp[key]; }
 
     };
 

@@ -36,33 +36,38 @@ namespace Calyx::Editor {
         m_sceneRenderer = CreateScope<SceneRenderer>();
         m_scene = CreateScope<Scene>();
         m_sceneHierarchyPanel = CreateScope<SceneHierarchyPanel>(m_scene.get());
-        m_contentBrowserPanel = CreateScope<ContentBrowserPanel>("./");
+        m_contentBrowserPanel = CreateScope<ContentBrowserPanel>(AssetRegistry::GetRootAssetPath());
+        m_statsPanel = CreateScope<StatisticsPanel>();
 
         m_editorCamera = CreateScope<CameraEditor>();
         m_editorCamera->GetTransform().SetPosition(vec3(1, 1, 1));
         m_editorCamera->GetTransform().SetRotation(vec3(-45, 45, 0));
 
-        m_grid = AssetRegistry::LoadScreenSpaceQuad();
-        m_gridShader = AssetRegistry::LoadAsset<Shader>("assets/shaders/grid.glsl");
+        m_grid = Assets::ScreenSpaceQuad();
+        m_gridShader = AssetRegistry::LoadAsset<Shader>("shaders/grid.glsl");
 
         RenderCommand::SetViewport(0, 0, window.GetWidth(), window.GetHeight());
         RenderCommand::SetClearColor(vec4(99, 90, 83, 255) / 255.0f);
         CX_CORE_INFO("Window size: {:d} x {:d}", window.GetWidth(), window.GetHeight());
 
-        auto* cubeMesh = AssetRegistry::LoadAsset<Mesh>("assets/meshes/cube.obj");
+        auto cubeMesh = AssetRegistry::LoadAsset<Mesh>("meshes/cube.obj");
+        CX_LOCK_PTR(cubeMesh, cubeMeshPtr);
         m_cube = m_scene->CreateGameObject();
-        m_cube->AddComponent<MeshComponent>(cubeMesh);
+        m_cube->AddComponent<MeshComponent>(cubeMeshPtr.get());
         m_cube->GetTransform().Translate(vec3(1, 0, 0));
 
         auto* test = m_scene->CreateGameObject("Test");
-        test->AddComponent<MeshComponent>(cubeMesh);
+        test->AddComponent<MeshComponent>(cubeMeshPtr.get());
         test->GetTransform().Translate(vec3(0, 2, 0));
         test->SetParent(m_cube);
     }
 
     void EditorLayer::OnUpdate() {
+        // Stats
+        m_statsPanel->BeginFrame();
+
         // Update Camera
-        if (m_viewportPressed && !ImGuizmo::IsUsing()) {
+        if (m_viewport.pressed && !ImGuizmo::IsUsing()) {
             m_editorCamera->Update();
         }
 
@@ -74,13 +79,16 @@ namespace Calyx::Editor {
         // Draw grid
         mat4 view = m_editorCamera->GetProjectionViewMatrix();
         mat4 invView = glm::inverse(view);
-        m_gridShader->Bind();
-        m_gridShader->SetMat4("view", view);
-        m_gridShader->SetMat4("invView", invView);
-        m_gridShader->SetFloat("nearPlane", m_editorCamera->GetNearPlane());
-        m_gridShader->SetFloat("farPlane", m_editorCamera->GetFarPlane());
-        m_grid->Draw();
-        m_gridShader->Unbind();
+
+        CX_LOCK_PTR(m_gridShader, gridShader);
+        CX_LOCK_PTR(m_grid, grid);
+        gridShader->Bind();
+        gridShader->SetMat4("view", view);
+        gridShader->SetMat4("invView", invView);
+        gridShader->SetFloat("nearPlane", m_editorCamera->GetNearPlane());
+        gridShader->SetFloat("farPlane", m_editorCamera->GetFarPlane());
+        grid->Draw();
+        gridShader->Unbind();
 
         // Blit and resolve MSAA samples
         m_msaaFramebuffer->Blit(m_framebuffer, 0, 0);
@@ -88,6 +96,9 @@ namespace Calyx::Editor {
 
         // Delete scene objects pending deletion
         m_scene->DeleteGameObjects();
+
+        // Stats
+        m_statsPanel->EndFrame();
     }
 
     void EditorLayer::OnGUI() {
@@ -99,18 +110,19 @@ namespace Calyx::Editor {
         Inspector();
         ContentBrowser();
         ImGui::ShowDemoWindow();
+        ImPlot::ShowDemoWindow();
         EndDockspace();
     }
 
     void EditorLayer::OnEvent(Event& event) {
         if (event.GetEventType() == EventType::MouseButtonPress &&
             dynamic_cast<EventMouseButtonPress&>(event).GetMouseButton() == MOUSE_BUTTON_1 &&
-            m_viewportHovered &&
-            ScreenSpaceUtils::IsInBounds(Input::GetMousePosition(), m_viewportBounds)) {
-            m_viewportPressed = true;
+            m_viewport.hovered &&
+            ScreenSpaceUtils::IsInBounds(Input::GetMousePosition(), m_viewport.bounds)) {
+            m_viewport.pressed = true;
         } else if (event.GetEventType() == EventType::MouseButtonRelease &&
                    dynamic_cast<EventMouseButtonRelease&>(event).GetMouseButton() == MOUSE_BUTTON_1) {
-            m_viewportPressed = false;
+            m_viewport.pressed = false;
         }
     }
 
@@ -168,13 +180,13 @@ namespace Calyx::Editor {
 
         // Resize viewport frame buffers if needed
         ImVec2 viewportSize = ImGui::GetWindowSize();
-        if (std::abs(viewportSize.x - m_viewportSize.x) < 1.0f ||
-            std::abs(viewportSize.y - m_viewportSize.y) < 1.0f) {
+        if (std::abs(viewportSize.x - m_viewport.size.x) < 1.0f ||
+            std::abs(viewportSize.y - m_viewport.size.y) < 1.0f) {
             m_framebuffer->Resize(viewportSize.x, viewportSize.y);
             m_msaaFramebuffer->Resize(viewportSize.x, viewportSize.y);
             m_editorCamera->SetAspect(viewportSize.x / viewportSize.y);
         }
-        m_viewportSize = viewportSize;
+        m_viewport.size = vec2(viewportSize.x, viewportSize.y);
 
         // Get viewport bounds
         ImGui::GetWindowContentRegionMin();
@@ -183,8 +195,8 @@ namespace Calyx::Editor {
         ImVec2 min(pos.x + contentMin.x, pos.y + contentMin.y);
         ImVec2 contentMax = ImGui::GetWindowContentRegionMax();
         ImVec2 max(pos.x + contentMax.x, pos.y + contentMax.y);
-        m_viewportBounds = vec4(min.x, min.y, max.x, max.y);
-        m_viewportHovered = ImGui::IsWindowHovered();
+        m_viewport.bounds = vec4(min.x, min.y, max.x, max.y);
+        m_viewport.hovered = ImGui::IsWindowHovered();
 
         // Gizmos
         GameObject* selected = m_sceneHierarchyPanel->GetSelectedObject();
@@ -192,9 +204,9 @@ namespace Calyx::Editor {
             ImGuizmo::SetOrthographic(false);
             ImGuizmo::SetDrawlist();
             ImGuizmo::SetRect(
-                m_viewportBounds.x, m_viewportBounds.y,
-                m_viewportBounds.z - m_viewportBounds.x,
-                m_viewportBounds.w - m_viewportBounds.y
+                m_viewport.bounds.x, m_viewport.bounds.y,
+                m_viewport.bounds.z - m_viewport.bounds.x,
+                m_viewport.bounds.w - m_viewport.bounds.y
             );
 
             mat4 projection = m_editorCamera->GetProjectionMatrix();
@@ -209,7 +221,7 @@ namespace Calyx::Editor {
             }
         }
 
-        if (!m_viewportPressed) {
+        if (!m_viewport.pressed) {
             if (Input::GetKeyDown(KEY_Q))
                 m_gizmoType = 0;
             if (Input::GetKeyDown(KEY_W))
@@ -228,8 +240,7 @@ namespace Calyx::Editor {
     }
 
     void EditorLayer::Statistics() {
-        ImGui::Begin("Stats");
-        ImGui::End();
+        m_statsPanel->Draw();
     }
 
     void EditorLayer::Inspector() {

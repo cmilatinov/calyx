@@ -7,9 +7,10 @@ namespace Calyx {
         switch (Renderer::GetAPI()) {
             case RendererAPI::OPENGL:
                 return CreateScope<GLRenderContext>(static_cast<GLFWwindow*>(window));
+            default:
+                CX_CORE_ASSERT(false, "Unsupported rendering API!");
+                return nullptr;
         }
-        CX_CORE_ASSERT(false, "Unsupported rendering API!");
-        return nullptr;
     }
 
 }

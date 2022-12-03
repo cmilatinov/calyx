@@ -1,17 +1,12 @@
+#include "core/Application.h"
+
 #include <iostream>
 
-#include "core/Application.h"
-#include "core/Time.h"
-
 #include "layers/GuiLayer.h"
-
 #include "render/Renderer.h"
-
 #include "input/Input.h"
-
 #include "assets/AssetRegistry.h"
-
-#include "ecs/Component.h"
+#include "assets/Assets.h"
 
 namespace Calyx {
 
@@ -24,7 +19,7 @@ namespace Calyx {
         s_instance = this;
 
         // Window event callback
-        m_window->SetEventCallback(CX_BIND_EVENT_FN(OnEvent));
+        m_window->SetEventCallback(CX_BIND_EVENT_METHOD(OnEvent));
 
         // Initialize renderer
         Renderer::Init();
@@ -34,6 +29,7 @@ namespace Calyx {
 
         // Initialize asset registry
         AssetRegistry::Init();
+        Assets::InitAssetTypes();
 
         // Gui layer
         m_guiLayer = new GuiLayer();
@@ -41,12 +37,10 @@ namespace Calyx {
     }
 
     void Application::Run() {
-        auto lastTime = Clock::now();
+        Time::Init();
         while (m_running) {
             // Time measurements
-            auto currentTime = Clock::now();
-            Time::s_deltaTime = DurationCast<Microseconds>(currentTime - lastTime).count() / 1e6;
-            Time::UpdateTime();
+            Time::GetInstance().UpdateTime();
 
             // Window events
             m_window->OnUpdate();
@@ -65,7 +59,6 @@ namespace Calyx {
 
             // Input
             Input::OnFrameEnd();
-            lastTime = currentTime;
         }
     }
 

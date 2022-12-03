@@ -6,8 +6,9 @@ namespace Calyx {
         // ImGui Setup
         IMGUI_CHECKVERSION();
         m_context = ImGui::CreateContext();
+        ImPlot::CreateContext();
         ImGuiIO& io = ImGui::GetIO();
-        (void) io;
+        (void)io;
         io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
         io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
@@ -18,18 +19,21 @@ namespace Calyx {
         SetupImGuiTheme();
 
         // Init ImGui for OpenGL 3.0
-        ImGui_ImplGlfw_InitForOpenGL(static_cast<GLFWwindow*>(Application::GetInstance().GetWindow().GetNativeWindow()),
-                                     true);
+        ImGui_ImplGlfw_InitForOpenGL(
+            static_cast<GLFWwindow*>(Application::GetInstance().GetWindow().GetNativeWindow()),
+            true
+        );
         ImGui_ImplOpenGL3_Init("#version 400");
     }
 
     void GuiLayer::OnDetach() {
         ImGui_ImplOpenGL3_Shutdown();
         ImGui_ImplGlfw_Shutdown();
+        ImPlot::DestroyContext();
         ImGui::DestroyContext();
     }
 
-    void GuiLayer::OnEvent(Event & event) {
+    void GuiLayer::OnEvent(Event& event) {
 //        ImGuiIO& io = ImGui::GetIO();
 //        event.handled |= event.IsInCategory(EventCategory::Mouse) & io.WantCaptureMouse;
 //        event.handled |= event.IsInCategory(EventCategory::Keyboard) & io.WantCaptureKeyboard;
@@ -47,7 +51,7 @@ namespace Calyx {
         ImGui::SetCurrentContext(m_context);
         ImGuiIO& io = ImGui::GetIO();
         const Application& app = Application::GetInstance();
-        io.DisplaySize = ImVec2((float) app.GetWindow().GetWidth(), (float) app.GetWindow().GetHeight());
+        io.DisplaySize = ImVec2((float)app.GetWindow().GetWidth(), (float)app.GetWindow().GetHeight());
 
         // Rendering
         ImGui::Render();

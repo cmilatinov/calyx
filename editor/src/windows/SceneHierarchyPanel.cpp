@@ -23,7 +23,9 @@ namespace Calyx::Editor {
             ImGuiTableFlags_RowBg |
             ImGuiTableFlags_NoPadInnerX
         )) {
+            ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 10, 0 });
             ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_NoHide);
+            ImGui::PopStyleVar();
             ImGui::TableHeadersRow();
             for (auto* rootGameObject: m_scene->GetRootGameObjects()) {
                 DrawGameObjectNode(rootGameObject);

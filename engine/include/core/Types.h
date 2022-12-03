@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <variant>
 #include <type_traits>
+#include <numeric>
 
 #include <string>
 #include <sstream>
@@ -22,7 +23,6 @@
 
 #include "reflect.h"
 #include "core/Utils.h"
-#include "core/Macros.h"
 
 namespace Calyx {
 
@@ -52,7 +52,11 @@ namespace Calyx {
     template<typename T>
     using Function = std::function<T>;
 
+    namespace FileSystem = std::filesystem;
     using Path = std::filesystem::path;
+
+    namespace ThisThread = std::this_thread;
+    using Thread = std::thread;
 
     namespace Integer {
         using uint8 = uint8_t;
@@ -87,19 +91,22 @@ namespace Calyx {
     }
 
     namespace Chrono {
-        using Hours = std::chrono::hours;
-        using Minutes = std::chrono::minutes;
-        using Seconds = std::chrono::seconds;
-        using Milliseconds = std::chrono::milliseconds;
-        using Microseconds = std::chrono::microseconds;
-        using Nanoseconds = std::chrono::nanoseconds;
-        using Clock = std::chrono::high_resolution_clock;
+        using namespace std::chrono;
+        using Hours = hours;
+        using Minutes = minutes;
+        using Seconds = seconds;
+        using Milliseconds = milliseconds;
+        using Microseconds = microseconds;
+        using Nanoseconds = nanoseconds;
+        using Clock = high_resolution_clock;
 
         template<class ToDuration, class Rep, class Period>
-        constexpr ToDuration DurationCast(const std::chrono::duration<Rep, Period>& d) {
-            return std::chrono::duration_cast<ToDuration>(d);
+        constexpr ToDuration DurationCast(const duration<Rep, Period>& d) {
+            return duration_cast<ToDuration>(d);
         }
     }
+
+    namespace FileSystem = std::filesystem;
 
     namespace Reflect {
         using TypeID = entt::id_type;

@@ -10,27 +10,30 @@ namespace Calyx {
         switch (Renderer::GetAPI()) {
             case RendererAPI::OPENGL:
                 return CreateRef<GLVertexBuffer>(size);
+            default:
+                CX_CORE_ASSERT(false, "Rendering API not supported!");
+                return nullptr;
         }
-        CX_CORE_ASSERT(false, "Rendering API not supported!");
-        return nullptr;
     }
 
     Ref<VertexBuffer> VertexBuffer::Create(uint32 size, const void* data) {
         switch (Renderer::GetAPI()) {
             case RendererAPI::OPENGL:
                 return CreateRef<GLVertexBuffer>(size, data);
+            default:
+                CX_CORE_ASSERT(false, "Rendering API not supported!");
+                return nullptr;
         }
-        CX_CORE_ASSERT(false, "Rendering API not supported!");
-        return nullptr;
     }
 
     Ref<IndexBuffer> IndexBuffer::Create(uint32 count, const uint32* indices) {
         switch (Renderer::GetAPI()) {
             case RendererAPI::OPENGL:
                 return CreateRef<GLIndexBuffer>(count, indices);
+            default:
+                CX_CORE_ASSERT(false, "Rendering API not supported!");
+                return nullptr;
         }
-        CX_CORE_ASSERT(false, "Rendering API not supported!");
-        return nullptr;
     }
 
 }

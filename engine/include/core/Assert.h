@@ -3,7 +3,7 @@
 #include <filesystem>
 
 #ifdef CX_ENABLE_ASSERTS
-#define CX_INTERNAL_ASSERT_IMPL(type, check, msg, ...) if(!(check)) { CX##type##ERROR(msg, __VA_ARGS__); CX_DEBUGBREAK(); }
+#define CX_INTERNAL_ASSERT_IMPL(type, check, msg, ...) do { if(!(check)) { CX##type##ERROR(msg, __VA_ARGS__); CX_DEBUGBREAK(); } } while(false)
 #define CX_INTERNAL_ASSERT_WITH_MSG(type, check, ...) CX_INTERNAL_ASSERT_IMPL(type, check, "Assertion failed: {0}", __VA_ARGS__)
 #define CX_INTERNAL_ASSERT_NO_MSG(type, check) CX_INTERNAL_ASSERT_IMPL(type, check, "Assertion '{0}' failed at {1}:{2}", #check, std::filesystem::path(__FILE__).filename().string(), __LINE__)
 

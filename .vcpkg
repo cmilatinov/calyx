@@ -1,10 +1,12 @@
 assimp
+efsw
 entt[experimental]
 glad
 glfw3
 glm
 imgui[docking-experimental,glfw-binding,opengl3-binding]
 imguizmo
+implot
 inja
 llvm[clang,clang-tools-extra]
 nameof

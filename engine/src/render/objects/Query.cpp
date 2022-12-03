@@ -1,14 +1,13 @@
-#include "render/objects/VertexArray.h"
-
+#include "render/objects/Query.h"
 #include "render/Renderer.h"
-#include "render/opengl/GLVertexArray.h"
+#include "render/opengl/GLQuery.h"
 
 namespace Calyx {
 
-    Ref<VertexArray> VertexArray::Create() {
+    Ref<Query> Query::Create() {
         switch (Renderer::GetAPI()) {
             case RendererAPI::OPENGL:
-                return CreateRef<GLVertexArray>();
+                return CreateRef<GLQuery>();
             default:
                 CX_CORE_ASSERT(false, "Rendering API not supported!");
                 return nullptr;

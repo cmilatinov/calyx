@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 3.20)
 
 # C++ standard
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Compiler flags
@@ -15,6 +15,9 @@ endif ()
 # Includes
 include(../build/include/utils.cmake)
 
+# Required libraries
+find_package(efsw CONFIG REQUIRED)
+
 # Clump source files from src
 file(GLOB_RECURSE EDITOR_SRC "src/**.cpp")
 
@@ -22,7 +25,7 @@ file(GLOB_RECURSE EDITOR_SRC "src/**.cpp")
 add_executable("Editor" ${EDITOR_SRC})
 
 # Link target
-target_link_libraries("Editor" PUBLIC "Engine")
+target_link_libraries("Editor" PUBLIC "Engine" efsw::efsw)
 target_include_directories("Editor" PUBLIC "include")
 target_precompile_headers("Editor" PUBLIC "../engine/include/Calyx.h")
 
