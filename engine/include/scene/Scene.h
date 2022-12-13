@@ -12,7 +12,7 @@ namespace Calyx {
     class GameObject;
     class SceneRenderer;
 
-    class Scene : public Asset<Scene> {
+    class CALYX_API Scene : public Asset<Scene> {
 
         friend class GameObject;
         friend class SceneRenderer;

@@ -6,6 +6,18 @@
 
 namespace Calyx::Editor {
 
+    template<typename T>
+    bool InspectorGUI::GameAssetControl(String name, Ref<T>& value) {
+        static_assert(std::is_base_of_v<IAsset, T>, "T must be an asset type!");
+        auto type = entt::resolve<T>();
+        if (ImGui::Button("Select")) {
+
+        }
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(-FLT_MIN);
+        ImGui::InputText("##Input", &name, ImGuiInputTextFlags_NoHorizontalScroll | ImGuiInputTextFlags_ReadOnly);
+    }
+
     bool InspectorGUI::TextControl(const String& name, String& value) {
         return ImGui::InputText(name.c_str(), &value, ImGuiInputTextFlags_AutoSelectAll);
     }

@@ -31,5 +31,3 @@ void operator=(const name& other) = delete
 static inline fn {                                         \
     return s_instance->instanceName(__VA_ARGS__);          \
 }
-
-#define CX_LOCK_PTR(ptr, name) auto name = ptr.lock()

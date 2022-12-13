@@ -8,6 +8,8 @@ namespace Calyx {
         CX_BEGIN_REFLECT();
 
     public:
+        virtual ~IComponent() = default;
+
         virtual String GetName() const = 0;
         virtual TypeID GetTypeId() const = 0;
 

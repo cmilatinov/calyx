@@ -7,6 +7,9 @@ namespace Calyx::Editor {
     class InspectorGUI {
 
     public:
+        template<typename T>
+        static bool GameAssetControl(String name, Ref<T>& value);
+
         static bool TextControl(const String& name, String& value);
         static bool Vec3Control(const String& name, vec3& value, float speed = 1.0f);
         static bool Vec2Control(const String& name, vec2& value, float speed = 1.0f);

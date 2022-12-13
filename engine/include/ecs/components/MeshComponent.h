@@ -9,15 +9,15 @@ namespace Calyx {
         CX_BEGIN_REFLECT();
 
     public:
-        explicit MeshComponent(Mesh* mesh)
+        explicit MeshComponent(const Ref<Mesh>& mesh)
             : m_mesh(mesh) {}
 
         String GetName() const override { return "Mesh Component"; }
 
-        void SetMesh(Mesh* mesh) { m_mesh = mesh; }
+        void SetMesh(const Ref<Mesh>& mesh) { m_mesh = mesh; }
 
         void DrawMesh() const {
-            if (m_mesh == nullptr) {
+            if (!m_mesh) {
                 CX_CORE_WARN("Cannot draw null mesh!");
                 return;
             }
@@ -25,7 +25,7 @@ namespace Calyx {
         }
 
     private:
-        Mesh* m_mesh;
+        CX_REFLECT_SERIALIZE Ref<Mesh> m_mesh;
 
     };
 

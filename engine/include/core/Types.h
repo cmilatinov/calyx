@@ -7,6 +7,7 @@
 #include <variant>
 #include <type_traits>
 #include <numeric>
+#include <typeinfo>
 
 #include <string>
 #include <sstream>
@@ -18,7 +19,6 @@
 
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
-#include <entt/entt.hpp>
 #include <nameof.hpp>
 
 #include "reflect.h"

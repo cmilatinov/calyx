@@ -39,4 +39,21 @@ namespace Calyx::Reflect::Tooling::Utils {
         );
     }
 
+    void CollectRefConversions(CXXRecordDecl* decl, std::vector<std::string>& outRefs) {
+        for (auto* fr: decl->friends()) {
+            auto* friendDecl = fr->getFriendDecl();
+            if (friendDecl != nullptr &&
+                friendDecl->isFunctionOrFunctionTemplate() &&
+                friendDecl->getName().str() == CX_XSTR(CX_REFLECT_CONVERTIBLE_REF_FN_NAME)) {
+                auto* args = friendDecl->getAsFunction()->getTemplateSpecializationArgs();
+                if (args->size() > 0) {
+                    auto* otherDecl = args->get(0).getAsType()->getAsCXXRecordDecl();
+                    if (otherDecl != nullptr) {
+                        outRefs.push_back(otherDecl->getQualifiedNameAsString());
+                    }
+                }
+            }
+        }
+    }
+
 }

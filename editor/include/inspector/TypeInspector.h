@@ -23,9 +23,6 @@ namespace Calyx::Editor {
 
         entt::meta_type GetMetaType() const override { return m_metaType; }
 
-        virtual void CX_ON_INSPECTOR_CONTEXT_GUI(T& component) {}
-        virtual void CX_ON_INSPECTOR_GUI(T& component) {}
-
     private:
         entt::meta_type m_metaType;
 

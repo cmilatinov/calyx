@@ -46,8 +46,8 @@ namespace Calyx::Editor {
         Scope<StatisticsPanel> m_statsPanel;
 
         // Grid
-        WeakRef<Mesh> m_grid;
-        WeakRef<Shader> m_gridShader;
+        Ref<Mesh> m_grid;
+        Ref<Shader> m_gridShader;
 
         // Framebuffers
         Ref<Framebuffer> m_framebuffer;

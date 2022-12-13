@@ -13,7 +13,7 @@ namespace Calyx::Editor {
         static void Init();
 
         static void DrawComponentInspector(const entt::meta_type& type, void* instance) {
-            DrawComponentInspector(type.from_void(instance));
+            DrawComponentInspector(Reflect::Core::CreateOpaqueReference(type, instance));
         }
 
         template<typename T>

@@ -36,6 +36,7 @@ add_reflected_headers("Editor" "include"
         "include/inspector/types/StringInspector.h"
         "include/inspector/types/Vec2Inspector.h"
         "include/inspector/types/Vec3Inspector.h"
+        "include/inspector/types/AssetInspector.h"
         "include/inspector/components/TransformComponentInspector.h")
 
 # Copy assets

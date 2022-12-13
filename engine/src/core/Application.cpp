@@ -29,7 +29,6 @@ namespace Calyx {
 
         // Initialize asset registry
         AssetRegistry::Init();
-        Assets::InitAssetTypes();
 
         // Gui layer
         m_guiLayer = new GuiLayer();

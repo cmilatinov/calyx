@@ -30,6 +30,7 @@ namespace Calyx::Reflect::Tooling {
         FieldSerializer m_fieldSerializer;
         MethodSerializer m_methodSerializer;
         std::vector<CXXRecordDecl*> m_reflectedBases;
+        std::vector<std::string> m_refConversions;
 
         void CollectReflectedBases(CXXRecordDecl* decl);
 

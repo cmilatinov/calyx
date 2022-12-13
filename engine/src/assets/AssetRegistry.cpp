@@ -1,16 +1,17 @@
 #include "assets/AssetRegistry.h"
 
+#include "render/objects/Shader.h"
+#include "render/objects/Texture2D.h"
+#include "assets/Mesh.h"
+
 namespace Calyx {
 
     CX_SINGLETON_INSTANCE(AssetRegistry);
 
     AssetRegistry::AssetRegistry()
-        : m_rootAssetDirectory("./GameAssets"),
-          m_assetWatcher(CreateScope<efsw::FileWatcher>()) {
-        FileSystem::create_directories(m_rootAssetDirectory);
-        String rootAssetDir = m_rootAssetDirectory.string();
-        _AddSearchPath(rootAssetDir);
-        m_assetWatcher->addWatch(rootAssetDir, this);
+        : m_assetWatcher(CreateScope<efsw::FileWatcher>()) {
+        InitAssetTypes();
+        _AddSearchPath("assets");
         m_assetWatcher->watch();
     }
 
@@ -44,20 +45,102 @@ namespace Calyx {
     }
 
     void AssetRegistry::_AddSearchPath(const String& path) {
-        m_searchPaths.insert(m_searchPaths.begin(), path);
+        Path normalizedPath = NormalizePath(FileSystem::absolute(path).string());
+        m_searchPaths.push_back(
+            {
+                .path = normalizedPath,
+                .watch = m_assetWatcher->addWatch(normalizedPath.string(), this),
+                .assets = {},
+            }
+        );
+        BuildAssetMeta(m_searchPaths.back());
     }
 
     void AssetRegistry::_RemoveSearchPath(const String& path) {
-        m_searchPaths.erase(path);
+        Path normalizedPath = NormalizePath(FileSystem::absolute(path).string());
+        auto it = std::find_if(
+            m_searchPaths.begin(),
+            m_searchPaths.end(),
+            [&normalizedPath](const auto& searchPath) {
+                return searchPath.path == normalizedPath;
+            }
+        );
+        if (it != m_searchPaths.end()) {
+            m_assetWatcher->removeWatch(it->watch);
+            ClearAssetMeta(*it);
+            m_searchPaths.erase(it);
+        }
     }
 
-    String AssetRegistry::FindAssetFile(const String& asset) {
-        for (const auto& path: m_searchPaths) {
-            Path file = path / asset;
-            if (FileSystem::exists(file) && FileSystem::is_regular_file(file))
-                return file.string();
+    String AssetRegistry::NormalizePath(const String& path) {
+        return Path(path).lexically_normal().string();
+    }
+
+    bool AssetRegistry::FindAssetType(const Path& file, AssetT& outType) {
+        String ext = file.extension().string();
+        auto extEntry = m_assetTypes.find(ext);
+        if (extEntry == m_assetTypes.end())
+            return false;
+        outType = extEntry->second;
+        return true;
+    }
+
+    bool AssetRegistry::ExpectAssetType(const Path& file, AssetT expectedType) {
+        AssetT actualType;
+        if (!FindAssetType(file, actualType))
+            return false;
+        return expectedType == actualType;
+    }
+
+    bool AssetRegistry::FindAssetFile(const String& asset, Path& outFilePath) {
+        for (const auto& searchPath: m_searchPaths) {
+            Path file = (searchPath.path / asset).lexically_normal();
+            if (FileSystem::exists(file) && FileSystem::is_regular_file(file)) {
+                outFilePath = file;
+                return true;
+            }
         }
-        return asset;
+        return false;
+    }
+
+    void AssetRegistry::InitAssetTypes() {
+        _RegisterAssetType<Mesh>(".obj", ".fbx", ".3ds", ".blend", ".ply");
+        _RegisterAssetType<Shader>(".glsl");
+        _RegisterAssetType<Texture2D>(".png", ".jpg", ".bmp");
+    }
+
+    void AssetRegistry::ClearAssetMeta(AssetSearchPath& searchPath) {
+        for (const auto& asset: searchPath.assets) {
+            m_assetMetaMap.erase(asset);
+        }
+        m_searchPaths.erase(
+            std::remove_if(
+                m_searchPaths.begin(),
+                m_searchPaths.end(),
+                [&searchPath](const auto& sp) { return sp.path.string() == searchPath.path; }
+            ),
+            m_searchPaths.end()
+        );
+    }
+
+
+    void AssetRegistry::BuildAssetMeta(AssetSearchPath& searchPath) {
+        for (const auto& file: FileSystem::recursive_directory_iterator(searchPath.path)) {
+            if (!FileSystem::is_regular_file(file))
+                continue;
+
+            auto relativeFilePath = FileSystem::relative(file, searchPath.path);
+            auto assetName = NormalizePath(relativeFilePath.string());
+            AssetT assetType;
+            if (!FindAssetType(file, assetType))
+                continue;
+            m_assetMetaMap[assetName] = {
+                .type = assetType,
+                .name = assetName,
+                .path = FileSystem::absolute(file).lexically_normal().string()
+            };
+            searchPath.assets.push_back(assetName);
+        }
     }
 
 }

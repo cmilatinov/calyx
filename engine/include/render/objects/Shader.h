@@ -25,6 +25,7 @@ namespace Calyx {
     class ShaderLibrary;
 
     class CALYX_API Shader : public Asset<Shader> {
+        CX_BEGIN_REFLECT();
         CX_ASSET_REGISTRY_FRIEND();
         friend class ShaderLibrary;
 

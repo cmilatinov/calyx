@@ -12,6 +12,37 @@ namespace Calyx {
     class AssetRegistry : public efsw::FileWatchListener {
     CX_SINGLETON(AssetRegistry);
 
+    private:
+        struct AssetSearchPath {
+            Path path;
+            efsw::WatchID watch;
+            List<String> assets;
+        };
+
+        struct AssetMeta {
+            AssetT type;
+            String name;
+            Path path;
+        };
+
+        template<typename T>
+        class AssetDeleter {
+            static_assert(std::is_base_of_v<IAsset, T>, "T must be an asset type!");
+
+        public:
+            explicit AssetDeleter(String name)
+                : m_name(std::move(name)) {}
+
+            void operator()(const T* ptr) {
+                delete ptr;
+                AssetRegistry::GetInstance().m_loadedAssets.erase(m_name);
+            }
+
+        private:
+            String m_name;
+
+        };
+
     public:
         template<typename T>
         static inline AssetT AssetType() {
@@ -19,12 +50,12 @@ namespace Calyx {
         }
 
         template<typename T, typename ...Args>
-        static inline WeakRef<T> CreateAsset(const String& name, Args... args) {
+        static inline Ref<T> CreateAsset(const String& name, Args... args) {
             return s_instance->_CreateAsset<T, Args...>(name, args...);
         }
 
         template<typename T>
-        static inline WeakRef<T> LoadAsset(const String& path) {
+        static inline Ref<T> LoadAsset(const String& path) {
             return s_instance->_LoadAsset<T>(path);
         }
 
@@ -36,7 +67,6 @@ namespace Calyx {
         CX_SINGLETON_EXPOSE_METHOD(_UnloadAll, void UnloadAll());
         CX_SINGLETON_EXPOSE_METHOD(_AddSearchPath, void AddSearchPath(const String& path), path);
         CX_SINGLETON_EXPOSE_METHOD(_RemoveSearchPath, void RemoveSearchPath(const String& path), path);
-        CX_SINGLETON_EXPOSE_METHOD(_GetRootAssetPath, Path GetRootAssetPath());
 
     public:
         AssetRegistry();
@@ -50,54 +80,62 @@ namespace Calyx {
         ) override;
 
     private:
-        String FindAssetFile(const String& asset);
+        String NormalizePath(const String& path);
+
+        bool FindAssetType(const Path& file, AssetT& outType);
+        bool ExpectAssetType(const Path& file, AssetT expectedType);
+
+        bool FindAssetFile(const String& asset, Path& outFilePath);
+        void BuildAssetMeta(AssetSearchPath& searchPath);
+        void ClearAssetMeta(AssetSearchPath& searchPath);
+
+        void InitAssetTypes();
 
     private:
         template<typename T, typename ...Args>
-        WeakRef<T> _CreateAsset(const String& name, Args... args) {
+        Ref<T> _CreateAsset(const String& name, Args... args) {
             static_assert(std::is_base_of_v<IAsset, T>, "T must be an asset type!");
+            String assetName = NormalizePath(name);
             auto ref = CreateRef<T>(std::forward<Args>(args)...);
-            m_loadedAssets[name] = ref;
+            m_loadedAssets[assetName] = WeakRef<IAsset>(ref);
             return ref;
         }
 
         template<typename T>
-        WeakRef<T> _LoadAsset(const String& name) {
+        Ref<T> _LoadAsset(const String& name) {
+            // Asset name & type
+            String assetName = NormalizePath(name);
+            AssetT assetType = AssetType<T>();
+
             // Asset already loaded
-            auto loadedAsset = _GetAsset<T>(name);
-            if (!loadedAsset.expired())
-                return loadedAsset;
+            auto loadedAsset = m_loadedAssets.find(assetName);
+            if (loadedAsset != m_loadedAssets.end()) {
+                auto assetPtr = loadedAsset->second.lock();
+                return assetPtr->GetAssetType() == assetType ?
+                       std::dynamic_pointer_cast<T>(assetPtr) :
+                       Ref<T>();
+            }
 
             // Check file exists
-            String filepath = FindAssetFile(name);
-            Path file = Path(filepath);
-            if (!FileSystem::exists(file) || !FileSystem::is_regular_file(file))
-                return WeakRef<T>();
+            Path assetFile;
+            if (!FindAssetFile(assetName, assetFile))
+                return Ref<T>();
 
             // Check extension matches asset type
-            String ext = file.extension().string();
+            String ext = assetFile.extension().string();
             auto extEntry = m_assetTypes.find(ext);
-            if (extEntry == m_assetTypes.end() ||
-                extEntry->second != AssetType<T>())
-                return WeakRef<T>();
+            if (!ExpectAssetType(assetFile, assetType))
+                return Ref<T>();
 
             // Load asset from file
-            T* asset = T::Create(filepath);
+            T* asset = T::Create(assetFile.string());
             if (asset == nullptr)
-                return WeakRef<T>();
+                return Ref<T>();
 
             // Return ref
-            Ref<T> ref(asset);
-            m_loadedAssets[name] = ref;
+            Ref<T> ref(asset, AssetDeleter<T>(assetName));
+            m_loadedAssets[assetName] = WeakRef<IAsset>(ref);
             return ref;
-        }
-
-        template<typename T>
-        WeakRef<T> _GetAsset(const String& name) {
-            auto asset = m_loadedAssets.find(name);
-            if (asset == m_loadedAssets.end() || asset->second->GetAssetType() != AssetType<T>())
-                return WeakRef<T>();
-            return std::dynamic_pointer_cast<T>(asset->second);
         }
 
         template<typename T, typename ...Ext>
@@ -114,14 +152,14 @@ namespace Calyx {
 
         void _RemoveSearchPath(const String& path);
 
-        Path _GetRootAssetPath() const { return m_rootAssetDirectory; }
-
     private:
         Scope<efsw::FileWatcher> m_assetWatcher;
-        Path m_rootAssetDirectory;
-        OrderedSet<Path> m_searchPaths = { "assets" };
+
+        List<AssetSearchPath> m_searchPaths{};
+
         Map<String, AssetT> m_assetTypes{};
-        Map<String, Ref<IAsset>> m_loadedAssets{};
+        Map<String, AssetMeta> m_assetMetaMap{};
+        Map<String, WeakRef<IAsset>> m_loadedAssets{};
 
     };
 

@@ -9,6 +9,12 @@ namespace Calyx::Reflect {
         }
     }
 
+    std::vector<entt::meta_type> Core::GetDerivedClasses(const entt::meta_type& type) {
+        std::vector<entt::meta_type> derived;
+        CollectDerivedClasses(type, derived);
+        return derived;
+    }
+
     void Core::CollectDerivedClasses(const entt::meta_type& type, std::vector<entt::meta_type>& derivedList) {
         auto& derivedClasses = GetDerivedClassMap();
         derivedList.reserve(derivedClasses.size());
@@ -63,6 +69,11 @@ namespace Calyx::Reflect {
     Core::ClassMap& Core::GetDerivedClassMap() {
         static ClassMap map;
         return map;
+    }
+
+    bool Core::IsRefType(const entt::meta_type& type) {
+        static const auto sharedPtrTypeId = entt::resolve<entt::meta_class_template_tag<std::shared_ptr>>().id();
+        return type.is_pointer_like() && type.template_type().id() == sharedPtrTypeId;
     }
 
 }

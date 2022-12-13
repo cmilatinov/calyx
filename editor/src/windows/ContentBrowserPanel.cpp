@@ -40,11 +40,9 @@ namespace Calyx::Editor {
 
                 ImGui::PushStyleColor(ImGuiCol_Button, 0);
                 ImGui::PushID(filename.c_str());
-                CX_LOCK_PTR(m_folderTexture, folderTexture);
-                CX_LOCK_PTR(m_objFileTexture, objFileTexture);
                 auto textureID = entry.is_directory() ?
-                                 reinterpret_cast<void*>(folderTexture->GetRendererID()) :
-                                 reinterpret_cast<void*>(objFileTexture->GetRendererID());
+                                 reinterpret_cast<void*>(m_folderTexture->GetRendererID()) :
+                                 reinterpret_cast<void*>(m_objFileTexture->GetRendererID());
                 if (ImGui::ImageButton(textureID, { m_thumbnailSize, m_thumbnailSize }) && entry.is_directory()) {
                     SetDirectory(entry.path());
                 }

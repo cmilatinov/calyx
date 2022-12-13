@@ -8,11 +8,13 @@ namespace Calyx::Reflect::Tooling {
           m_constructorSerializer(*this),
           m_fieldSerializer(*this),
           m_methodSerializer(*this),
-          m_reflectedBases() {}
+          m_reflectedBases(),
+          m_refConversions() {}
 
     void ClassSerializer::Accept(CXXRecordDecl* decl) {
         m_record = decl;
         CollectReflectedBases(decl);
+        Utils::CollectRefConversions(decl, m_refConversions);
         m_constructorSerializer.TraverseDecl(decl);
         m_fieldSerializer.TraverseDecl(decl);
         m_methodSerializer.TraverseDecl(decl);
@@ -26,6 +28,10 @@ namespace Calyx::Reflect::Tooling {
                 return base->getQualifiedNameAsString();
             }
         );
+        json refs = json::array();
+        for (const auto& ref: m_refConversions) {
+            refs.push_back(ref);
+        }
         return json::object(
             {
                 { "name", m_record->getNameAsString() },
@@ -33,7 +39,8 @@ namespace Calyx::Reflect::Tooling {
                 { "bases", bases },
                 { "constructors", m_constructorSerializer.Serialize() },
                 { "fields", m_fieldSerializer.Serialize() },
-                { "methods", m_methodSerializer.Serialize() }
+                { "methods", m_methodSerializer.Serialize() },
+                { "ref_conversions", refs }
             }
         );
     }

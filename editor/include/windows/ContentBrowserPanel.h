@@ -14,8 +14,8 @@ namespace Calyx::Editor {
         void Draw();
 
     private:
-        WeakRef<Texture2D> m_objFileTexture;
-        WeakRef<Texture2D> m_folderTexture;
+        Ref<Texture2D> m_objFileTexture;
+        Ref<Texture2D> m_folderTexture;
         Path m_rootDirectory;
         Path m_currentDirectory;
         float m_thumbnailSize = 120;

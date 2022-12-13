@@ -42,7 +42,14 @@ target_compile_definitions("Engine" PUBLIC "STB_IMAGE_IMPLEMENTATION")
 
 # Add reflection
 add_reflected_target("Engine")
-add_reflected_headers("Engine" "include" "include/ecs/Component.h" "include/ecs/components/TransformComponent.h" "include/ecs/components/MeshComponent.h")
+add_reflected_headers("Engine" "include"
+        "include/assets/Asset.h"
+        "include/assets/Mesh.h"
+        "include/render/objects/Shader.h"
+        "include/render/objects/Texture2D.h"
+        "include/ecs/Component.h"
+        "include/ecs/components/TransformComponent.h"
+        "include/ecs/components/MeshComponent.h")
 target_sources("Engine" PUBLIC "src/reflect/Global.cpp")
 
 # Compile definitions based on platform

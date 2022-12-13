@@ -19,3 +19,9 @@ static void CX_REFLECT_REGISTRATION_FN_NAME()
 // Class registration macro and forward decl
 #define CX_BEGIN_REFLECT() friend void ::CX_REFLECT_REGISTRATION_FN_NAME()
 static void CX_REFLECT_REGISTRATION_FN_NAME();
+
+// Automatic Ref<...> conversion
+#define CX_REFLECT_CONVERTIBLE_REF_FN_NAME reflect_convertible_ref_
+template<typename T>
+static void CX_REFLECT_CONVERTIBLE_REF_FN_NAME() {}
+#define CX_REFLECT_CONVERTIBLE_REF(className) friend void ::CX_REFLECT_CONVERTIBLE_REF_FN_NAME<className>()

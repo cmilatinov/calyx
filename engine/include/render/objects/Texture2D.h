@@ -6,10 +6,10 @@
 namespace Calyx {
 
     class CALYX_API Texture2D : public IRenderTarget, public Asset<Texture2D> {
+        CX_BEGIN_REFLECT();
         CX_ASSET_REGISTRY_FRIEND();
 
     public:
-
         static Ref<Texture2D> Create(
             uint32 width,
             uint32 height,

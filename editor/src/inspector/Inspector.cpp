@@ -9,7 +9,7 @@ namespace Calyx::Editor {
     void Inspector::Init() {
         s_inspectorClasses.clear();
         List<entt::meta_type> inspectorClasses = Reflect::Core::GetDerivedClasses<ITypeInspector>();
-        for (auto& inspector: inspectorClasses) {
+        for (const auto& inspector: inspectorClasses) {
             auto instance = inspector.construct();
             if (!instance)
                 continue;
@@ -20,15 +20,27 @@ namespace Calyx::Editor {
                 continue;
             }
 
-            s_inspectorClasses[typeInspector->GetMetaType().id()] = instance;
+            auto type = typeInspector->GetMetaType();
+            if (Reflect::Core::IsRefType(type)) {
+                auto ptrType = type.template_arg(0);
+                s_inspectorClasses[ptrType.id()] = instance;
+                List<entt::meta_type> derivedClasses = Reflect::Core::GetDerivedClasses(ptrType);
+                for (const auto& derived: derivedClasses) {
+                    s_inspectorClasses[derived.id()] = instance;
+                }
+            } else {
+                s_inspectorClasses[type.id()] = instance;
+            }
         }
     }
 
     String Inspector::GetName(const entt::meta_any& instance) {
-        String name = String(instance.type().info().name());
+        String name;
         const IComponent* component;
         if ((component = instance.try_cast<IComponent>()) != nullptr) {
             name = component->GetName();
+        } else {
+            name = String(instance.type().info().name());
         }
         // TODO: Check for custom component name via instance.type().prop()
         return name;
@@ -62,7 +74,7 @@ namespace Calyx::Editor {
         if (!CheckInspectorFunctionExists(CX_ON_INSPECTOR_GUI_HS, inspector, &fn))
             return;
 
-        fn.invoke(inspector, (entt::meta_any* const) &instance, (const entt::meta_func::size_type) 1);
+        fn.invoke(inspector, (entt::meta_any* const)&instance, (const entt::meta_func::size_type)1);
     }
 
     void Inspector::DrawDefaultComponentInspector(entt::meta_any&& instance) {
@@ -95,7 +107,7 @@ namespace Calyx::Editor {
             return;
 
         if (ImGui::BeginPopupContextItem()) {
-            fn.invoke(inspector, (entt::meta_any* const) &component, (const entt::meta_func::size_type) 1);
+            fn.invoke(inspector, (entt::meta_any* const)&component, (const entt::meta_func::size_type)1);
             ImGui::EndPopup();
         }
     }
@@ -108,11 +120,25 @@ namespace Calyx::Editor {
     }
 
     bool Inspector::CheckInspectorTypeExists(const entt::meta_any& instance, entt::id_type* typeId) {
-        auto id = instance.type().id();
-        if (!s_inspectorClasses.count(instance.type().id()))
+        auto type = instance.type();
+        auto id = type.id();
+
+        // Check type is Ref<...>
+        if (Reflect::Core::IsRefType(type)) {
+            auto ptrTypeId = type.template_arg(0).id();
+            if (s_inspectorClasses.count(ptrTypeId)) {
+                if (typeId != nullptr)
+                    *typeId = ptrTypeId;
+                return true;
+            }
+        }
+
+        if (!s_inspectorClasses.count(id))
             return false;
+
         if (typeId != nullptr)
             *typeId = id;
+
         return true;
     }
 

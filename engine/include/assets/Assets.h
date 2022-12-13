@@ -10,8 +10,6 @@ namespace Calyx {
 
 namespace Calyx::Assets {
 
-    void InitAssetTypes();
-
-    WeakRef<Mesh> ScreenSpaceQuad();
+    Ref<Mesh> ScreenSpaceQuad();
 
 }

@@ -5,8 +5,10 @@
 
 namespace Calyx {
 
-    class Mesh : public Asset<Mesh> {
+    class CALYX_API Mesh : public Asset<Mesh> {
         CX_ASSET_REGISTRY_FRIEND();
+        CX_BEGIN_REFLECT();
+        CX_REFLECT_CONVERTIBLE_REF(IAsset);
 
     public:
         void Clear();

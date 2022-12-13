@@ -40,5 +40,13 @@ CX_REFLECT_REGISTRATION {
 ## for base in class.bases
     Core::RegisterDerivedClass(entt::resolve<{{base}}>(), entt::resolve<{{class.fullName}}>());
 ## endfor
+
+## if length(class.ref_conversions) > 0
+    entt::meta<Ref<{{class.fullName}}>>()
+## for ref in class.ref_conversions
+        .conv<entt::overload<Ref<{{ref}}> (const Ref<{{class.fullName}}>&)>(&std::static_pointer_cast<{{ref}}, {{class.fullName}}>)>()
+## endfor
+        ;
+## endif
 ## endfor
 })";

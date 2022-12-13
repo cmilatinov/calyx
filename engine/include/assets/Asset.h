@@ -1,12 +1,11 @@
 #pragma once
 
-#include <typeinfo>
-
 namespace Calyx {
 
     using AssetT = size_t;
 
     class IAsset {
+        CX_BEGIN_REFLECT();
 
     public:
         virtual ~IAsset() = default;

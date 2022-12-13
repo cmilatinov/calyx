@@ -36,7 +36,10 @@ namespace Calyx::Editor {
         m_sceneRenderer = CreateScope<SceneRenderer>();
         m_scene = CreateScope<Scene>();
         m_sceneHierarchyPanel = CreateScope<SceneHierarchyPanel>(m_scene.get());
-        m_contentBrowserPanel = CreateScope<ContentBrowserPanel>(AssetRegistry::GetRootAssetPath());
+        Path gameAssets = "./GameAssets";
+        FileSystem::create_directories(gameAssets);
+        AssetRegistry::AddSearchPath(gameAssets.string());
+        m_contentBrowserPanel = CreateScope<ContentBrowserPanel>(gameAssets);
         m_statsPanel = CreateScope<StatisticsPanel>();
 
         m_editorCamera = CreateScope<CameraEditor>();
@@ -51,13 +54,12 @@ namespace Calyx::Editor {
         CX_CORE_INFO("Window size: {:d} x {:d}", window.GetWidth(), window.GetHeight());
 
         auto cubeMesh = AssetRegistry::LoadAsset<Mesh>("meshes/cube.obj");
-        CX_LOCK_PTR(cubeMesh, cubeMeshPtr);
         m_cube = m_scene->CreateGameObject();
-        m_cube->AddComponent<MeshComponent>(cubeMeshPtr.get());
+        m_cube->AddComponent<MeshComponent>(cubeMesh);
         m_cube->GetTransform().Translate(vec3(1, 0, 0));
 
         auto* test = m_scene->CreateGameObject("Test");
-        test->AddComponent<MeshComponent>(cubeMeshPtr.get());
+        test->AddComponent<MeshComponent>(cubeMesh);
         test->GetTransform().Translate(vec3(0, 2, 0));
         test->SetParent(m_cube);
     }
@@ -80,15 +82,13 @@ namespace Calyx::Editor {
         mat4 view = m_editorCamera->GetProjectionViewMatrix();
         mat4 invView = glm::inverse(view);
 
-        CX_LOCK_PTR(m_gridShader, gridShader);
-        CX_LOCK_PTR(m_grid, grid);
-        gridShader->Bind();
-        gridShader->SetMat4("view", view);
-        gridShader->SetMat4("invView", invView);
-        gridShader->SetFloat("nearPlane", m_editorCamera->GetNearPlane());
-        gridShader->SetFloat("farPlane", m_editorCamera->GetFarPlane());
-        grid->Draw();
-        gridShader->Unbind();
+        m_gridShader->Bind();
+        m_gridShader->SetMat4("view", view);
+        m_gridShader->SetMat4("invView", invView);
+        m_gridShader->SetFloat("nearPlane", m_editorCamera->GetNearPlane());
+        m_gridShader->SetFloat("farPlane", m_editorCamera->GetFarPlane());
+        m_grid->Draw();
+        m_gridShader->Unbind();
 
         // Blit and resolve MSAA samples
         m_msaaFramebuffer->Blit(m_framebuffer, 0, 0);
