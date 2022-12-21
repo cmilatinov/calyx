@@ -7,8 +7,8 @@ namespace Calyx::Editor {
     ContentBrowserPanel::ContentBrowserPanel(const Path& basePath)
         : m_objFileTexture(AssetRegistry::LoadAsset<Texture2D>("icons/block.png")),
           m_folderTexture(AssetRegistry::LoadAsset<Texture2D>("icons/folder-grey.png")),
-          m_rootDirectory(basePath),
-          m_currentDirectory(m_rootDirectory) {}
+          m_rootDirectory(basePath.parent_path()),
+          m_currentDirectory(basePath) {}
 
     ContentBrowserPanel::ContentBrowserPanel(const String& basePath)
         : m_objFileTexture(AssetRegistry::LoadAsset<Texture2D>("icons/block.png")),
@@ -25,6 +25,19 @@ namespace Calyx::Editor {
             if (ImGui::MenuItem("<<")) {
                 SetDirectory(m_currentDirectory.parent_path());
             }
+
+            // Dynamically create the breadcrumbs
+            auto tempPath = m_rootDirectory;
+            for (auto& path: std::filesystem::relative(m_currentDirectory, m_rootDirectory)) {
+                tempPath /= path;
+
+                ImGui::Text("/");
+                if (ImGui::MenuItem(path.string().c_str())) {
+                    SetDirectory(tempPath);
+                    break;
+                }
+            }
+
             ImGui::EndMenuBar();
         }
 
