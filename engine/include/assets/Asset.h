@@ -19,7 +19,7 @@ namespace Calyx {
 
     public:
         AssetT GetAssetType() override {
-            return typeid(T).hash_code();
+            return entt::resolve<T>().id();
         }
 
     };
