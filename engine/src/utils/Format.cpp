@@ -1,6 +1,6 @@
 #include "utils/Format.h"
 
-namespace Calyx {
+namespace Calyx::Utils {
 
     String Format::ByteSize(uint64 bytes, int precision) {
         static constexpr const uint64 BASE = 10;

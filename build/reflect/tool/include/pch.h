@@ -31,8 +31,9 @@ using namespace clang::tooling;
 namespace ch = std::chrono;
 namespace fs = std::filesystem;
 
+#include "Macros.h"
 #include "interfaces/IDeclProcessor.h"
 #include "interfaces/IJSONSerializer.h"
 #include "definitions/Member.h"
 #include "definitions/Utils.h"
-#include "reflect.h"
+#include "Reflect.h"

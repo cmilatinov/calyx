@@ -5,10 +5,6 @@ find_program(CLANG_EXECUTABLE clang)
 
 # Find libclang
 find_package(Clang REQUIRED)
-#find_file(LIBCLANG_PATH NAMES libclang.dll libclang.so)
-#if (NOT EXISTS "${LIBCLANG_PATH}")
-#    message(FATAL_ERROR "libclang not found")
-#endif ()
 
 # Add a reflection target to the reflection build system
 function(add_reflected_target target)

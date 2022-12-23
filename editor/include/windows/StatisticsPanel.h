@@ -21,12 +21,12 @@ namespace Calyx::Editor {
         void EndFrame();
 
     private:
-        MetricCollector<uint64> m_memCollector;
-        MetricCollector<double> m_cpuCollector;
+        Utils::MetricCollector<uint64> m_memCollector;
+        Utils::MetricCollector<double> m_cpuCollector;
 
         // Metrics
-        MemoryMetrics m_memory{};
-        CPUMetrics m_cpu{};
+        Utils::MemoryMetrics m_memory{};
+        Utils::CPUMetrics m_cpu{};
 
         // Queries
         Ref<Query> m_timeElapsedQuery;

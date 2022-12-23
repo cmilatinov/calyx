@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Calyx {
+namespace Calyx::Utils {
 
     template<typename T>
     class MetricCollector {

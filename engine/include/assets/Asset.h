@@ -2,7 +2,7 @@
 
 namespace Calyx {
 
-    using AssetT = size_t;
+    using AssetT = IdentifierT;
 
     class IAsset {
         CX_BEGIN_REFLECT();

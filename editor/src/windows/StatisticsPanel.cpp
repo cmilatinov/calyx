@@ -12,27 +12,28 @@ namespace Calyx::Editor {
         ImGui::Begin("Stats");
 
         if (Time::Timer("Metrics") >= 0.05f) {
-            Metrics::CollectCPUMetrics(&m_cpu);
-            Metrics::CollectMemoryMetrics(&m_memory);
+            Utils::Metrics::CollectCPUMetrics(&m_cpu);
+            Utils::Metrics::CollectMemoryMetrics(&m_memory);
             m_memCollector.Record(m_memory.ProcessUsed);
             m_cpuCollector.Record(m_cpu.ProcessUsage);
             Time::ResetTimer("Metrics");
         }
 
-        Graph::Line("CPU Usage (%%)", m_cpuCollector);
+        Utils::Graph::Line("CPU Usage (%%)", m_cpuCollector);
         ImGui::Separator();
 
-        ImGui::Text("RAM Total: %s", Format::ByteSize(m_memory.Total).c_str());
-        ImGui::Text("RAM Used: %s", Format::ByteSize(m_memory.Used).c_str());
+        ImGui::Text("RAM Total: %s", Utils::Format::ByteSize(m_memory.Total).c_str());
+        ImGui::Text("RAM Used: %s",Utils::Format::ByteSize(m_memory.Used).c_str());
         ImGui::Text(
             "RAM Process: %s (%s)",
-            Format::ByteSize(m_memory.ProcessUsed).c_str(),
-            Format::Percentage((double)m_memory.ProcessUsed / m_memory.Total).c_str());
+            Utils::Format::ByteSize(m_memory.ProcessUsed).c_str(),
+            Utils::Format::Percentage((double)m_memory.ProcessUsed / m_memory.Total).c_str()
+        );
         ImGui::Separator();
 
-        ImGui::Text("CPU Usage: %s", Format::Percentage(m_cpu.ProcessUsage).c_str());
-        ImGui::Text("CPU Time: %s", Format::Milliseconds((float)m_cpuTime / 1000000).c_str());
-        ImGui::Text("GPU Time: %s", Format::Milliseconds((float)m_gpuTime / 1000000).c_str());
+        ImGui::Text("CPU Usage: %s", Utils::Format::Percentage(m_cpu.ProcessUsage).c_str());
+        ImGui::Text("CPU Time: %s", Utils::Format::Milliseconds((float)m_cpuTime / 1000000).c_str());
+        ImGui::Text("GPU Time: %s", Utils::Format::Milliseconds((float)m_gpuTime / 1000000).c_str());
         ImGui::Separator();
 
         ImGui::Text("Triangles: %llu", m_primitives);

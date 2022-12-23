@@ -7,40 +7,49 @@
 namespace Calyx::Editor {
 
     class Inspector {
-        using InspectorMap = std::unordered_map<entt::id_type, entt::meta_any>;
+    CX_SINGLETON(Inspector);
 
     public:
-        static void Init();
+        Inspector();
 
         static void DrawComponentInspector(const entt::meta_type& type, void* instance) {
-            DrawComponentInspector(Reflect::Core::CreateOpaqueReference(type, instance));
+            auto ref = Reflect::Core::CreateOpaqueReference(type, instance);
+            s_instance->_DrawComponentInspector(ref);
         }
 
         template<typename T>
         static void DrawComponentInspector(T* instance) {
-            DrawComponentInspector(Reflect::Core::CreateReference(instance));
+            auto ref = Reflect::Core::CreateReference(instance);
+            s_instance->_DrawComponentInspector(ref);
         }
 
     private:
-        static InspectorMap s_inspectorClasses;
-
         static String GetName(const entt::meta_any& instance);
 
-        static void DrawComponentInspector(entt::meta_any&& instance);
-        static void DrawPropertyInspector(const String& propertyName, entt::meta_any&& instance);
+    private:
+        Map<entt::id_type, entt::meta_any> m_inspectorClasses{};
 
-        static void DrawTypeInspector(entt::id_type typeId, entt::meta_any&& instance);
+        void _DrawComponentInspector(entt::meta_any& instance);
+        void DrawPropertyInspector(const String& propertyName, entt::meta_any& instance);
 
-        static void DrawDefaultComponentInspector(entt::meta_any&& component);
+        void DrawTypeInspector(entt::id_type typeId, entt::meta_any& instance);
 
-        static void DrawComponentContextInspector(entt::meta_any&& component);
-        static bool DrawComponentInspectorHeader(entt::meta_any&& instance);
+        void DrawDefaultComponentInspector(entt::meta_any& component);
 
-        static bool CheckInspectorTypeExists(const entt::meta_any& instance, entt::id_type* typeId = nullptr);
-        static bool CheckInspectorFunctionExists(
+        void DrawComponentContextInspector(entt::meta_any& component);
+        bool DrawComponentInspectorHeader(entt::meta_any& instance);
+
+        bool CheckInspectorTypeExists(const entt::meta_any& instance, entt::id_type* typeId = nullptr);
+        bool CheckInspectorFunctionExists(
             entt::id_type function,
             const entt::meta_any& inspector,
             entt::meta_func* fn = nullptr
+        );
+
+        void InvokeInspectorFunction(
+            const entt::meta_func& fn,
+            entt::meta_any& inspector,
+            entt::meta_any& instance
         );
 
     };

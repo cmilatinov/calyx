@@ -88,6 +88,7 @@ namespace Calyx {
 
     void Mesh::CreateVAO() {
         m_vertexArray = VertexArray::Create();
+        m_vertexArray->Bind();
 
         auto indexBuffer = IndexBuffer::Create(m_indices.size(), m_indices.data());
         m_vertexArray->SetIndexBuffer(indexBuffer);
@@ -138,12 +139,13 @@ namespace Calyx {
 
         m_vertexArray->Bind();
         m_vertexArray->GetIndexBuffer()->SetData(m_indices.size(), m_indices.data());
-        m_vertexArray->GetVertexBuffers()[0]->SetData(m_vertices.size() * sizeof(vec3), m_vertices.data());
-        m_vertexArray->GetVertexBuffers()[1]->SetData(m_normals.size() * sizeof(vec3), m_normals.data());
-        m_vertexArray->GetVertexBuffers()[2]->SetData(m_uvs0.size() * sizeof(vec2), m_uvs0.data());
-        m_vertexArray->GetVertexBuffers()[3]->SetData(m_uvs1.size() * sizeof(vec2), m_uvs1.data());
-        m_vertexArray->GetVertexBuffers()[4]->SetData(m_uvs2.size() * sizeof(vec2), m_uvs2.data());
-        m_vertexArray->GetVertexBuffers()[5]->SetData(m_uvs3.size() * sizeof(vec2), m_uvs3.data());
+        const auto& buffers = m_vertexArray->GetVertexBuffers();
+        buffers[0]->SetData(m_vertices.size() * sizeof(vec3), m_vertices.data());
+        buffers[1]->SetData(m_normals.size() * sizeof(vec3), m_normals.data());
+        buffers[2]->SetData(m_uvs0.size() * sizeof(vec2), m_uvs0.data());
+        buffers[3]->SetData(m_uvs1.size() * sizeof(vec2), m_uvs1.data());
+        buffers[4]->SetData(m_uvs2.size() * sizeof(vec2), m_uvs2.data());
+        buffers[5]->SetData(m_uvs3.size() * sizeof(vec2), m_uvs3.data());
         m_vertexArray->Unbind();
     }
 

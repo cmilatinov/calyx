@@ -17,15 +17,14 @@ namespace Calyx {
         void SetMesh(const Ref<Mesh>& mesh) { m_mesh = mesh; }
 
         void DrawMesh() const {
-            if (!m_mesh) {
-                CX_CORE_WARN("Cannot draw null mesh!");
-                return;
-            }
+            if (!m_mesh) return;
             m_mesh->Draw();
         }
 
     private:
-        CX_REFLECT_SERIALIZE Ref<Mesh> m_mesh;
+        CX_REFLECT_SERIALIZE
+        CX_REFLECT_NAME("Mesh")
+        Ref<Mesh> m_mesh;
 
     };
 

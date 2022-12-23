@@ -15,9 +15,6 @@ endif ()
 # Includes
 include(../build/include/utils.cmake)
 
-# Required libraries
-find_package(efsw CONFIG REQUIRED)
-
 # Clump source files from src
 file(GLOB_RECURSE EDITOR_SRC "src/**.cpp")
 
@@ -25,9 +22,9 @@ file(GLOB_RECURSE EDITOR_SRC "src/**.cpp")
 add_executable("Editor" ${EDITOR_SRC})
 
 # Link target
-target_link_libraries("Editor" PUBLIC "Engine" efsw::efsw)
+target_link_libraries("Editor" PUBLIC "Engine")
 target_include_directories("Editor" PUBLIC "include")
-target_precompile_headers("Editor" PUBLIC "../engine/include/Calyx.h")
+target_precompile_headers("Editor" PUBLIC "include/pch.h")
 
 # Add reflection
 add_reflected_target("Editor")

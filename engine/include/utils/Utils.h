@@ -1,14 +1,11 @@
 #pragma once
 
-namespace Calyx {
+namespace Calyx::Utils {
 
-    class Utils {
+    String ToLowercase(const String& str);
+    List<String> Split(const String& str, const String& regex);
+    bool IsSearchMatch(const String& query, const String& searchTarget);
 
-    public:
-        static String GetEnv(const String& name);
-        static void SetEnv(const String& name, const String& value);
-        static void AddEnv(const String& name, const String& value);
-
-    };
+    UUID GenerateUUID();
 
 }

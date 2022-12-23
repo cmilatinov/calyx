@@ -1,5 +1,7 @@
 #pragma once
 
+#define UUID_SYSTEM_GENERATOR
+
 #include <chrono>
 #include <filesystem>
 #include <memory>
@@ -16,15 +18,19 @@
 #include <vector>
 #include <unordered_map>
 #include <unordered_set>
+#include <regex>
 
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 #include <nameof.hpp>
+#include <stduuid/uuid.h>
 
-#include "reflect.h"
-#include "core/Utils.h"
+#include "Macros.h"
+#include "Reflect.h"
 
 namespace Calyx {
+
+    using UUID = uuids::uuid;
 
     using String = std::string;
 
@@ -54,6 +60,8 @@ namespace Calyx {
 
     namespace FileSystem = std::filesystem;
     using Path = std::filesystem::path;
+
+    using IdentifierT = entt::id_type;
 
     namespace ThisThread = std::this_thread;
     using Thread = std::thread;

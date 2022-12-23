@@ -3,6 +3,7 @@
 #include <efsw/efsw.hpp>
 
 #include "assets/Asset.h"
+#include "utils/Utils.h"
 
 #define CX_ASSET_REGISTRY_FRIEND()                          \
 friend class ::Calyx::AssetRegistry;
@@ -12,17 +13,26 @@ namespace Calyx {
     class AssetRegistry : public efsw::FileWatchListener {
     CX_SINGLETON(AssetRegistry);
 
+    public:
+        struct AssetMeta {
+            UUID id;
+            AssetT type;
+            String name;
+            String displayName;
+            Path path;
+            const IAsset* ptr = nullptr;
+        };
+
     private:
         struct AssetSearchPath {
             Path path;
             efsw::WatchID watch;
-            List<String> assets;
+            List<UUID> assets;
         };
 
-        struct AssetMeta {
+        struct AssetType {
             AssetT type;
-            String name;
-            Path path;
+            IAsset* (*loadAssetFn)(const String&);
         };
 
         template<typename T>
@@ -30,23 +40,27 @@ namespace Calyx {
             static_assert(std::is_base_of_v<IAsset, T>, "T must be an asset type!");
 
         public:
-            explicit AssetDeleter(String name)
-                : m_name(std::move(name)) {}
+            explicit AssetDeleter(const UUID& id) : m_id(id) {}
 
             void operator()(const T* ptr) {
+                auto& registry = AssetRegistry::GetInstance();
+                registry.m_loadedAssets.erase(m_id);
+                registry.m_assetPointers_IDs.erase(static_cast<const IAsset*>(ptr));
+                CX_MAP_FIND(registry.m_assetMeta, m_id, i_assetMeta) {
+                    i_assetMeta->second.ptr = nullptr;
+                }
                 delete ptr;
-                AssetRegistry::GetInstance().m_loadedAssets.erase(m_name);
             }
 
         private:
-            String m_name;
+            UUID m_id;
 
         };
 
     public:
         template<typename T>
-        static inline AssetT AssetType() {
-            return typeid(T).hash_code();
+        static inline AssetT GetAssetType() {
+            return entt::resolve<T>().id();
         }
 
         template<typename T, typename ...Args>
@@ -64,9 +78,22 @@ namespace Calyx {
             return s_instance->_RegisterAssetType<T, Ext...>(extensions...);
         }
 
+        CX_SINGLETON_EXPOSE_METHOD(_LoadAsset, Ref<IAsset> LoadAsset(const UUID& id), id);
         CX_SINGLETON_EXPOSE_METHOD(_UnloadAll, void UnloadAll());
         CX_SINGLETON_EXPOSE_METHOD(_AddSearchPath, void AddSearchPath(const String& path), path);
         CX_SINGLETON_EXPOSE_METHOD(_RemoveSearchPath, void RemoveSearchPath(const String& path), path);
+        CX_SINGLETON_EXPOSE_METHOD(
+            _SearchAssets,
+            void SearchAssets(AssetT assetType, const String& query, List<AssetMeta>& outList),
+            assetType, query, outList
+        );
+
+        CX_SINGLETON_EXPOSE_METHOD(_GetAssetID, UUID GetAssetID(const IAsset* ptr), ptr);
+        CX_SINGLETON_EXPOSE_METHOD(_GetAssetID, UUID GetAssetID(const Ref<IAsset>& ref), ref);
+        CX_SINGLETON_EXPOSE_METHOD(_GetAssetDisplayName, String GetAssetDisplayName(const IAsset* ptr), ptr);
+        CX_SINGLETON_EXPOSE_METHOD(_GetAssetDisplayName, String GetAssetDisplayName(const Ref<IAsset>& ref), ref);
+        CX_SINGLETON_EXPOSE_METHOD(_GetAssetMeta, AssetMeta GetAssetMeta(const IAsset* ptr), ptr);
+        CX_SINGLETON_EXPOSE_METHOD(_GetAssetMeta, AssetMeta GetAssetMeta(const Ref<IAsset>& ref), ref);
 
     public:
         AssetRegistry();
@@ -96,24 +123,40 @@ namespace Calyx {
         Ref<T> _CreateAsset(const String& name, Args... args) {
             static_assert(std::is_base_of_v<IAsset, T>, "T must be an asset type!");
             String assetName = NormalizePath(name);
+            Path assetPath(assetName);
+            UUID assetID = Utils::GenerateUUID();
             auto ref = CreateRef<T>(std::forward<Args>(args)...);
-            m_loadedAssets[assetName] = WeakRef<IAsset>(ref);
+            const auto* ptr = static_cast<const IAsset*>(ref.get());
+            m_assetNames_IDs[assetName] = assetID;
+            m_assetPointers_IDs[ptr] = assetID;
+            m_loadedAssets[assetID] = WeakRef<IAsset>(ref);
+            m_assetMeta[assetID] = {
+                .id = assetID,
+                .type = GetAssetType<T>(),
+                .name = assetName,
+                .displayName = assetPath.stem().string(),
+                .path = assetPath,
+                .ptr = ptr
+            };
             return ref;
         }
 
         template<typename T>
         Ref<T> _LoadAsset(const String& name) {
-            // Asset name & type
+            // Asset name, type, and ID
             String assetName = NormalizePath(name);
-            AssetT assetType = AssetType<T>();
+            AssetT assetType = GetAssetType<T>();
+            UUID assetID;
 
             // Asset already loaded
-            auto loadedAsset = m_loadedAssets.find(assetName);
-            if (loadedAsset != m_loadedAssets.end()) {
-                auto assetPtr = loadedAsset->second.lock();
-                return assetPtr->GetAssetType() == assetType ?
-                       std::dynamic_pointer_cast<T>(assetPtr) :
-                       Ref<T>();
+            CX_MAP_FIND(m_assetNames_IDs, assetName, i_assetID) {
+                assetID = i_assetID->second;
+                CX_MAP_FIND(m_loadedAssets, assetID, i_asset) {
+                    auto assetPtr = i_asset->second.lock();
+                    return assetPtr->GetAssetType() == assetType ?
+                           std::dynamic_pointer_cast<T>(assetPtr) :
+                           Ref<T>();
+                }
             }
 
             // Check file exists
@@ -122,8 +165,6 @@ namespace Calyx {
                 return Ref<T>();
 
             // Check extension matches asset type
-            String ext = assetFile.extension().string();
-            auto extEntry = m_assetTypes.find(ext);
             if (!ExpectAssetType(assetFile, assetType))
                 return Ref<T>();
 
@@ -133,16 +174,29 @@ namespace Calyx {
                 return Ref<T>();
 
             // Return ref
-            Ref<T> ref(asset, AssetDeleter<T>(assetName));
-            m_loadedAssets[assetName] = WeakRef<IAsset>(ref);
+            CX_CORE_ASSERT(!assetID.is_nil(), "Invalid asset UUID!");
+            const auto* ptr = static_cast<const IAsset*>(asset);
+            Ref<T> ref(asset, AssetDeleter<T>(assetID));
+            m_assetPointers_IDs[ptr] = assetID;
+            m_loadedAssets[assetID] = WeakRef<IAsset>(ref);
+            m_assetMeta[assetID].ptr = ptr;
             return ref;
         }
+
+        Ref<IAsset> _LoadAsset(const UUID& id);
 
         template<typename T, typename ...Ext>
         void _RegisterAssetType(Ext... extensions) {
             List<String> exts = { extensions... };
+            auto assetType = GetAssetType<T>();
+            m_assetTypes[assetType] = {
+                .type = GetAssetType<T>(),
+                .loadAssetFn = reinterpret_cast<IAsset* (*)(const String&)>(
+                    entt::overload<T* (const String&)>(&T::Create)
+                )
+            };
             for (const auto& ext: exts) {
-                m_assetTypes[ext] = AssetType<T>();
+                m_assetExtensions_Types[ext] = assetType;
             }
         }
 
@@ -152,14 +206,30 @@ namespace Calyx {
 
         void _RemoveSearchPath(const String& path);
 
+        void _SearchAssets(AssetT assetType, const String& query, List<AssetMeta>& outList);
+
+        UUID _GetAssetID(const IAsset* ptr);
+        UUID _GetAssetID(const Ref<IAsset>& ref);
+
+        String _GetAssetDisplayName(const IAsset* ptr);
+        String _GetAssetDisplayName(const Ref<IAsset>& ref);
+
+        AssetMeta _GetAssetMeta(const IAsset* ptr);
+        AssetMeta _GetAssetMeta(const Ref<IAsset>& ref);
+
     private:
         Scope<efsw::FileWatcher> m_assetWatcher;
 
         List<AssetSearchPath> m_searchPaths{};
 
-        Map<String, AssetT> m_assetTypes{};
-        Map<String, AssetMeta> m_assetMetaMap{};
-        Map<String, WeakRef<IAsset>> m_loadedAssets{};
+        Map<AssetT, AssetType> m_assetTypes{};
+        Map<String, AssetT> m_assetExtensions_Types{};
+
+        Map<UUID, AssetMeta> m_assetMeta{};
+
+        Map<UUID, WeakRef<IAsset>> m_loadedAssets{};
+        Map<String, UUID> m_assetNames_IDs;
+        Map<const IAsset*, UUID> m_assetPointers_IDs;
 
     };
 

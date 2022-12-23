@@ -14,7 +14,7 @@ function(add_file_copy target dest)
             COMMAND ${CMAKE_COMMAND} -E copy_if_different
             ${files}
             "${dest}"
-            COMMENT "Copying file ''"
+            DEPENDS ${files}
     )
 endfunction()
 

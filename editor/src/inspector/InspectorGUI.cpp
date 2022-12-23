@@ -6,20 +6,42 @@
 
 namespace Calyx::Editor {
 
-    template<typename T>
-    bool InspectorGUI::GameAssetControl(String name, Ref<T>& value) {
-        static_assert(std::is_base_of_v<IAsset, T>, "T must be an asset type!");
-        auto type = entt::resolve<T>();
-        if (ImGui::Button("Select")) {
+    String InspectorGUI::s_assetSearch{};
+    List<AssetRegistry::AssetMeta> InspectorGUI::s_assetList{};
 
+    bool InspectorGUI::GameAssetControl(const String& name, AssetT assetType, Ref<IAsset>& value) {
+        auto displayName = AssetRegistry::GetAssetDisplayName(value);
+        if (ImGui::BeginCombo("##AssetSelect", displayName.c_str())) {
+            if (ImGui::IsWindowAppearing()) {
+                s_assetList.clear();
+                AssetRegistry::SearchAssets(assetType, s_assetSearch, s_assetList);
+                ImGui::SetKeyboardFocusHere();
+            }
+
+            ImGui::SetNextItemWidth(-FLT_MIN);
+            if (ImGui::InputText("##Search", &s_assetSearch, ImGuiInputTextFlags_AutoSelectAll)) {
+                s_assetList.clear();
+                AssetRegistry::SearchAssets(assetType, s_assetSearch, s_assetList);
+            }
+
+            if (ImGui::Selectable("None", !value)) {
+                value = Ref<IAsset>();
+            }
+
+            for (const auto& asset: s_assetList) {
+                auto id = AssetRegistry::GetAssetID(value);
+                if (ImGui::Selectable(asset.displayName.c_str(), asset.id == id)) {
+                    value = AssetRegistry::LoadAsset(asset.id);
+                }
+            }
+            ImGui::EndCombo();
         }
-        ImGui::SameLine();
-        ImGui::SetNextItemWidth(-FLT_MIN);
-        ImGui::InputText("##Input", &name, ImGuiInputTextFlags_NoHorizontalScroll | ImGuiInputTextFlags_ReadOnly);
+
+        return false;
     }
 
     bool InspectorGUI::TextControl(const String& name, String& value) {
-        return ImGui::InputText(name.c_str(), &value, ImGuiInputTextFlags_AutoSelectAll);
+        return ImGui::InputText(("##" + name).c_str(), &value, ImGuiInputTextFlags_AutoSelectAll);
     }
 
     bool InspectorGUI::Vec3Control(const String& name, vec3& value, float speed) {
@@ -31,7 +53,7 @@ namespace Calyx::Editor {
     }
 
     bool InspectorGUI::SliderControl(const String& name, float& value, float min, float max) {
-        return ImGui::SliderFloat(name.c_str(), &value, min, max);
+        return ImGui::SliderFloat(("##" + name).c_str(), &value, min, max);
     }
 
     bool InspectorGUI::BeginPropertyTable(const String& name) {
@@ -53,10 +75,6 @@ namespace Calyx::Editor {
         ImGui::Text(label.c_str());
         ImGui::TableNextColumn();
         ImGui::SetNextItemWidth(-FLT_MIN);
-    }
-
-    void InspectorGUI::AssetSelector(AssetT assetType) {
-
     }
 
     bool InspectorGUI::DragFloatN_Colored(

@@ -30,6 +30,7 @@ add_executable("ReflectTool" ${REFLECT_SRC})
 target_compile_definitions("ReflectTool" PRIVATE ${LLVM_DEFINITIONS_LIST} INJA_NOEXCEPTION)
 target_include_directories("ReflectTool" PRIVATE include ${LLVM_INCLUDE_DIRS})
 target_link_libraries("ReflectTool" PRIVATE
+        Macros
         ReflectLib
         libclang clangAST clangASTMatchers clangBasic clangFrontend clangRewrite clangTooling
         ${LLVM_LIBRARIES}

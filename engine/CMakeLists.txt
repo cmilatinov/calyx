@@ -16,16 +16,18 @@ endif ()
 include(../build/include/reflect.cmake)
 
 # Required libraries
-find_package(glfw3 CONFIG REQUIRED)
+find_package(assimp CONFIG REQUIRED)
+find_package(efsw CONFIG REQUIRED)
+find_package(EnTT CONFIG REQUIRED)
 find_package(glad REQUIRED)
+find_package(glfw3 CONFIG REQUIRED)
+find_package(glm CONFIG REQUIRED)
 find_package(imgui CONFIG REQUIRED)
 find_package(imguizmo CONFIG REQUIRED)
 find_package(implot CONFIG REQUIRED)
-find_package(glm CONFIG REQUIRED)
-find_package(assimp CONFIG REQUIRED)
-find_package(spdlog REQUIRED)
-find_package(EnTT CONFIG REQUIRED)
 find_package(nameof CONFIG REQUIRED)
+find_package(spdlog REQUIRED)
+find_package(stduuid CONFIG REQUIRED)
 find_path(STB_INCLUDE_DIRS "stb_image.h")
 
 # Clump source files from src
@@ -35,7 +37,20 @@ file(GLOB_RECURSE ENGINE_SRC "src/**.cpp")
 add_library("Engine" STATIC ${ENGINE_SRC})
 
 # Link target
-target_link_libraries("Engine" PUBLIC glfw glad::glad imgui::imgui imguizmo::imguizmo implot::implot glm::glm assimp::assimp spdlog::spdlog_header_only EnTT::EnTT nameof::nameof)
+target_link_libraries("Engine" PUBLIC
+        Macros
+        assimp::assimp
+        efsw::efsw
+        EnTT::EnTT
+        glad::glad
+        glfw
+        glm::glm
+        imgui::imgui
+        imguizmo::imguizmo
+        implot::implot
+        nameof::nameof
+        spdlog::spdlog_header_only
+        stduuid)
 target_include_directories("Engine" PUBLIC include ${STB_INCLUDE_DIRS})
 target_precompile_headers("Engine" PUBLIC include/pch.h)
 target_compile_definitions("Engine" PUBLIC "STB_IMAGE_IMPLEMENTATION")

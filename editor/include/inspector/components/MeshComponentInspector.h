@@ -7,7 +7,7 @@ namespace Calyx::Editor {
 
     class MeshComponentInspector : public TypeInspector<MeshComponent> {
         CX_BEGIN_REFLECT();
-        void CX_ON_INSPECTOR_GUI(MeshComponent& mc);
+        void CX_ON_INSPECTOR_GUI(IdentifierT typeID, MeshComponent& mc);
     };
 
 }

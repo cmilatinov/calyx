@@ -4,7 +4,7 @@
 #include "psapi.h"
 #endif
 
-namespace Calyx {
+namespace Calyx::Utils {
 
     void Metrics::CollectMemoryMetrics(MemoryMetrics* metrics) {
 #ifdef CX_PLATFORM_WINDOWS

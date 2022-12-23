@@ -1,5 +1,7 @@
 #include "scene/SceneRenderer.h"
 
+#include <glad/glad.h>
+
 namespace Calyx {
 
     SceneRenderer::SceneRenderer()

@@ -40,6 +40,31 @@ namespace Calyx {
         }
     }
 
+    Ref<IAsset> AssetRegistry::_LoadAsset(const UUID& id) {
+        // Asset already loaded
+        CX_MAP_FIND(m_loadedAssets, id, i_asset) {
+            return i_asset->second.lock();
+        }
+
+        // Load asset by type
+        CX_MAP_FIND(m_assetMeta, id, i_assetMeta) {
+            CX_MAP_FIND(m_assetTypes, i_assetMeta->second.type, i_assetType) {
+                auto* asset = i_assetType->second.loadAssetFn(i_assetMeta->second.path.string());
+                if (asset == nullptr)
+                    return Ref<IAsset>();
+
+                auto ref = Ref<IAsset>(asset, AssetDeleter<IAsset>(id));
+                m_assetPointers_IDs[asset] = id;
+                m_loadedAssets[id] = WeakRef<IAsset>(ref);
+                i_assetMeta->second.ptr = asset;
+                return ref;
+            }
+        }
+
+        // No such asset
+        return Ref<IAsset>();
+    }
+
     void AssetRegistry::_UnloadAll() {
         m_loadedAssets.clear();
     }
@@ -72,17 +97,62 @@ namespace Calyx {
         }
     }
 
+    void AssetRegistry::_SearchAssets(AssetT assetType, const String& query, List<AssetMeta>& outList) {
+        for (const auto& [_, meta]: m_assetMeta) {
+            if (meta.type == assetType && Utils::IsSearchMatch(query, meta.displayName))
+                outList.push_back(meta);
+        }
+    }
+
+    UUID AssetRegistry::_GetAssetID(const IAsset* ptr) {
+        CX_MAP_FIND(m_assetPointers_IDs, ptr, i_assetID) {
+            return i_assetID->second;
+        }
+        return UUID();
+    }
+
+    UUID AssetRegistry::_GetAssetID(const Ref<IAsset>& ref) {
+        return _GetAssetID(ref.get());
+    }
+
+    String AssetRegistry::_GetAssetDisplayName(const IAsset* ptr) {
+        if (ptr == nullptr) return "None";
+        CX_MAP_FIND(m_assetPointers_IDs, ptr, i_assetID) {
+            CX_MAP_FIND(m_assetMeta, i_assetID->second, i_assetMeta) {
+                return i_assetMeta->second.displayName;
+            }
+        }
+        return "";
+    }
+
+    String AssetRegistry::_GetAssetDisplayName(const Ref<IAsset>& ref) {
+        return _GetAssetDisplayName(ref.get());
+    }
+
+    AssetRegistry::AssetMeta AssetRegistry::_GetAssetMeta(const IAsset* ptr) {
+        CX_MAP_FIND(m_assetPointers_IDs, ptr, i_assetID) {
+            CX_MAP_FIND(m_assetMeta, i_assetID->second, i_assetMeta) {
+                return i_assetMeta->second;
+            }
+        }
+        return {};
+    }
+
+    AssetRegistry::AssetMeta AssetRegistry::_GetAssetMeta(const Ref<IAsset>& ref) {
+        return _GetAssetMeta(ref.get());
+    }
+
     String AssetRegistry::NormalizePath(const String& path) {
         return Path(path).lexically_normal().string();
     }
 
     bool AssetRegistry::FindAssetType(const Path& file, AssetT& outType) {
         String ext = file.extension().string();
-        auto extEntry = m_assetTypes.find(ext);
-        if (extEntry == m_assetTypes.end())
-            return false;
-        outType = extEntry->second;
-        return true;
+        CX_MAP_FIND(m_assetExtensions_Types, ext, i_assetType) {
+            outType = i_assetType->second;
+            return true;
+        }
+        return false;
     }
 
     bool AssetRegistry::ExpectAssetType(const Path& file, AssetT expectedType) {
@@ -111,18 +181,19 @@ namespace Calyx {
 
     void AssetRegistry::ClearAssetMeta(AssetSearchPath& searchPath) {
         for (const auto& asset: searchPath.assets) {
-            m_assetMetaMap.erase(asset);
+            m_assetMeta.erase(asset);
         }
         m_searchPaths.erase(
             std::remove_if(
                 m_searchPaths.begin(),
                 m_searchPaths.end(),
-                [&searchPath](const auto& sp) { return sp.path.string() == searchPath.path; }
+                [&searchPath](const auto& sp) {
+                    return FileSystem::equivalent(sp.path, searchPath.path);
+                }
             ),
             m_searchPaths.end()
         );
     }
-
 
     void AssetRegistry::BuildAssetMeta(AssetSearchPath& searchPath) {
         for (const auto& file: FileSystem::recursive_directory_iterator(searchPath.path)) {
@@ -134,12 +205,17 @@ namespace Calyx {
             AssetT assetType;
             if (!FindAssetType(file, assetType))
                 continue;
-            m_assetMetaMap[assetName] = {
+
+            UUID assetID = Utils::GenerateUUID();
+            m_assetNames_IDs[assetName] = assetID;
+            m_assetMeta[assetID] = {
+                .id = assetID,
                 .type = assetType,
                 .name = assetName,
+                .displayName = relativeFilePath.stem().string(),
                 .path = FileSystem::absolute(file).lexically_normal().string()
             };
-            searchPath.assets.push_back(assetName);
+            searchPath.assets.push_back(assetID);
         }
     }
 

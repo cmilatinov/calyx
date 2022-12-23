@@ -1,32 +1,53 @@
 #include "utils/Utils.h"
 
-namespace Calyx {
+namespace Calyx::Utils {
 
-    String Utils::GetEnv(const String& name) {
-#ifdef CX_PLATFORM_WINDOWS
-        String value;
-        DWORD strSize = GetEnvironmentVariableA(name.c_str(), value.data(), 0);
-        value.resize(strSize);
-        strSize = GetEnvironmentVariableA(name.c_str(), value.data(), strSize);
-        value.resize(strSize);
-        return value;
-#else
-        return "";
-#endif
+    String ToLowercase(const String& str) {
+        String result(str);
+        std::transform(
+            result.begin(),
+            result.end(),
+            result.begin(),
+            [](auto c) { return std::tolower(c); }
+        );
+        return result;
     }
 
-    void Utils::SetEnv(const String& name, const String& value) {
-#ifdef CX_PLATFORM_WINDOWS
-        SetEnvironmentVariableA(name.c_str(), value.c_str());
-#endif
+    List<String> Split(const String& str, const String& regex) {
+        std::regex rgx(regex);
+        std::sregex_token_iterator it(str.begin(), str.end(), rgx, -1);
+        List<String> result;
+        std::transform(
+            std::sregex_token_iterator(str.begin(), str.end(), rgx, -1),
+            std::sregex_token_iterator(),
+            std::back_inserter(result),
+            [](auto str) { return str; }
+        );
+        return result;
     }
 
-    void Utils::AddEnv(const Calyx::String& name, const Calyx::String& value) {
-#ifdef CX_PLATFORM_WINDOWS
-        String env = GetEnv(name);
-        env += ";" + value;
-        SetEnv(name, env);
-#endif
+    bool IsSearchMatch(const String& query, const String& target) {
+        auto words = Split(query, "\\s+");
+        std::transform(
+            words.begin(),
+            words.end(),
+            words.begin(),
+            [](const auto& word) { return ToLowercase(word); }
+        );
+
+        auto targetLower = ToLowercase(target);
+        return std::all_of(
+            words.begin(),
+            words.end(),
+            [&targetLower](const auto& word) {
+                return targetLower.find(word) != String::npos;
+            }
+        );
+    }
+
+    UUID GenerateUUID() {
+        static uuids::uuid_system_generator gen{};
+        return gen();
     }
 
 }

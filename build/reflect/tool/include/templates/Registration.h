@@ -11,14 +11,16 @@ CX_REFLECT_REGISTRATION {
     // Class '{{class.fullName}}'
     entt::meta<{{class.fullName}}>()
         .type("{{class.fullName}}"_hs)
-        .prop(CX_REFLECT_FIELD_NAMES, Core::FieldNameMap({
+        .prop(CX_REFLECT_FIELD_META, Core::FieldMetaMap({
 ## for field in class.fields
-            { "{{field.name}}"_hs, "{{field.name}}" }{% if not loop.is_last %},{% endif %}
-## endfor
-        }))
-        .prop(CX_REFLECT_FIELD_OFFSETS, Core::FieldOffsetMap({
-## for field in class.fields
-            { "{{field.name}}"_hs, static_cast<int32_t>(offsetof({{class.fullName}}, {{field.name}})) }{% if not loop.is_last %},{% endif %}
+            {
+                "{{field.name}}"_hs,
+                {
+                    .name = "{{field.name}}",
+                    .displayName = "{{field.name}}",
+                    .offset = static_cast<int32_t>(offsetof({{class.fullName}}, {{field.name}}))
+                }
+            }{% if not loop.is_last %},{% endif %}
 ## endfor
         }))
 ## for base in class.bases
@@ -44,6 +46,8 @@ CX_REFLECT_REGISTRATION {
 ## if length(class.ref_conversions) > 0
     entt::meta<Ref<{{class.fullName}}>>()
 ## for ref in class.ref_conversions
+        .ctor<const Ref<{{class.fullName}}>&>()
+        .ctor<entt::overload<Ref<{{class.fullName}}> (const Ref<{{ref}}>&)>(&std::dynamic_pointer_cast<{{class.fullName}}, {{ref}}>)>()
         .conv<entt::overload<Ref<{{ref}}> (const Ref<{{class.fullName}}>&)>(&std::static_pointer_cast<{{ref}}, {{class.fullName}}>)>()
 ## endfor
         ;

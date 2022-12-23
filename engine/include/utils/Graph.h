@@ -5,7 +5,7 @@
 #include "utils/Format.h"
 #include "utils/metrics/MetricCollector.h"
 
-namespace Calyx {
+namespace Calyx::Utils {
 
     class Graph {
 

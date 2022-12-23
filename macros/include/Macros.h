@@ -2,6 +2,9 @@
 
 #define CX_BIT(x) (1 << x)
 
+#define CX_XSTR(x) CX_STR(x)
+#define CX_STR(x) #x
+
 #define CX_CONCAT(a, b) CX_CONCAT_IMPL(a, b)
 #define CX_CONCAT_IMPL(a, b) a##b
 
@@ -31,3 +34,5 @@ void operator=(const name& other) = delete
 static inline fn {                                         \
     return s_instance->instanceName(__VA_ARGS__);          \
 }
+
+#define CX_MAP_FIND(map, key, it) if (auto it = map.find(key); it != map.end())

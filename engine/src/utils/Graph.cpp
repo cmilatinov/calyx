@@ -1,6 +1,6 @@
 #include "utils/Graph.h"
 
-namespace Calyx {
+namespace Calyx::Utils {
 
 
 }

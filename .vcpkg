@@ -13,3 +13,4 @@ nameof
 nlohmann-json
 spdlog
 stb
+stduuid

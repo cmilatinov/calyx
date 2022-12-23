@@ -1,4 +1,4 @@
-#include "reflect.h"
+#include "Reflect.h"
 
 namespace Calyx::Reflect {
 
@@ -17,7 +17,6 @@ namespace Calyx::Reflect {
 
     void Core::CollectDerivedClasses(const entt::meta_type& type, std::vector<entt::meta_type>& derivedList) {
         auto& derivedClasses = GetDerivedClassMap();
-        derivedList.reserve(derivedClasses.size());
         for (auto& derived: derivedClasses[type.id()]) {
             derivedList.push_back(derived);
             CollectDerivedClasses(derived, derivedList);
@@ -25,31 +24,17 @@ namespace Calyx::Reflect {
     }
 
     std::string Core::GetFieldName(const entt::meta_type& type, entt::id_type fieldId) {
-        using namespace entt::literals;
-
-        auto fieldNamesAny = type.prop(CX_REFLECT_FIELD_NAMES).value();
-        if (!fieldNamesAny)
+        const auto* meta = GetFieldMeta(type, fieldId);
+        if (meta == nullptr)
             return "";
-
-        auto fieldNames = fieldNamesAny.cast<FieldNameMap>();
-        if (!fieldNames.count(fieldId))
-            return "";
-
-        return fieldNames.at(fieldId);
+        return meta->name;
     }
 
     int32_t Core::GetFieldOffset(const entt::meta_type& type, entt::id_type fieldId) {
-        using namespace entt::literals;
-
-        auto fieldOffsetsAny = type.prop(CX_REFLECT_FIELD_OFFSETS).value();
-        if (!fieldOffsetsAny)
+        const auto* meta = GetFieldMeta(type, fieldId);
+        if (meta == nullptr)
             return -1;
-
-        auto fieldOffsets = fieldOffsetsAny.cast<FieldOffsetMap>();
-        if (!fieldOffsets.count(fieldId))
-            return -1;
-
-        return fieldOffsets.at(fieldId);
+        return meta->offset;
     }
 
     void* Core::GetFieldPointer(const entt::meta_any& instance, entt::id_type fieldId) {
@@ -66,14 +51,34 @@ namespace Calyx::Reflect {
         return type.from_void(ref);
     }
 
-    Core::ClassMap& Core::GetDerivedClassMap() {
-        static ClassMap map;
-        return map;
-    }
-
     bool Core::IsRefType(const entt::meta_type& type) {
         static const auto sharedPtrTypeId = entt::resolve<entt::meta_class_template_tag<std::shared_ptr>>().id();
         return type.is_pointer_like() && type.template_type().id() == sharedPtrTypeId;
+    }
+
+    entt::meta_type Core::GetRefPointerType(const entt::meta_type& type) {
+        if (!IsRefType(type))
+            return entt::meta_type();
+        return type.template_arg(0);
+    }
+
+    const Core::FieldMeta* Core::GetFieldMeta(const entt::meta_type& type, entt::id_type fieldId) {
+        using namespace entt::literals;
+
+        auto fieldMetaAny = type.prop(CX_REFLECT_FIELD_META).value();
+        if (!fieldMetaAny)
+            return nullptr;
+
+        const auto* fieldMeta = fieldMetaAny.try_cast<const FieldMetaMap>();
+        if (fieldMeta == nullptr || !fieldMeta->count(fieldId))
+            return nullptr;
+
+        return &fieldMeta->at(fieldId);
+    }
+
+    Core::ClassMap& Core::GetDerivedClassMap() {
+        static ClassMap map{};
+        return map;
     }
 
 }

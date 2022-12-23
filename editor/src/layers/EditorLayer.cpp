@@ -109,8 +109,8 @@ namespace Calyx::Editor {
         Statistics();
         Inspector();
         ContentBrowser();
-        ImGui::ShowDemoWindow();
-        ImPlot::ShowDemoWindow();
+//        ImGui::ShowDemoWindow();
+//        ImPlot::ShowDemoWindow();
         EndDockspace();
     }
 

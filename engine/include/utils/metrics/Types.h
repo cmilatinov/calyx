@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Calyx {
+namespace Calyx::Utils {
 
     struct MemoryMetrics {
         uint64 Total;

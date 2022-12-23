@@ -1,7 +1,7 @@
 #pragma once
 
 #include "layers/EditorLayer.h"
-#include "utils/Utils.h"
+#include "utils/Environment.h"
 
 namespace Calyx::Editor {
 
