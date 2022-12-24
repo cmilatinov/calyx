@@ -25,6 +25,14 @@ namespace Calyx {
             return &component;
         }
 
+        void AddComponent(const entt::meta_type& type) {
+            auto storage = m_scene->m_entityRegistry.storage(type.info().hash());
+            storage->emplace(m_entityID);
+            void* component = storage->get(m_entityID);
+            auto ref = type.from_void(component);
+            ref.assign(type.construct());
+        }
+
         template<typename T>
         void RemoveComponent() {
             m_scene->m_entityRegistry.erase<T>(m_entityID);

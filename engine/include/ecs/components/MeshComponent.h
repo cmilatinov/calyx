@@ -9,6 +9,9 @@ namespace Calyx {
         CX_BEGIN_REFLECT();
 
     public:
+        MeshComponent()
+            : m_mesh() {}
+
         explicit MeshComponent(const Ref<Mesh>& mesh)
             : m_mesh(mesh) {}
 
