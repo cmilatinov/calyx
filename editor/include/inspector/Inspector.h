@@ -1,5 +1,6 @@
 #pragma once
 
+#include "inspector/SelectionManager.h"
 #include "inspector/TypeInspector.h"
 #include "inspector/InspectorGUI.h"
 #include "ecs/Component.h"

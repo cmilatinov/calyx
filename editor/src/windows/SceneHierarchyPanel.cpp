@@ -39,19 +39,23 @@ namespace Calyx::Editor {
     void SceneHierarchyPanel::DrawGameObjectNode(GameObject* gameObject) {
         ImGui::TableNextRow();
         ImGui::TableNextColumn();
+        bool isSelected = SelectionManager::IsSelected(gameObject);
         int flags = (gameObject->GetChildren().empty() ? ImGuiTreeNodeFlags_Leaf : 0) |
-                    (m_selected == gameObject ? ImGuiTreeNodeFlags_Selected : 0) |
+                    (isSelected ? ImGuiTreeNodeFlags_Selected : 0) |
                     ImGuiTreeNodeFlags_OpenOnArrow |
                     ImGuiTreeNodeFlags_OpenOnDoubleClick |
                     ImGuiTreeNodeFlags_SpanFullWidth;
         bool open = ImGui::TreeNodeEx(gameObject, flags, "%s", gameObject->GetName().c_str());
 
         if (ImGui::IsItemClicked(ImGuiMouseButton_Left)) {
-            m_selected = m_selected == gameObject ? nullptr : gameObject;
+            if (isSelected)
+                SelectionManager::SetCurrentSelection(Selection());
+            else
+                SelectionManager::SetCurrentSelection(Selection::Create<GameObject>().AddItem(gameObject));
         }
 
         if (ImGui::IsItemClicked(ImGuiMouseButton_Right)) {
-            m_selected = gameObject;
+            SelectionManager::SetCurrentSelection(Selection::Create<GameObject>().AddItem(gameObject));
         }
 
         if (ImGui::BeginPopupContextItem()) {
@@ -61,7 +65,7 @@ namespace Calyx::Editor {
             }
             if (ImGui::MenuItem("Delete")) {
                 m_scene->DeleteGameObject(gameObject);
-                m_selected = nullptr;
+                SelectionManager::SetCurrentSelection(Selection());
             }
             ImGui::EndPopup();
         }

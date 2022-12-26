@@ -7,16 +7,22 @@
 namespace Calyx {
 
     class CALYX_API Log {
+    CX_SINGLETON(Log);
 
     public:
-        static void Init();
+        Log();
 
-        static Ref<spdlog::logger>& GetCoreLogger() { return s_CoreLogger; }
-        static Ref<spdlog::logger>& GetClientLogger() { return s_ClientLogger; }
+    public:
+        CX_SINGLETON_EXPOSE_METHOD(_GetCoreLogger, Ref<spdlog::logger>& GetCoreLogger());
+        CX_SINGLETON_EXPOSE_METHOD(_GetClientLogger, Ref<spdlog::logger>& GetClientLogger());
 
     private:
-        static Ref<spdlog::logger> s_CoreLogger;
-        static Ref<spdlog::logger> s_ClientLogger;
+        Ref<spdlog::logger>& _GetCoreLogger() { return m_coreLogger; }
+        Ref<spdlog::logger>& _GetClientLogger() { return m_clientLogger; }
+
+    private:
+        Ref<spdlog::logger> m_coreLogger;
+        Ref<spdlog::logger> m_clientLogger;
 
     };
 

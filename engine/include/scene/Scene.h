@@ -19,6 +19,7 @@ namespace Calyx {
         friend class Editor::EditorLayer;
 
     public:
+        Scene();
         ~Scene() override;
 
         GameObject* CreateGameObject(const String& name = "Game Object", GameObject* parent = nullptr);

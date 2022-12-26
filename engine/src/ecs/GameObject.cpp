@@ -52,5 +52,12 @@ namespace Calyx {
         return tc->GetTransform();
     }
 
+    bool operator==(const GameObject& left, const GameObject& right) {
+        return left.m_entityID == right.m_entityID;
+    }
+
+    bool operator!=(const GameObject& left, const GameObject& right) {
+        return !(left == right);
+    }
 
 }

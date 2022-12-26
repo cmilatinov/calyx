@@ -62,8 +62,8 @@ namespace Calyx {
 
         Transform& GetTransform();
 
-        bool operator==(const GameObject& other) { return m_entityID == other.m_entityID; }
-        bool operator!=(const GameObject& other) { return m_entityID != other.m_entityID; }
+        friend bool operator==(const GameObject& left, const GameObject& right);
+        friend bool operator!=(const GameObject& left, const GameObject& right);
 
     private:
         Scene* m_scene;
@@ -73,5 +73,8 @@ namespace Calyx {
         Set<GameObject*> m_children;
 
     };
+
+    bool operator==(const GameObject& left, const GameObject& right);
+    bool operator!=(const GameObject& left, const GameObject& right);
 
 }

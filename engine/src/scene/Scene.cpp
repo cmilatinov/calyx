@@ -3,6 +3,10 @@
 
 namespace Calyx {
 
+    Scene::Scene() {
+
+    }
+
     Scene::~Scene() {
         AssetRegistry::UnloadAll();
     }

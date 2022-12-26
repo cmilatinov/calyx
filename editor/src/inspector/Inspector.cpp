@@ -9,6 +9,7 @@ namespace Calyx::Editor {
     CX_SINGLETON_INSTANCE(Inspector);
 
     Inspector::Inspector() {
+        SelectionManager::Init();
         List<entt::meta_type> inspectorClasses = Reflect::Core::GetDerivedClasses<ITypeInspector>();
         for (const auto& inspector: inspectorClasses) {
             auto instance = inspector.construct();

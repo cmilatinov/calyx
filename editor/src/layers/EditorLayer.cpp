@@ -109,8 +109,6 @@ namespace Calyx::Editor {
         Statistics();
         Inspector();
         ContentBrowser();
-//        ImGui::ShowDemoWindow();
-//        ImPlot::ShowDemoWindow();
         EndDockspace();
     }
 
@@ -199,8 +197,9 @@ namespace Calyx::Editor {
         m_viewport.hovered = ImGui::IsWindowHovered();
 
         // Gizmos
-        GameObject* selected = m_sceneHierarchyPanel->GetSelectedObject();
-        if (selected != nullptr) {
+        auto& selection = SelectionManager::GetCurrentSelection();
+        if (selection.IsGameObjectSelection() && !selection.IsEmpty()) {
+            auto* selected = selection.First().try_cast<GameObject>();
             ImGuizmo::SetOrthographic(false);
             ImGuizmo::SetDrawlist();
             ImGuizmo::SetRect(
@@ -245,9 +244,11 @@ namespace Calyx::Editor {
 
     void EditorLayer::Inspector() {
         ImGui::Begin("Inspector");
+        // TODO: Handle multiple object selection
+        auto& selection = SelectionManager::GetCurrentSelection();
+        if (selection.IsGameObjectSelection() && !selection.IsEmpty()) {
+            auto* selected = selection.First().try_cast<GameObject>();
 
-        auto* selected = m_sceneHierarchyPanel->GetSelectedObject();
-        if (selected != nullptr) {
             // Name
             if (InspectorGUI::BeginPropertyTable("GameObject")) {
                 InspectorGUI::Property("Name");
@@ -258,10 +259,8 @@ namespace Calyx::Editor {
             // Components
             for (auto& component: m_reflectedComponents) {
                 auto storage = m_scene->m_entityRegistry.storage(component.info().hash());
-                if (storage != nullptr) {
-                    if (storage->contains(selected->m_entityID)) {
-                        Inspector::DrawComponentInspector(component, storage->get(selected->m_entityID));
-                    }
+                if (storage != nullptr && storage->contains(selected->m_entityID)) {
+                    Inspector::DrawComponentInspector(component, storage->get(selected->m_entityID));
                 }
             }
         }

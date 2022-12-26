@@ -2,6 +2,7 @@
 
 #include <imgui.h>
 
+#include "inspector/SelectionManager.h"
 #include "scene/Scene.h"
 #include "ecs/GameObject.h"
 
@@ -14,11 +15,8 @@ namespace Calyx::Editor {
 
         void Draw();
 
-        GameObject* GetSelectedObject() { return m_selected; }
-
     private:
         Scene* m_scene;
-        GameObject* m_selected = nullptr;
 
         void DrawGameObjectNode(GameObject* gameObject);
 
