@@ -27,15 +27,18 @@ namespace Calyx::Editor {
             }
 
             // Dynamically create the breadcrumbs
-            auto tempPath = m_rootDirectory.parent_path();
-            for (auto& path: std::filesystem::relative(m_currentDirectory, m_rootDirectory.parent_path())) {
-                tempPath /= path;
+            Path tempPath = m_rootDirectory;
+            ImGui::Text("/");
+            for (auto& file: std::filesystem::relative(m_currentDirectory, m_rootDirectory)) {
+                if (file.string() == ".")
+                    continue;
 
-                ImGui::Text("/");
-                if (ImGui::MenuItem(path.string().c_str())) {
+                tempPath /= file;
+                if (ImGui::MenuItem(file.string().c_str())) {
                     SetDirectory(tempPath);
                     break;
                 }
+                ImGui::Text("/");
             }
 
             ImGui::EndMenuBar();
@@ -88,6 +91,10 @@ namespace Calyx::Editor {
     }
 
     void ContentBrowserPanel::SetDirectory(const Path& path) {
+        auto relativePath = FileSystem::relative(path, m_rootDirectory).string();
+        if (relativePath.starts_with(".."))
+            return;
+
         m_currentDirectory = path;
     }
 
