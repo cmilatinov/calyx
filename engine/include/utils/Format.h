@@ -15,7 +15,7 @@ namespace Calyx::Utils {
                 sprintf(buffer, ("%." + std::to_string(precision) + "f" + suffix).c_str(), value);
                 return buffer;
             }
-            return std::format("{}{}", value, suffix.c_str());
+            return fmt::format("{}{}", value, suffix.c_str());
         }
 
         template<typename T>

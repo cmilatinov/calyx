@@ -3,10 +3,12 @@
 ```shell
 # Install vcpkg
 git clone https://github.com/microsoft/vcpkg
-./vcpkg/bootstrap-vcpkg.bat
+./vcpkg/bootstrap-vcpkg.sh
 
-# Install dependencies
-vcpkg install "@.vcpkg" --triplet x64-windows
+# Install clang llvm-libs uuid
+
+# Install vcpkg dependencies
+vcpkg install "@.vcpkg"
 
 # Run cmake
 mkdir build

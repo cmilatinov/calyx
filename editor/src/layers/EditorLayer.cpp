@@ -110,6 +110,7 @@ namespace Calyx::Editor {
         Inspector();
         ContentBrowser();
         EndDockspace();
+//        ImGui::ShowDemoWindow();
     }
 
     void EditorLayer::OnEvent(Event& event) {
@@ -178,8 +179,8 @@ namespace Calyx::Editor {
 
         // Resize viewport frame buffers if needed
         ImVec2 viewportSize = ImGui::GetWindowSize();
-        if (std::abs(viewportSize.x - m_viewport.size.x) < 1.0f ||
-            std::abs(viewportSize.y - m_viewport.size.y) < 1.0f) {
+        if (std::abs(viewportSize.x - m_viewport.size.x) > 1.0f ||
+            std::abs(viewportSize.y - m_viewport.size.y) > 1.0f) {
             m_framebuffer->Resize(viewportSize.x, viewportSize.y);
             m_msaaFramebuffer->Resize(viewportSize.x, viewportSize.y);
             m_editorCamera->SetAspect(viewportSize.x / viewportSize.y);

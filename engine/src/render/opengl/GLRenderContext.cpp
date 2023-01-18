@@ -8,7 +8,6 @@ namespace Calyx {
     void GLRenderContext::Init() {
         CX_CORE_INFO("Initializing OpenGL context ...");
 
-        glfwMakeContextCurrent(m_windowHandle);
         int status = gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress));
         CX_CORE_ASSERT(status, "Failed to initialize Glad!");
 

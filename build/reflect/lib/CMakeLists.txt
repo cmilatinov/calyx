@@ -9,6 +9,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(EnTT CONFIG REQUIRED)
 
 # Library
-add_library("ReflectLib" "Reflect.cpp")
-target_include_directories("ReflectLib" PUBLIC "./")
+file(GLOB_RECURSE REFLECT_LIB_SRC "src/**.cpp")
+add_library("ReflectLib" ${REFLECT_LIB_SRC})
+target_include_directories("ReflectLib" PUBLIC include)
 target_link_libraries("ReflectLib" PUBLIC EnTT::EnTT)

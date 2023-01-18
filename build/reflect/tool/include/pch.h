@@ -18,10 +18,9 @@
 #include <clang/Tooling/CommonOptionsParser.h>
 #include <clang/Tooling/Tooling.h>
 
-#include <llvm/Support/CommandLine.h>
-
 #include <nlohmann/json.hpp>
 #include <inja/inja.hpp>
+#include <cxxopts.hpp>
 
 using json = nlohmann::json;
 using namespace llvm;

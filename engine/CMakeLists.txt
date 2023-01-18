@@ -8,19 +8,24 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Compiler flags
 set(CMAKE_C_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DCX_DEBUG")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DCX_DEBUG")
-if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -Wno-invalid-offsetof")
-endif ()
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-invalid-offsetof")
+endif()
 
 # Includes
 include(../build/include/reflect.cmake)
 
 # Required libraries
+if(UNIX)
+    find_library(UUID_LIB NAMES uuid libuuid)
+endif()
 find_package(assimp CONFIG REQUIRED)
 find_package(efsw CONFIG REQUIRED)
 find_package(EnTT CONFIG REQUIRED)
+find_package(fmt CONFIG REQUIRED)
 find_package(glad REQUIRED)
 find_package(glfw3 CONFIG REQUIRED)
+
 find_package(glm CONFIG REQUIRED)
 find_package(imgui CONFIG REQUIRED)
 find_package(imguizmo CONFIG REQUIRED)
@@ -42,6 +47,7 @@ target_link_libraries("Engine" PUBLIC
         assimp::assimp
         efsw::efsw
         EnTT::EnTT
+        fmt::fmt-header-only
         glad::glad
         glfw
         glm::glm
@@ -51,6 +57,9 @@ target_link_libraries("Engine" PUBLIC
         nameof::nameof
         spdlog::spdlog_header_only
         stduuid)
+if(UNIX)
+    target_link_libraries("Engine" PUBLIC "${UUID_LIB}")
+endif()
 target_include_directories("Engine" PUBLIC include ${STB_INCLUDE_DIRS})
 target_precompile_headers("Engine" PUBLIC include/pch.h)
 target_compile_definitions("Engine" PUBLIC "STB_IMAGE_IMPLEMENTATION")
@@ -68,16 +77,16 @@ add_reflected_headers("Engine" "include"
 target_sources("Engine" PUBLIC "src/reflect/Global.cpp")
 
 # Compile definitions based on platform
-if (WIN32)
+if(WIN32)
     get_target_property(LIB_TYPE "Engine" TYPE)
-    if (LIB_TYPE STREQUAL SHARED_LIBRARY)
+    if(LIB_TYPE STREQUAL SHARED_LIBRARY)
         target_compile_definitions("Engine" PUBLIC CX_BUILD_DLL)
         target_compile_definitions("Engine" PRIVATE CX_DLL_EXPORT)
-
+        
         add_file_copy("Engine" "${PROJECT_BINARY_DIR}/sandbox" "$<TARGET_FILE_DIR:Engine>/Engine.dll")
         add_file_copy("Engine" "${PROJECT_BINARY_DIR}/sandbox" "$<TARGET_FILE_DIR:Engine>/Engine.pdb")
-    endif ()
-endif ()
+    endif()
+endif()
 
 # Copy assets to build folder
 add_dir_copy("Engine" "${PROJECT_BINARY_DIR}/sandbox" "assets")

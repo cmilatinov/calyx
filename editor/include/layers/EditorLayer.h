@@ -19,7 +19,7 @@
 
 namespace Calyx::Editor {
 
-    struct Viewport {
+    struct ViewportState {
         vec2 size;
         vec4 bounds;
         bool pressed;
@@ -54,7 +54,7 @@ namespace Calyx::Editor {
         Ref<Framebuffer> m_msaaFramebuffer;
 
         // Viewport
-        Viewport m_viewport{};
+        ViewportState m_viewport{};
 
         // Gizmos
         int m_gizmoType = ImGuizmo::OPERATION::TRANSLATE;

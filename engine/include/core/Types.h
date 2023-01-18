@@ -19,11 +19,13 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <regex>
+#include <thread>
 
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 #include <nameof.hpp>
 #include <stduuid/uuid.h>
+#include <fmt/format.h>
 
 #include "Macros.h"
 #include "Reflect.h"
