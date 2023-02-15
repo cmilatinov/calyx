@@ -24,7 +24,7 @@ add_executable("Editor" ${EDITOR_SRC})
 # Link target
 target_link_libraries("Editor" PUBLIC "Engine")
 target_include_directories("Editor" PUBLIC "include")
-target_precompile_headers("Editor" PUBLIC "include/pch.h")
+target_precompile_headers("Editor" PRIVATE "include/pch.h")
 
 # Add reflection
 add_reflected_target("Editor")
@@ -34,6 +34,7 @@ add_reflected_headers("Editor" "include"
         "include/inspector/types/Vec2Inspector.h"
         "include/inspector/types/Vec3Inspector.h"
         "include/inspector/types/AssetInspector.h"
+        "include/inspector/components/CameraComponentInspector.h"
         "include/inspector/components/TransformComponentInspector.h")
 
 # Copy assets

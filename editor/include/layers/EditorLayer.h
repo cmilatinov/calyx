@@ -24,6 +24,7 @@ namespace Calyx::Editor {
         vec4 bounds;
         bool pressed;
         bool hovered;
+        bool focused;
     };
 
     class EditorLayer : public ILayer {
@@ -34,7 +35,7 @@ namespace Calyx::Editor {
         void OnGUI() override;
         void OnEvent(Event& event) override;
 
-        String GetName() const override { return "Editor Layer"; };
+        String GetName() const override { return "Editor Layer"; }
 
     private:
         // Scene

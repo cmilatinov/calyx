@@ -11,7 +11,7 @@
 
 namespace Calyx {
 
-    class SceneRenderer {
+    class CALYX_API SceneRenderer {
 
     public:
         SceneRenderer();

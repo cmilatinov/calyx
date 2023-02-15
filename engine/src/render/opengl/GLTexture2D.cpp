@@ -1,13 +1,6 @@
 #include "render/opengl/GLTexture2D.h"
 #include "render/opengl/GLUtils.h"
 
-// Removing the __OPTIMIZE__ macro on GCC defined by fmt before
-// including stb_image because it causes a compilation error otherwise
-// https://stackoverflow.com/questions/70657762/linux-c-compilation-error-emmintrin-h
-#if defined(__GNUC__) && !defined(NDEBUG) && defined(__OPTIMIZE__)
-#undef __OPTIMIZE__
-#endif
-
 #include <stb_image.h>
 
 namespace Calyx {

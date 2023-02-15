@@ -1,8 +1,11 @@
 #include "layers/EditorLayer.h"
 
+#include "scene/serialization/SceneExporter.h"
+
 namespace Calyx::Editor {
 
     void EditorLayer::OnAttach() {
+        AssetRegistry::AddSearchPath("assets");
         m_reflectedComponents = Reflect::Core::GetDerivedClasses<IComponent>();
 
         const Window& window = Application::GetInstance().GetWindow();
@@ -36,9 +39,12 @@ namespace Calyx::Editor {
         m_sceneRenderer = CreateScope<SceneRenderer>();
         m_scene = CreateScope<Scene>();
         m_sceneHierarchyPanel = CreateScope<SceneHierarchyPanel>(m_scene.get());
-        Path gameAssets = "./GameAssets";
+        String assets = "./assets";
+        String gameAssets = "./GameAssets";
+        FileSystem::create_directories(assets);
         FileSystem::create_directories(gameAssets);
-        AssetRegistry::AddSearchPath(gameAssets.string());
+        AssetRegistry::AddSearchPath(assets);
+        AssetRegistry::AddSearchPath(gameAssets);
         m_contentBrowserPanel = CreateScope<ContentBrowserPanel>(gameAssets);
         m_statsPanel = CreateScope<StatisticsPanel>();
 
@@ -127,7 +133,6 @@ namespace Calyx::Editor {
 
     void EditorLayer::BeginDockspace() {
         // Setup parent window
-        const Window& window = Application::GetInstance().GetWindow();
         int windowFlags =
             ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking |
             ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse |
@@ -152,9 +157,13 @@ namespace Calyx::Editor {
             if (ImGui::BeginMenu("File")) {
                 ImGui::MenuItem("New", "Ctrl+N");
                 ImGui::MenuItem("Open...", "Ctrl+O");
-                ImGui::MenuItem("Save As...", "Ctrl+Shift+S");
-                if (ImGui::MenuItem("Exit", "Alt+F4"))
+                if (ImGui::MenuItem("Save", "Ctrl+S")) {
+                    SceneExporter exporter(*m_scene);
+                    exporter.Save("./test.cx");
+                }
+                if (ImGui::MenuItem("Exit", "Alt+F4")) {
                     Application::GetInstance().Close();
+                }
                 ImGui::EndMenu();
             }
             ImGui::EndMenuBar();
@@ -196,6 +205,7 @@ namespace Calyx::Editor {
         ImVec2 max(pos.x + contentMax.x, pos.y + contentMax.y);
         m_viewport.bounds = vec4(min.x, min.y, max.x, max.y);
         m_viewport.hovered = ImGui::IsWindowHovered();
+        m_viewport.focused = ImGui::IsWindowFocused();
 
         // Gizmos
         auto& selection = SelectionManager::GetCurrentSelection();
@@ -221,7 +231,7 @@ namespace Calyx::Editor {
             }
         }
 
-        if (!m_viewport.pressed) {
+        if (!m_viewport.pressed && m_viewport.focused) {
             if (Input::GetKeyDown(KEY_Q))
                 m_gizmoType = 0;
             if (Input::GetKeyDown(KEY_W))
@@ -250,20 +260,33 @@ namespace Calyx::Editor {
         if (selection.IsGameObjectSelection() && !selection.IsEmpty()) {
             auto* selected = selection.First().try_cast<GameObject>();
 
-            // Name
+            // Name & ID
             if (InspectorGUI::BeginPropertyTable("GameObject")) {
+                InspectorGUI::Property("ID");
+                String id = uuids::to_string(selected->GetID());
+                InspectorGUI::TextControl("##id", id, true);
+
                 InspectorGUI::Property("Name");
-                InspectorGUI::TextControl("##name", selected->GetNameRef());
+                String name = selected->GetName();
+                if (InspectorGUI::TextControl("##name", name)) {
+                    selected->SetName(name);
+                }
+
                 InspectorGUI::EndPropertyTable();
             }
 
             // Components
+            Set<AssetType> componentSet;
             for (auto& component: m_reflectedComponents) {
                 auto storage = m_scene->m_entityRegistry.storage(component.info().hash());
                 if (storage != nullptr && storage->contains(selected->m_entityID)) {
-                    Inspector::DrawComponentInspector(component, storage->get(selected->m_entityID));
+                    Inspector::DrawComponentInspector(selected, component, storage->get(selected->m_entityID));
+                    componentSet.insert(component.id());
                 }
             }
+
+            // Add components
+            InspectorGUI::ComponentPicker(selected, componentSet);
         }
         ImGui::End();
     }

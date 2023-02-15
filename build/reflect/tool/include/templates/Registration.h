@@ -17,7 +17,7 @@ CX_REFLECT_REGISTRATION {
                 "{{field.name}}"_hs,
                 {
                     .name = "{{field.name}}",
-                    .displayName = "{{field.name}}",
+                    .displayName = "{{field.displayName}}",
                     .offset = static_cast<int32_t>(offsetof({{class.fullName}}, {{field.name}}))
                 }
             }{% if not loop.is_last %},{% endif %}

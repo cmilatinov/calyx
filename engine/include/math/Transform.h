@@ -4,7 +4,8 @@
 
 namespace Calyx {
 
-    class Transform {
+    class CALYX_API Transform {
+        CX_BEGIN_REFLECT();
 
     public:
         Transform();
@@ -57,6 +58,8 @@ namespace Calyx {
         vec3 m_position;
         vec3 m_rotation;
         vec3 m_scale;
+
+        CX_PROPERTY(CX_SERIALIZE)
         mat4 m_matrix;
 
         void UpdateMatrix();

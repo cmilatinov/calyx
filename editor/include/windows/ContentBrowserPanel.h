@@ -2,6 +2,7 @@
 
 #include "assets/AssetRegistry.h"
 #include "render/objects/Texture2D.h"
+#include "ui/Definitions.h"
 
 namespace Calyx::Editor {
 

@@ -1,11 +1,8 @@
 #include "scene/Scene.h"
-#include "ecs/GameObject.h"
+#include "ecs/Component.h"
+#include "ecs/components/TransformComponent.h"
 
 namespace Calyx {
-
-    Scene::Scene() {
-
-    }
 
     Scene::~Scene() {
         AssetRegistry::UnloadAll();
@@ -26,7 +23,7 @@ namespace Calyx {
     GameObject* Scene::CreateGameObject(const String& name, GameObject* parent) {
         // Create object
         entt::entity entityID = m_entityRegistry.create();
-        m_gameObjects[entityID] = CreateScope<GameObject>(this, entityID, name);
+        m_gameObjects[entityID] = Scope<GameObject>(new GameObject(this, UUIDUtils::Generate(), entityID, name));
 
         // TODO: Add default components
         GameObject* gameObject = m_gameObjects[entityID].get();

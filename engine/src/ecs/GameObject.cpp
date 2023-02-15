@@ -1,11 +1,44 @@
 #include "ecs/GameObject.h"
+#include "ecs/components/TransformComponent.h"
 
 namespace Calyx {
 
-    GameObject::GameObject(Scene* scene, entt::entity entityID, const String& name)
+    GameObject::GameObject(Scene* scene, UUID id, entt::entity entityID, const String& name)
         : m_scene(scene),
+          m_id(id),
           m_entityID(entityID),
           m_name(name) {}
+
+    bool GameObject::HasComponent(const entt::meta_type& type) {
+        auto storage = m_scene->m_entityRegistry.storage(type.id());
+        if (storage == nullptr)
+            return false;
+        return storage->get(m_entityID) != nullptr;
+    }
+
+    void GameObject::AddComponent(const entt::meta_type& type) {
+        auto instance = type.construct();
+        if (!instance)
+            return;
+
+        auto instancePtr = instance.try_cast<IComponent>();
+        if (instancePtr == nullptr)
+            return;
+
+        instancePtr->Emplace(m_entityID, m_scene->m_entityRegistry);
+    }
+
+    void GameObject::RemoveComponent(const entt::meta_type& type) {
+        auto instance = type.construct();
+        if (!instance)
+            return;
+
+        auto instancePtr = instance.try_cast<IComponent>();
+        if (instancePtr == nullptr)
+            return;
+
+        instancePtr->Erase(m_entityID, m_scene->m_entityRegistry);
+    }
 
     void GameObject::AddChild(GameObject* child) {
         CX_CORE_ASSERT(child != nullptr, "GameObject::AddChild called will null child!");

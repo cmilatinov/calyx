@@ -2,23 +2,23 @@
 
 namespace Calyx {
 
-    using AssetT = IdentifierT;
+    using AssetType = IdentifierType;
 
-    class IAsset {
+    class CALYX_API IAsset {
         CX_BEGIN_REFLECT();
 
     public:
         virtual ~IAsset() = default;
 
-        virtual AssetT GetAssetType() = 0;
+        virtual AssetType GetAssetType() const = 0;
 
     };
 
     template<typename T>
-    class Asset : public IAsset {
+    class CALYX_API Asset : public IAsset {
 
     public:
-        AssetT GetAssetType() override {
+        AssetType GetAssetType() const override {
             return entt::resolve<T>().id();
         }
 

@@ -5,7 +5,7 @@
 
 namespace Calyx {
 
-    class MeshComponent : public Component<MeshComponent> {
+    class CALYX_API MeshComponent final : public Component<MeshComponent> {
         CX_BEGIN_REFLECT();
 
     public:
@@ -15,7 +15,7 @@ namespace Calyx {
         explicit MeshComponent(const Ref<Mesh>& mesh)
             : m_mesh(mesh) {}
 
-        String GetName() const override { return "Mesh Component"; }
+        String GetDisplayName() const override { return "Mesh Component"; }
 
         void SetMesh(const Ref<Mesh>& mesh) { m_mesh = mesh; }
 
@@ -25,8 +25,7 @@ namespace Calyx {
         }
 
     private:
-        CX_REFLECT_SERIALIZE
-        CX_REFLECT_NAME("Mesh")
+        CX_PROPERTY(CX_SERIALIZE, CX_NAME(Mesh))
         Ref<Mesh> m_mesh;
 
     };

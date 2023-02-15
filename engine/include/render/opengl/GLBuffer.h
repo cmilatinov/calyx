@@ -6,7 +6,7 @@
 
 namespace Calyx {
 
-    class GLVertexBuffer : public VertexBuffer {
+    class CALYX_API GLVertexBuffer : public VertexBuffer {
 
     public:
         explicit GLVertexBuffer(uint32 size);

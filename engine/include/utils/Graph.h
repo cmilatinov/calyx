@@ -2,18 +2,17 @@
 
 #include <implot.h>
 
-#include "utils/Format.h"
 #include "utils/metrics/MetricCollector.h"
 
 namespace Calyx::Utils {
 
-    class Graph {
+    class CALYX_API Graph {
 
     public:
         template<typename T>
         static void Line(const String& name, const MetricCollector<T> collector) {
             ImPlot::PushStyleVar(ImPlotStyleVar_PlotPadding, { 10, 20 });
-            ImGui::Text(name.c_str());
+            ImGui::Text("%s", name.c_str());
             if (ImPlot::BeginPlot(name.c_str(), { -1, 200 }, ImPlotFlags_CanvasOnly)) {
                 ImPlot::SetupAxes(
                     "##Time", "##Value",
@@ -39,14 +38,14 @@ namespace Calyx::Utils {
         }
 
         static int FormatByteSize(double value, char* buff, int size, void* user_data) {
-            auto str = Format::ByteSize(value);
+            auto str = FormatUtils::ByteSize(value);
             auto cpySize = std::min(str.size() + 1, (size_t)size);
             memcpy(buff, str.c_str(), cpySize);
             return cpySize;
         };
 
         static int FormatPercentage(double value, char* buff, int size, void* user_data) {
-            snprintf(buff, size, "%llu", (uint64)(value * 100));
+            snprintf(buff, size, "%lu", (uint64)(value * 100));
             return 1;
         }
 

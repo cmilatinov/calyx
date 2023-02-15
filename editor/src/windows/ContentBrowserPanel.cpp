@@ -7,7 +7,7 @@ namespace Calyx::Editor {
     ContentBrowserPanel::ContentBrowserPanel(const Path& basePath)
         : m_objFileTexture(AssetRegistry::LoadAsset<Texture2D>("icons/block.png")),
           m_folderTexture(AssetRegistry::LoadAsset<Texture2D>("icons/folder-grey.png")),
-          m_rootDirectory(basePath),
+          m_rootDirectory(std::filesystem::absolute(basePath)),
           m_currentDirectory(m_rootDirectory) {}
 
     ContentBrowserPanel::ContentBrowserPanel(const String& basePath)
@@ -47,7 +47,7 @@ namespace Calyx::Editor {
         float lineHeight = ImGui::GetTextLineHeight();
         float cellSize = m_thumbnailSize + 2 * m_padding;
         float contentRegionWidth = ImGui::GetContentRegionAvail().x;
-        ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[0]);
+        ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[CX_FONT_REGULAR + CX_FONT_SIZE_SMALL]);
         if (ImGui::BeginTable("Files", std::max(1, (int)(contentRegionWidth / cellSize)), 0)) {
             for (const auto& entry: std::filesystem::directory_iterator(m_currentDirectory)) {
                 ImGui::TableNextColumn();

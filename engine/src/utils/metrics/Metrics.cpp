@@ -2,6 +2,12 @@
 
 #ifdef CX_PLATFORM_WINDOWS
 #include "psapi.h"
+#elif defined(CX_PLATFORM_LINUX)
+
+#include "sys/types.h"
+#include "sys/sysinfo.h"
+#include "sys/times.h"
+
 #endif
 
 namespace Calyx::Utils {
@@ -18,6 +24,34 @@ namespace Calyx::Utils {
         metrics->Total = memInfo.ullTotalPhys;
         metrics->Used = memInfo.ullTotalPhys - memInfo.ullAvailPhys;
         metrics->ProcessUsed = pmc.WorkingSetSize;
+#elif defined(CX_PLATFORM_LINUX)
+        struct sysinfo memInfo{};
+        sysinfo(& memInfo);
+        metrics->Total = memInfo.totalram;
+        metrics->Total *= memInfo.mem_unit;
+        metrics->Used = memInfo.totalram - memInfo.freeram;
+        metrics->Used *= memInfo.mem_unit;
+
+        std::ifstream memInfoFile("/proc/meminfo");
+        for (String line; std::getline(memInfoFile, line);) {
+            if (line.starts_with("MemAvailable:")) {
+                StringStream ss(line);
+                ss >> line >> metrics->Used;
+                metrics->Used *= 1024;
+                metrics->Used = metrics->Total - metrics->Used;
+                break;
+            }
+        }
+
+        std::ifstream statusFile("/proc/self/status");
+        for (String line; std::getline(statusFile, line);) {
+            if (line.starts_with("VmRSS:")) {
+                StringStream ss(line);
+                ss >> line >> metrics->ProcessUsed;
+                metrics->ProcessUsed *= 1024;
+                break;
+            }
+        }
 #endif
     }
 
@@ -55,6 +89,40 @@ namespace Calyx::Utils {
         s_procTimes.LastCPU = now;
         s_procTimes.LastSysCPU = sys;
         s_procTimes.LastUserCPU = user;
+#elif defined(CX_PLATFORM_LINUX)
+        static int s_numProcessors = 0;
+        static struct {
+            clock_t LastCPU;
+            clock_t LastSysCPU;
+            clock_t LastUserCPU;
+        } s_procTimes;
+        struct tms timeSample{};
+
+        if (s_numProcessors == 0) {
+            s_procTimes.LastCPU = times(&timeSample);
+            s_procTimes.LastSysCPU = timeSample.tms_stime;
+            s_procTimes.LastUserCPU = timeSample.tms_utime;
+
+            std::ifstream cpuInfoFile("/proc/cpuinfo");
+            for (String line; std::getline(cpuInfoFile, line);) {
+                if (line.starts_with("processor")) {
+                    s_numProcessors++;
+                }
+            }
+        }
+
+        // Overflow detection. Just skip this value.
+        clock_t now = times(&timeSample);
+        if (now <= s_procTimes.LastCPU ||
+            timeSample.tms_stime < s_procTimes.LastSysCPU ||
+            timeSample.tms_utime < s_procTimes.LastUserCPU) {
+            return;
+        }
+
+        metrics->ProcessUsage = (timeSample.tms_stime - s_procTimes.LastSysCPU) +
+                                (timeSample.tms_utime - s_procTimes.LastUserCPU);
+        metrics->ProcessUsage /= (now - s_procTimes.LastCPU);
+        metrics->ProcessUsage /= s_numProcessors;
 #endif
     }
 

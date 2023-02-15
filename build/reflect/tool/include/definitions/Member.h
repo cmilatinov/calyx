@@ -10,6 +10,7 @@ namespace Calyx::Reflect::Tooling {
     };
 
     struct Field : public Member {
+        std::string displayName;
     };
 
     struct Method : public Member {

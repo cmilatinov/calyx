@@ -7,7 +7,7 @@ namespace Calyx::Editor {
 
     class StringInspector : public TypeInspector<String> {
         CX_BEGIN_REFLECT();
-        void CX_ON_INSPECTOR_GUI(IdentifierT typeID, String& value);
+        void CX_ON_INSPECTOR_GUI(String& value);
     };
 
 }

@@ -7,7 +7,7 @@ namespace Calyx::Editor {
 
     class Vec3Inspector : public TypeInspector<vec3> {
         CX_BEGIN_REFLECT();
-        void CX_ON_INSPECTOR_GUI(IdentifierT typeID, vec3& value);
+        void CX_ON_INSPECTOR_GUI(vec3& value);
     };
 
 }

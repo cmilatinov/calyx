@@ -2,9 +2,9 @@
 
 namespace Calyx {
 
-    using TimeT = double;
+    using TimeType = double;
 
-    class Time {
+    class CALYX_API Time {
     CX_SINGLETON(Time);
 
         friend class Application;
@@ -13,34 +13,34 @@ namespace Calyx {
         Time() = default;
 
     public:
-        static void SetTimeScale(TimeT timeScale) { s_instance->m_timeScale = timeScale; }
+        static void SetTimeScale(TimeType timeScale) { s_instance->m_timeScale = timeScale; }
 
-        template<typename T = TimeT>
+        template<typename T = TimeType>
         static T TimeScale() { return s_instance->m_timeScale; }
-        template<typename T = TimeT>
+        template<typename T = TimeType>
         static T DeltaTime() { return s_instance->m_deltaTime; }
-        template<typename T = TimeT>
+        template<typename T = TimeType>
         static T FixedDeltaTime() { return s_instance->m_fixedDeltaTime; }
-        template<typename T = TimeT>
+        template<typename T = TimeType>
         static T CurrentTime() { return s_instance->m_time; }
 
-        CX_SINGLETON_EXPOSE_METHOD(_Timer, TimeT Timer(const String& name), name);
+        CX_SINGLETON_EXPOSE_METHOD(_Timer, TimeType Timer(const String& name), name);
         CX_SINGLETON_EXPOSE_METHOD(_ResetTimer, void ResetTimer(const String& name), name);
 
     private:
-        TimeT m_timeScale = 1.0f;
-        TimeT m_deltaTime = 0.0f;
-        TimeT m_fixedDeltaTime = 0.0f;
+        TimeType m_timeScale = 1.0f;
+        TimeType m_deltaTime = 0.0f;
+        TimeType m_fixedDeltaTime = 0.0f;
 
         Chrono::time_point<Clock> m_lastTime;
-        TimeT m_time = 0.0f;
-        TimeT m_staticTime = 0.0f;
+        TimeType m_time = 0.0f;
+        TimeType m_staticTime = 0.0f;
 
-        Map<String, TimeT> m_timerMap;
+        Map<String, TimeType> m_timerMap;
 
         void UpdateTime();
 
-        TimeT _Timer(const String& name);
+        TimeType _Timer(const String& name);
         void _ResetTimer(const String& name);
 
     };

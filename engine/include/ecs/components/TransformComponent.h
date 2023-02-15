@@ -5,15 +5,18 @@
 
 namespace Calyx {
 
-    class TransformComponent : public Component<TransformComponent> {
+    class CALYX_API TransformComponent final : public Component<TransformComponent> {
         CX_BEGIN_REFLECT();
 
     public:
-        String GetName() const override { return "Transform"; }
+        TransformComponent() = default;
+
+        String GetDisplayName() const override { return "Transform"; }
         Transform& GetTransform() { return m_transform; }
 
     private:
-        CX_REFLECT_SERIALIZE Transform m_transform;
+        CX_PROPERTY(CX_SERIALIZE)
+        Transform m_transform;
 
     };
 

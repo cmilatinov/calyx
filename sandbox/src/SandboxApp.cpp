@@ -2,16 +2,8 @@
 
 namespace Calyx {
 
-    SandboxApp::SandboxApp() {
-
-    }
-
-    SandboxApp::~SandboxApp() {
-
-    }
-
-    Application* CreateApplication() {
-        return new SandboxApp;
+    Scope<Application> CreateApplication(int argc, char** argv) {
+        return CreateScope<SandboxApp>();
     }
 
 }

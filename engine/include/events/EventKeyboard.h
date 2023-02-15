@@ -5,9 +5,9 @@
 
 namespace Calyx {
 
-    class EventKey : public Event {
+    class CALYX_API EventKey : public Event {
     public:
-        KeyCode GetKeyCode() { return m_keycode; }
+        KeyCode GetKeyCode() const { return m_keycode; }
 
         EVENT_CLASS_CATEGORY(EventCategory::Input | EventCategory::Keyboard)
 
@@ -18,15 +18,15 @@ namespace Calyx {
         KeyCode m_keycode;
     };
 
-    class EventKeyPress : public EventKey {
+    class CALYX_API EventKeyPress : public EventKey {
     public:
         explicit EventKeyPress(KeyCode keycode, bool repeated = false)
             : EventKey(keycode), m_repeated(repeated) {}
 
-        bool IsRepeated() { return m_repeated; }
+        bool IsRepeated() const { return m_repeated; }
 
         String ToString() const override {
-            std::stringstream ss;
+            StringStream ss;
             ss << "EventKeyPress: " << m_keycode;
             if (m_repeated)
                 ss << " (repeated)";
@@ -38,13 +38,13 @@ namespace Calyx {
         bool m_repeated;
     };
 
-    class EventKeyRelease : public EventKey {
+    class CALYX_API EventKeyRelease : public EventKey {
     public:
-        EventKeyRelease(KeyCode keycode)
+        explicit EventKeyRelease(KeyCode keycode)
             : EventKey(keycode) {}
 
         String ToString() const override {
-            std::stringstream ss;
+            StringStream ss;
             ss << "EventKeyRelease: " << m_keycode;
             return ss.str();
         }
@@ -52,13 +52,13 @@ namespace Calyx {
         EVENT_CLASS_TYPE(KeyRelease)
     };
 
-    class EventKeyType : public EventKey {
+    class CALYX_API EventKeyType : public EventKey {
     public:
-        EventKeyType(KeyCode keycode)
+        explicit EventKeyType(KeyCode keycode)
             : EventKey(keycode) {}
 
         String ToString() const override {
-            std::stringstream ss;
+            StringStream ss;
             ss << "EventKeyType: " << m_keycode;
             return ss.str();
         }

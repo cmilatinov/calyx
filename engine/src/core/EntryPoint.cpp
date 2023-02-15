@@ -4,11 +4,10 @@ int main(int argc, char** argv) {
     Log::Init();
 
     CX_CORE_INFO("Creating Calyx application ...");
-    auto* CxApp = Calyx::CreateApplication();
+    auto app = Calyx::CreateApplication(argc, argv);
 
     CX_CORE_INFO("Running Calyx application ...");
-    CxApp->Run();
+    app->Run();
 
     CX_CORE_INFO("Cleaning up Calyx application ...");
-    delete CxApp;
 }

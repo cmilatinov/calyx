@@ -2,33 +2,49 @@
 
 namespace Calyx::Reflect::Tooling::Utils {
 
-    bool HasAttribute(
-        Decl* decl,
-        const std::string& key
-    ) {
-        auto attrRange = decl->specific_attrs<AnnotateAttr>();
-        return
-            std::any_of(
-                attrRange.begin(), attrRange.end(),
-                [&key](auto attr) {
-                    return attr->getAnnotation().str() == key;
-                }
-            );
+    static DeclAttributesMap s_declAttributes;
+
+    static std::string ConvertValue(const std::string& value) {
+        static const auto strRegex = std::regex("\"([^\"]*?)\"");
+        std::smatch match;
+        if (std::regex_search(value, match, strRegex))
+            return match[1];
+        return value;
     }
 
-    bool AttributeValue(Decl* decl, const std::string& key, std::string& value) {
-        for (auto attr: decl->specific_attrs<AnnotateAttr>()) {
-            auto annotation = attr->getAnnotation().str();
-            size_t valueIndex;
-            if (annotation.rfind(key, 0) == 0 && (valueIndex = annotation.find('=')) != std::string::npos) {
-                value = annotation.substr(valueIndex);
-                return true;
+    static Attributes& GetDeclAttributes(const Decl* decl) {
+        if (!s_declAttributes.contains(decl)) {
+            auto& attributes = s_declAttributes[decl];
+            for (const auto* attr: decl->specific_attrs<AnnotateAttr>()) {
+                for (const auto& annotation: StringUtils::Split(attr->getAnnotation().str(), ",\\s*")) {
+                    auto parts = StringUtils::Split(annotation, "=");
+                    auto& key = parts[0];
+                    std::string value = (parts.size() == 2) ? ConvertValue(parts[1]) : "true";
+                    attributes[key] = value;
+                }
             }
+        }
+        return s_declAttributes[decl];
+    }
+
+    bool HasAttribute(
+        const Decl* decl,
+        const std::string& key
+    ) {
+        const auto& attributes = GetDeclAttributes(decl);
+        return attributes.contains(key);
+    }
+
+    bool GetAttributeValue(const Decl* decl, const std::string& key, std::string& value) {
+        const auto& attributes = GetDeclAttributes(decl);
+        CX_MAP_FIND(attributes, key, it) {
+            value = it->second;
+            return true;
         }
         return false;
     }
 
-    bool IsReflected(CXXRecordDecl* classDecl) {
+    bool IsReflected(const CXXRecordDecl* classDecl) {
         return classDecl->hasFriends() && std::any_of(
             classDecl->friend_begin(), classDecl->friend_end(),
             [](FriendDecl* fr) {
@@ -39,7 +55,7 @@ namespace Calyx::Reflect::Tooling::Utils {
         );
     }
 
-    void CollectRefConversions(CXXRecordDecl* decl, std::vector<std::string>& outRefs) {
+    void CollectRefConversions(const CXXRecordDecl* decl, std::vector<std::string>& outRefs) {
         for (auto* fr: decl->friends()) {
             auto* friendDecl = fr->getFriendDecl();
             if (friendDecl != nullptr &&

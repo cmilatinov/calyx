@@ -3,7 +3,7 @@
 namespace Calyx::Utils {
 
     template<typename T>
-    class MetricCollector {
+    class CALYX_API MetricCollector {
 
     public:
         MetricCollector(uint32 maxHistory)

@@ -46,12 +46,13 @@ namespace Calyx::Reflect::Tooling {
     }
 
     void ClassSerializer::CollectReflectedBases(CXXRecordDecl* decl) {
-        for (auto base: decl->bases()) {
+        for (const auto& base: decl->bases()) {
             auto* record = base.getType()->getAsCXXRecordDecl();
             if (Utils::IsReflected(record)) {
                 m_reflectedBases.push_back(record);
+            } else {
+                CollectReflectedBases(record);
             }
-            CollectReflectedBases(record);
         }
     }
 

@@ -36,6 +36,7 @@ namespace Calyx::Reflect {
         }
 
         static std::string GetFieldName(const entt::meta_type& type, entt::id_type fieldId);
+        static std::string GetFieldDisplayName(const entt::meta_type& type, entt::id_type fieldId);
         static int32_t GetFieldOffset(const entt::meta_type& type, entt::id_type fieldId);
         static void* GetFieldPointer(const entt::meta_any& instance, entt::id_type fieldId);
 
@@ -48,6 +49,9 @@ namespace Calyx::Reflect {
 
         static bool IsRefType(const entt::meta_type& type);
         static entt::meta_type GetRefPointerType(const entt::meta_type& type);
+
+        static bool IsPointerType(const entt::meta_type& type);
+        static entt::meta_type GetPointerType(const entt::meta_type& type);
 
     private:
         static ClassMap& GetDerivedClassMap();

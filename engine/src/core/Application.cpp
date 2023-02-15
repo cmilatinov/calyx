@@ -1,12 +1,14 @@
 #include "core/Application.h"
 
 #include <iostream>
+#include <ranges>
 
 #include "layers/GuiLayer.h"
 #include "render/Renderer.h"
 #include "input/Input.h"
+#include "reflect/ClassRegistry.h"
 #include "assets/AssetRegistry.h"
-#include "assets/Assets.h"
+#include "serialization/Serializer.h"
 
 namespace Calyx {
 
@@ -18,6 +20,19 @@ namespace Calyx {
         CX_CORE_ASSERT(s_instance == nullptr, "Application already running!");
         s_instance = this;
 
+        Init();
+    }
+
+    Application::Application(const WindowMode& windowMode)
+        : m_window(Window::Create(windowMode)) {
+        // Singleton application instance
+        CX_CORE_ASSERT(s_instance == nullptr, "Application already running!");
+        s_instance = this;
+
+        Init();
+    }
+
+    void Application::Init() {
         // Window event callback
         m_window->SetEventCallback(CX_BIND_EVENT_METHOD(OnEvent));
 
@@ -27,8 +42,10 @@ namespace Calyx {
         // Initialize input
         Input::Init();
 
-        // Initialize asset registry
+        // Initialize registries
+        ClassRegistry::Init();
         AssetRegistry::Init();
+        Serializer::Init();
 
         // Gui layer
         m_guiLayer = new GuiLayer();
@@ -71,10 +88,10 @@ namespace Calyx {
 
         Input::OnEvent(event);
 
-        for (auto it = m_layerStack.rbegin(); it != m_layerStack.rend(); ++it) {
+        for (auto& i_layer: std::ranges::reverse_view(m_layerStack)) {
             if (event.handled)
                 break;
-            (*it)->OnEvent(event);
+            i_layer->OnEvent(event);
         }
     }
 

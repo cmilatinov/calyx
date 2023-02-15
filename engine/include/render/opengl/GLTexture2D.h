@@ -6,7 +6,7 @@
 
 namespace Calyx {
 
-    class GLTexture2D : public Texture2D {
+    class CALYX_API GLTexture2D : public Texture2D {
 
     public:
         explicit GLTexture2D(const String& file);

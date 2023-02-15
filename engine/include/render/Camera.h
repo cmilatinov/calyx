@@ -4,7 +4,8 @@
 
 namespace Calyx {
 
-    class Camera {
+    class CALYX_API Camera {
+        CX_BEGIN_REFLECT();
 
     public:
         explicit Camera(
@@ -34,10 +35,15 @@ namespace Calyx {
         void Update() { return UpdateProjectionMatrix(); }
 
     protected:
+        CX_PROPERTY(CX_SERIALIZE)
         float m_fov;
+        CX_PROPERTY(CX_SERIALIZE)
         float m_aspect;
+        CX_PROPERTY(CX_SERIALIZE)
         float m_nearPlane;
+        CX_PROPERTY(CX_SERIALIZE)
         float m_farPlane;
+
         mat4 m_projectionMatrix;
 
     private:

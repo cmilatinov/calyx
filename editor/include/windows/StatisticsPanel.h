@@ -5,7 +5,6 @@
 #include "render/objects/Query.h"
 #include "utils/metrics/Metrics.h"
 #include "utils/metrics/MetricCollector.h"
-#include "utils/Format.h"
 #include "utils/Graph.h"
 
 namespace Calyx::Editor {
@@ -37,6 +36,7 @@ namespace Calyx::Editor {
         uint64 m_gpuTime = 0;
         uint64 m_cpuTime = 0;
         uint64 m_primitives = 0;
+        uint64 m_fps = 0;
 
     };
 

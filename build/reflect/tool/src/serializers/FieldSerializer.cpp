@@ -12,7 +12,8 @@ namespace Calyx::Reflect::Tooling {
             return;
 
         // Check member is public or serialized
-        if (decl->getAccess() != clang::AS_public && !Utils::HasAttribute(decl, CX_REFLECT_SERIALIZE_ANNOTATION))
+        if (decl->getAccess() != clang::AS_public &&
+            !Utils::HasAttribute(decl, CX_XSTR(CX_REFLECT_ANNOTATION_SERIALIZE)))
             return;
 
         // Add field
@@ -22,6 +23,8 @@ namespace Calyx::Reflect::Tooling {
         field.name = decl->getNameAsString();
         field.fullName = decl->getQualifiedNameAsString();
         field.pointer = "&" + decl->getQualifiedNameAsString();
+        if (!Utils::GetAttributeValue(decl, CX_XSTR(CX_REFLECT_ANNOTATION_NAME), field.displayName))
+            field.displayName = field.name;
         m_fields.push_back(field);
     }
 
@@ -33,6 +36,7 @@ namespace Calyx::Reflect::Tooling {
                     {
                         { "type", f.type },
                         { "name", f.name },
+                        { "displayName", f.displayName },
                         { "fullName", f.fullName },
                         { "pointer", f.pointer }
                     }

@@ -5,7 +5,7 @@
 
 namespace Calyx {
 
-    class Input {
+    class CALYX_API Input {
     CX_SINGLETON(Input);
 
     public:

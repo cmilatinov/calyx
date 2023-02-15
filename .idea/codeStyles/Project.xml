@@ -6,8 +6,10 @@
     <Objective-C>
       <option name="FUNCTION_PARAMETERS_NEW_LINE_AFTER_LPAR" value="true" />
       <option name="FUNCTION_PARAMETERS_NEW_LINE_BEFORE_RPAR" value="true" />
+      <option name="FUNCTION_CALL_ARGUMENTS_ALIGN_MULTILINE" value="false" />
       <option name="FUNCTION_CALL_ARGUMENTS_NEW_LINE_AFTER_LPAR" value="true" />
       <option name="FUNCTION_CALL_ARGUMENTS_NEW_LINE_BEFORE_RPAR" value="true" />
+      <option name="SPACE_WITHIN_TEMPLATE_DOUBLE_GT" value="false" />
       <option name="ALIGN_INIT_LIST_IN_COLUMNS" value="false" />
       <option name="SPACE_BEFORE_POINTER_IN_DECLARATION" value="false" />
       <option name="SPACE_AFTER_POINTER_IN_DECLARATION" value="true" />

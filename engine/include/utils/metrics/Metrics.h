@@ -5,7 +5,7 @@
 
 namespace Calyx::Utils {
 
-    class Metrics {
+    class CALYX_API Metrics {
 
     public:
         static void CollectMemoryMetrics(MemoryMetrics* metrics);

@@ -9,7 +9,7 @@
 
 namespace Calyx {
 
-    class GLFramebuffer : public Framebuffer {
+    class CALYX_API GLFramebuffer : public Framebuffer {
 
     public:
         static const uint32 s_maxColorAttachments = 4;

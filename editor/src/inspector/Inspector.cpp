@@ -1,6 +1,7 @@
 #include "inspector/Inspector.h"
 
-#include "assets/Mesh.h"
+#include "reflect/ClassRegistry.h"
+#include "ecs/components/TransformComponent.h"
 
 #include <imgui.h>
 
@@ -10,36 +11,28 @@ namespace Calyx::Editor {
 
     Inspector::Inspector() {
         SelectionManager::Init();
-        List<entt::meta_type> inspectorClasses = Reflect::Core::GetDerivedClasses<ITypeInspector>();
-        for (const auto& inspector: inspectorClasses) {
-            auto instance = inspector.construct();
-            if (!instance)
-                continue;
+        InitializeTypes();
+    }
 
-            auto* typeInspector = instance.try_cast<ITypeInspector>();
-            if (typeInspector == nullptr) {
-                instance.reset();
-                continue;
-            }
+    void Inspector::RegisterRefTypeProcessor(const entt::meta_type& type, const entt::meta_any& instance) {
+        m_typeProcessors[type.id()] = instance;
+        List<entt::meta_type> derivedClasses = Reflect::Core::GetDerivedClasses(type);
 
-            auto type = typeInspector->GetMetaType();
-            if (Reflect::Core::IsRefType(type)) {
-                auto ptrType = Reflect::Core::GetRefPointerType(type);
-                m_inspectorClasses[ptrType.id()] = instance;
-                List<entt::meta_type> derivedClasses = Reflect::Core::GetDerivedClasses(ptrType);
-                for (const auto& derived: derivedClasses) {
-                    m_inspectorClasses[derived.id()] = instance;
-                }
-            } else {
-                m_inspectorClasses[type.id()] = instance;
-            }
+        // TODO: Find a way around this
+        for (const auto& component: ClassRegistry::GetComponentClasses()) {
+            auto it = std::remove(derivedClasses.begin(), derivedClasses.end(), component);
+            derivedClasses.erase(it);
+        }
+
+        for (const auto& derived: derivedClasses) {
+            m_typeMap[derived.id()] = type.id();
         }
     }
 
     String Inspector::GetName(const entt::meta_any& instance) {
         String name;
         if (const auto* component = instance.try_cast<IComponent>(); component != nullptr) {
-            name = component->GetName();
+            name = component->GetDisplayName();
         } else {
             name = String(instance.type().info().name());
         }
@@ -47,32 +40,31 @@ namespace Calyx::Editor {
         return name;
     }
 
-    void Inspector::_DrawComponentInspector(entt::meta_any& instance) {
-        if (!DrawComponentInspectorHeader(instance))
+    void Inspector::_DrawComponentInspector(GameObject* gameObject, entt::meta_any& componentInstance) {
+        if (!DrawComponentInspectorHeader(gameObject, componentInstance))
             return;
 
-        entt::id_type typeId;
-        if (!CheckInspectorTypeExists(instance, &typeId))
-            return DrawDefaultComponentInspector(instance);
+        entt::meta_any* inspector;
+        if (!CheckProcessorExists(componentInstance, &inspector))
+            return DrawDefaultComponentInspector(componentInstance);
 
-        DrawTypeInspector(typeId, instance);
+        DrawTypeInspector(*inspector, componentInstance);
     }
 
     void Inspector::DrawPropertyInspector(const String& propertyName, entt::meta_any& instance) {
-        entt::id_type typeId;
-        if (!CheckInspectorTypeExists(instance, &typeId))
+        entt::meta_any* inspector;
+        if (!CheckProcessorExists(instance, &inspector))
             return;
 
         InspectorGUI::Property(propertyName);
-        DrawTypeInspector(typeId, instance);
+        DrawTypeInspector(*inspector, instance);
     }
 
-    void Inspector::DrawTypeInspector(entt::id_type typeId, entt::meta_any& instance) {
+    void Inspector::DrawTypeInspector(entt::meta_any& inspector, entt::meta_any& instance) {
         using namespace entt::literals;
 
-        auto& inspector = m_inspectorClasses[typeId];
         entt::meta_func fn;
-        if (!CheckInspectorFunctionExists(CX_ON_INSPECTOR_GUI_HS, inspector, &fn))
+        if (!CheckProcessorFunctionExists(CX_ON_INSPECTOR_GUI_HS, inspector, &fn))
             return;
 
         InvokeInspectorFunction(fn, inspector, instance);
@@ -82,7 +74,7 @@ namespace Calyx::Editor {
         if (InspectorGUI::BeginPropertyTable("Default Inspector")) {
             auto type = instance.type();
             for (auto [id, data]: type.data()) {
-                String label = Reflect::Core::GetFieldName(type, id);
+                String label = Reflect::Core::GetFieldDisplayName(type, id);
                 auto ref = Reflect::Core::CreateOpaqueReference(
                     data.type(),
                     Reflect::Core::GetFieldPointer(instance, id)
@@ -93,65 +85,37 @@ namespace Calyx::Editor {
         }
     }
 
-    void Inspector::DrawComponentContextInspector(entt::meta_any& component) {
+    bool Inspector::DrawComponentContextInspector(GameObject* gameObject, entt::meta_any& component) {
         using namespace entt::literals;
 
-        entt::id_type typeId;
-        if (!CheckInspectorTypeExists(component, &typeId))
-            return;
-
-        auto& inspector = m_inspectorClasses[typeId];
-        entt::meta_func fn;
-        if (!CheckInspectorFunctionExists(CX_ON_INSPECTOR_CONTEXT_GUI_HS, inspector, &fn))
-            return;
-
+        bool removed = false;
         if (ImGui::BeginPopupContextItem()) {
-            InvokeInspectorFunction(fn, inspector, component);
+            if (component.type().id() != entt::resolve<TransformComponent>().id() && ImGui::MenuItem("Remove")) {
+                removed = true;
+            }
+
+            entt::meta_any* inspector;
+            entt::meta_func fn;
+            if (CheckProcessorExists(component, &inspector) &&
+                CheckProcessorFunctionExists(CX_ON_INSPECTOR_CONTEXT_GUI_HS, *inspector, &fn)) {
+                InvokeInspectorFunction(fn, *inspector, component);
+            }
+
             ImGui::EndPopup();
         }
-    }
 
-    bool Inspector::DrawComponentInspectorHeader(entt::meta_any& instance) {
-        String name = GetName(instance);
-        bool header = ImGui::CollapsingHeader(name.c_str(), ImGuiTreeNodeFlags_DefaultOpen);
-        DrawComponentContextInspector(instance);
-        return header;
-    }
-
-    bool Inspector::CheckInspectorTypeExists(const entt::meta_any& instance, entt::id_type* typeId) {
-        auto type = instance.type();
-        auto id = type.id();
-
-        // Check type is Ref<...>
-        if (Reflect::Core::IsRefType(type)) {
-            auto ptrTypeId = Reflect::Core::GetRefPointerType(type).id();
-            if (m_inspectorClasses.count(ptrTypeId)) {
-                if (typeId != nullptr)
-                    *typeId = ptrTypeId;
-                return true;
-            }
+        if (removed) {
+            gameObject->RemoveComponent(component.type());
         }
 
-        if (!m_inspectorClasses.count(id))
-            return false;
-
-        if (typeId != nullptr)
-            *typeId = id;
-
-        return true;
+        return !removed;
     }
 
-    bool Inspector::CheckInspectorFunctionExists(
-        entt::id_type function,
-        const entt::meta_any& inspector,
-        entt::meta_func* fn
-    ) {
-        auto inspectorFn = inspector.type().func(function);
-        if (!inspectorFn)
-            return false;
-        if (fn != nullptr)
-            *fn = inspectorFn;
-        return true;
+    bool Inspector::DrawComponentInspectorHeader(GameObject* gameObject, entt::meta_any& instance) {
+        String name = GetName(instance);
+        bool header = ImGui::CollapsingHeader(name.c_str(), ImGuiTreeNodeFlags_DefaultOpen);
+        bool context = DrawComponentContextInspector(gameObject, instance);
+        return header && context;
     }
 
     void Inspector::InvokeInspectorFunction(
@@ -170,11 +134,20 @@ namespace Calyx::Editor {
             args[1] = type.construct((entt::meta_any* const)&args[1], (const entt::meta_func::size_type)1);
         }
 
-        fn.invoke(
-            inspector,
-            (entt::meta_any* const)args,
-            (const entt::meta_func::size_type)(sizeof(args) / sizeof(*args))
-        );
+        const auto arity = fn.arity();
+        if (arity == 1) {
+            fn.invoke(
+                inspector,
+                (entt::meta_any* const)&args[1],
+                (const entt::meta_func::size_type)1
+            );
+        } else if (arity == 2) {
+            fn.invoke(
+                inspector,
+                (entt::meta_any* const)args,
+                (const entt::meta_func::size_type)2
+            );
+        }
 
         if (isRefType) {
             const_cast<entt::meta_any&>(instance)

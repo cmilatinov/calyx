@@ -5,8 +5,7 @@ namespace Calyx {
     class SandboxApp : public Application {
 
     public:
-        SandboxApp();
-        ~SandboxApp() override;
+        SandboxApp() = default;
 
     };
 

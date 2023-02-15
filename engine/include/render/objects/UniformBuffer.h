@@ -9,10 +9,10 @@ namespace Calyx {
         4, 8, 16, 16
     };
 
-    class UniformBufferLayout {
+    class CALYX_API UniformBufferLayout {
 
     public:
-        UniformBufferLayout() {}
+        UniformBufferLayout() = default;
 
         UniformBufferLayout(std::initializer_list<BufferElement> elements)
             : m_elements(elements) {

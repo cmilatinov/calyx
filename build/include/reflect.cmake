@@ -12,16 +12,21 @@ function(add_reflected_target target)
     get_target_include_directories(includes "${target}")
     list(APPEND includes "${PROJECT_SOURCE_DIR}/build/reflect/lib/include")
     list(TRANSFORM includes PREPEND "-I")
-    foreach(header ${pch})
-        get_filename_component(filename "${header}" NAME_WE)
-        add_custom_command(
-                COMMAND "${CLANG_EXECUTABLE}" -xc++-header
-                -Xclang -std=c++${CMAKE_CXX_STANDARD} "${header}" ${includes}
-                -o "${CMAKE_CURRENT_BINARY_DIR}/${filename}.pch" -Wno-everything
-                COMMENT "Generating precompiled header '${header}' using clang"
-                OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${filename}.pch"
-        )
-    endforeach()
+    if(DEFINED pch)
+        foreach(header ${pch})
+            get_filename_component(filename "${header}" NAME_WE)
+            add_custom_command(
+                    COMMAND "${CLANG_EXECUTABLE}" -xc++-header
+                    -Xclang -std=c++${CMAKE_CXX_STANDARD} "${header}" ${includes}
+                    -o "${CMAKE_CURRENT_BINARY_DIR}/${filename}.pch" -Wno-everything
+                    COMMENT "Generating precompiled header '${header}' using clang"
+                    OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${filename}.pch"
+            )
+        endforeach()
+    endif()
+    if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        target_compile_options("${target}" PRIVATE "-Wno-invalid-offsetof")
+    endif()
 endfunction()
 
 # Add a header to the reflection tool
@@ -64,7 +69,7 @@ function(add_reflected_headers target root_include)
                 OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/generated/${rel_path}.gen.cpp"
                 COMMENT "Running reflection code generation for '${header}'"
         )
-        target_sources("${target}" PUBLIC "generated/${rel_path}.gen.cpp")
+        target_sources("${target}" PRIVATE "generated/${rel_path}.gen.cpp")
         set_source_files_properties("generated/${rel_path}.gen.cpp" PROPERTIES GENERATED 1)
     endforeach()
 endfunction()

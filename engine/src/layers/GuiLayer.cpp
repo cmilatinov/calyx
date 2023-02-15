@@ -1,5 +1,7 @@
 #include "layers/GuiLayer.h"
 
+#include <IconsMaterialDesign.h>
+
 namespace Calyx {
 
     void GuiLayer::OnAttach() {
@@ -67,18 +69,19 @@ namespace Calyx {
     }
 
     void GuiLayer::SetupImGuiTheme() {
-        // Set font
+        // Add fonts
         const float fontSizeNormal = 22.0f;
         const float fontSizeSmall = 18.0f;
         const float fontSizeLarge = 30.0f;
-        ImGuiIO& io = ImGui::GetIO();
-        io.Fonts->AddFontFromFileTTF("assets/fonts/inconsolata/Inconsolata-Regular.ttf", fontSizeSmall);
-        io.Fonts->AddFontFromFileTTF("assets/fonts/inconsolata/Inconsolata-Regular.ttf", fontSizeNormal);
-        io.Fonts->AddFontFromFileTTF("assets/fonts/inconsolata/Inconsolata-Regular.ttf", fontSizeLarge);
-        io.Fonts->AddFontFromFileTTF("assets/fonts/inconsolata/Inconsolata-Bold.ttf", fontSizeSmall);
-        io.Fonts->AddFontFromFileTTF("assets/fonts/inconsolata/Inconsolata-Bold.ttf", fontSizeNormal);
-        io.Fonts->AddFontFromFileTTF("assets/fonts/inconsolata/Inconsolata-Bold.ttf", fontSizeNormal);
-        io.FontDefault = io.Fonts->Fonts[1];
+        static const ImWchar iconRanges[] = { 1, ICON_MAX_16_MD, 0 };
+        auto& io = ImGui::GetIO();
+        io.Fonts->AddFontFromFileTTF("assets/fonts/inconsolata/Inconsolata-Regular.ttf", fontSizeSmall, nullptr, iconRanges);
+        io.Fonts->AddFontFromFileTTF("assets/fonts/inconsolata/Inconsolata-Regular.ttf", fontSizeNormal, nullptr, iconRanges);
+        io.Fonts->AddFontFromFileTTF("assets/fonts/inconsolata/Inconsolata-Regular.ttf", fontSizeLarge, nullptr, iconRanges);
+        io.Fonts->AddFontFromFileTTF("assets/fonts/inconsolata/Inconsolata-Bold.ttf", fontSizeSmall, nullptr, iconRanges);
+        io.Fonts->AddFontFromFileTTF("assets/fonts/inconsolata/Inconsolata-Bold.ttf", fontSizeNormal, nullptr, iconRanges);
+        io.Fonts->AddFontFromFileTTF("assets/fonts/inconsolata/Inconsolata-Bold.ttf", fontSizeNormal, nullptr, iconRanges);
+        io.FontDefault = io.Fonts->Fonts[CX_FONT_REGULAR + CX_FONT_SIZE_NORMAL];
 
         // Set dark theme
         ImGui::StyleColorsDark();
@@ -86,6 +89,7 @@ namespace Calyx {
         // Windows
         auto& colors = ImGui::GetStyle().Colors;
         colors[ImGuiCol_WindowBg] = ImVec4{ 0.1f, 0.105f, 0.11f, 1.0f };
+        colors[ImGuiCol_PopupBg].w = 1.0f;
 
         // Headers
         colors[ImGuiCol_Header] = ImVec4{ 0.2f, 0.205f, 0.21f, 1.0f };

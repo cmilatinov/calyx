@@ -10,7 +10,7 @@ namespace Calyx {
      */
     class CALYX_API Window {
 
-        using EventCallbackFn = std::function<void(Event&)>;
+        using EventCallbackFn = Function<void(Event&)>;
 
     public:
         virtual ~Window() = default;

@@ -1,10 +1,11 @@
 assimp
+cxxopts
 efsw
-entt[experimental]
+entt
 glad
 glfw3
 glm
-imgui[docking-experimental,glfw-binding,opengl3-binding]
+imgui[docking-experimental,glfw-binding,opengl3-binding,wchar32]
 imguizmo
 implot
 inja

@@ -8,17 +8,14 @@ namespace Calyx::Reflect::Tooling {
 
     public:
         explicit HeaderSerializer(std::string headerFile);
-        ~HeaderSerializer() override;
 
         void run(const MatchFinder::MatchResult& Result) override;
-
-        ClassSerializer* GetSerializer(CXXRecordDecl* decl);
 
         const json& GetJSONObject();
 
     private:
         std::string m_headerFile;
-        std::unordered_map<CXXRecordDecl*, ClassSerializer*> m_classSerializers;
+        std::unordered_map<CXXRecordDecl*, std::unique_ptr<ClassSerializer>> m_classSerializers;
         json m_jsonObject = json::array();
 
     };

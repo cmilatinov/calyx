@@ -1,14 +1,16 @@
 #pragma once
 
 // Annotation names
-#define CX_REFLECT_SERIALIZE_ANNOTATION "serialize"
-#define CX_REFLECT_NAME_ANNOTATION "name"
+#define CX_REFLECT_ANNOTATION_SERIALIZE serialize
+#define CX_REFLECT_ANNOTATION_NAME name
 
 // Annotation definitions
 #ifdef __clang__
-#define CX_REFLECT_SERIALIZE __attribute__((annotate(CX_REFLECT_SERIALIZE_ANNOTATION)))
-#define CX_REFLECT_NAME(name) __attribute__((annotate(CX_REFLECT_NAME_ANNOTATION "=" name)))
+#define CX_PROPERTY(...) __attribute__((annotate(CX_XSTR_ALL(__VA_ARGS__))))
+#define CX_SERIALIZE CX_REFLECT_ANNOTATION_SERIALIZE
+#define CX_NAME(x) CX_REFLECT_ANNOTATION_NAME=#x
 #else
-#define CX_REFLECT_SERIALIZE
-#define CX_REFLECT_NAME(...)
+#define CX_PROPERTY(...)
+#define CX_SERIALIZE
+#define CX_NAME(...)
 #endif

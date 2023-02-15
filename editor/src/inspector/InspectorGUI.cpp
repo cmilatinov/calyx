@@ -1,15 +1,48 @@
 #include "inspector/InspectorGUI.h"
 
+#include "ecs/GameObject.h"
+
 #include <imgui.h>
 #include <imgui_stdlib.h>
 #include <imgui_internal.h>
 
 namespace Calyx::Editor {
 
-    String InspectorGUI::s_assetSearch{};
-    List<AssetRegistry::AssetMeta> InspectorGUI::s_assetList{};
+    bool InspectorGUI::ComponentPicker(GameObject* gameObject, const Set<AssetType>& excluded) {
+        static String s_componentSearch{};
+        static List<AssetRegistry::AssetMeta> s_componentList{};
 
-    bool InspectorGUI::GameAssetControl(const String& name, AssetT assetType, Ref<IAsset>& value) {
+        if (ImGui::Button("Add Component")) {
+            ImGui::OpenPopup("##ComonentPicker");
+        }
+
+        if (ImGui::BeginPopup("##ComonentPicker")) {
+            if (ImGui::IsWindowAppearing()) {
+                s_componentList.clear();
+                AssetRegistry::SearchComponents(s_componentSearch, excluded, s_componentList);
+                ImGui::SetKeyboardFocusHere();
+            }
+
+            if (ImGui::InputText("##ComponentSearch", &s_componentSearch, ImGuiInputTextFlags_AutoSelectAll)) {
+                s_componentList.clear();
+                AssetRegistry::SearchComponents(s_componentSearch, excluded, s_componentList);
+            }
+
+            for (const auto& component: s_componentList) {
+                if (ImGui::Selectable(component.displayName.c_str(), false)) {
+                    gameObject->AddComponent(entt::resolve(component.type));
+                }
+            }
+
+            ImGui::EndPopup();
+        }
+        return false;
+    }
+
+    bool InspectorGUI::GameAssetControl(const String& name, AssetType assetType, Ref<IAsset>& value) {
+        static String s_assetSearch{};
+        static List<AssetRegistry::AssetMeta> s_assetList{};
+
         auto displayName = AssetRegistry::GetAssetDisplayName(value);
         if (ImGui::BeginCombo("##AssetSelect", displayName.c_str())) {
             if (ImGui::IsWindowAppearing()) {
@@ -19,7 +52,7 @@ namespace Calyx::Editor {
             }
 
             ImGui::SetNextItemWidth(-FLT_MIN);
-            if (ImGui::InputText("##Search", &s_assetSearch, ImGuiInputTextFlags_AutoSelectAll)) {
+            if (ImGui::InputText("##AssetSearch", &s_assetSearch, ImGuiInputTextFlags_AutoSelectAll)) {
                 s_assetList.clear();
                 AssetRegistry::SearchAssets(assetType, s_assetSearch, s_assetList);
             }
@@ -40,8 +73,11 @@ namespace Calyx::Editor {
         return false;
     }
 
-    bool InspectorGUI::TextControl(const String& name, String& value) {
-        return ImGui::InputText(("##" + name).c_str(), &value, ImGuiInputTextFlags_AutoSelectAll);
+    bool InspectorGUI::TextControl(const String& name, String& value, bool readonly) {
+        ImGuiInputTextFlags flags = ImGuiInputTextFlags_AutoSelectAll;
+        if (readonly)
+            flags |= ImGuiInputTextFlags_ReadOnly;
+        return ImGui::InputText(("##" + name).c_str(), &value, flags);
     }
 
     bool InspectorGUI::Vec3Control(const String& name, vec3& value, float speed) {
@@ -52,8 +88,8 @@ namespace Calyx::Editor {
         return DragFloatN_Colored(name.c_str(), glm::value_ptr(value), 2, speed);
     }
 
-    bool InspectorGUI::SliderControl(const String& name, float& value, float min, float max) {
-        return ImGui::SliderFloat(("##" + name).c_str(), &value, min, max);
+    bool InspectorGUI::FloatControl(const String& name, float& value, float speed, float min, float max) {
+        return ImGui::DragFloat(("##" + name).c_str(), &value, speed, min, max);
     }
 
     bool InspectorGUI::BeginPropertyTable(const String& name) {

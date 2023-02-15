@@ -12,7 +12,7 @@ namespace Calyx {
         m_lastTime = currentTime;
     }
 
-    TimeT Time::_Timer(const String& name) {
+    TimeType Time::_Timer(const String& name) {
         return m_staticTime - m_timerMap[name];
     }
 

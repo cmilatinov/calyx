@@ -28,7 +28,7 @@ namespace Calyx {
         inline int GetPosY() const { return m_posY; }
 
         String ToString() const override {
-            std::stringstream ss;
+            StringStream ss;
             ss << "EventWindowMove: " << m_posX << ", " << m_posY;
             return ss.str();
         }
@@ -49,7 +49,7 @@ namespace Calyx {
         inline int GetHeight() const { return m_height; }
 
         String ToString() const override {
-            std::stringstream ss;
+            StringStream ss;
             ss << "EventWindowResize: " << m_width << ", " << m_height;
             return ss.str();
         }

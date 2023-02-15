@@ -30,6 +30,13 @@ namespace Calyx::Reflect {
         return meta->name;
     }
 
+    std::string Core::GetFieldDisplayName(const entt::meta_type& type, entt::id_type fieldId) {
+        const auto* meta = GetFieldMeta(type, fieldId);
+        if (meta == nullptr)
+            return "";
+        return meta->displayName;
+    }
+
     int32_t Core::GetFieldOffset(const entt::meta_type& type, entt::id_type fieldId) {
         const auto* meta = GetFieldMeta(type, fieldId);
         if (meta == nullptr)
@@ -60,6 +67,14 @@ namespace Calyx::Reflect {
         if (!IsRefType(type))
             return entt::meta_type();
         return type.template_arg(0);
+    }
+
+    bool Core::IsPointerType(const entt::meta_type& type) {
+        return type.is_pointer();
+    }
+
+    entt::meta_type Core::GetPointerType(const entt::meta_type& type) {
+        return type.remove_pointer();
     }
 
     const Core::FieldMeta* Core::GetFieldMeta(const entt::meta_type& type, entt::id_type fieldId) {

@@ -14,6 +14,7 @@ namespace Calyx {
 
     public:
         Application();
+        explicit Application(const WindowMode& windowMode);
         virtual ~Application() = default;
 
         virtual void Run();
@@ -36,12 +37,14 @@ namespace Calyx {
         LayerStack m_layerStack;
         GuiLayer* m_guiLayer;
 
+        void Init();
+
         void OnEvent(Event& event);
         bool OnWindowClose(EventWindowClose& event);
         bool OnWindowResize(EventWindowResize& event);
 
     };
 
-    extern Application* CreateApplication();
+    extern Scope<Application> CreateApplication(int argc, char** argv);
 
 }

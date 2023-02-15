@@ -11,15 +11,18 @@ namespace Calyx {
 
     class GameObject;
     class SceneRenderer;
+    class SceneExporter;
+    class SceneImporter;
 
     class CALYX_API Scene : public Asset<Scene> {
 
         friend class GameObject;
         friend class SceneRenderer;
+        friend class SceneExporter;
+        friend class SceneImporter;
         friend class Editor::EditorLayer;
 
     public:
-        Scene();
         ~Scene() override;
 
         GameObject* CreateGameObject(const String& name = "Game Object", GameObject* parent = nullptr);
@@ -39,6 +42,8 @@ namespace Calyx {
 
         bool Load(const String& path);
         void Clear();
+
+        void EnsureComponentStorage();
 
     };
 

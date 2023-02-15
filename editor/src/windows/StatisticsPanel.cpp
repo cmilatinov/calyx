@@ -19,25 +19,31 @@ namespace Calyx::Editor {
             Time::ResetTimer("Metrics");
         }
 
-        Utils::Graph::Line("CPU Usage (%%)", m_cpuCollector);
+        if (Time::Timer("FPS") >= 1.0f) {
+            m_fps = 0;
+            Time::ResetTimer("FPS");
+        }
+
+        Utils::Graph::Line("CPU Usage (%)", m_cpuCollector);
         ImGui::Separator();
 
-        ImGui::Text("RAM Total: %s", Utils::Format::ByteSize(m_memory.Total).c_str());
-        ImGui::Text("RAM Used: %s",Utils::Format::ByteSize(m_memory.Used).c_str());
+        ImGui::Text("RAM Total: %s", FormatUtils::ByteSize(m_memory.Total).c_str());
+        ImGui::Text("RAM Used: %s", FormatUtils::ByteSize(m_memory.Used).c_str());
         ImGui::Text(
             "RAM Process: %s (%s)",
-            Utils::Format::ByteSize(m_memory.ProcessUsed).c_str(),
-            Utils::Format::Percentage((double)m_memory.ProcessUsed / m_memory.Total).c_str()
+            FormatUtils::ByteSize(m_memory.ProcessUsed).c_str(),
+            FormatUtils::Percentage((double)m_memory.ProcessUsed / m_memory.Total).c_str()
         );
         ImGui::Separator();
 
-        ImGui::Text("CPU Usage: %s", Utils::Format::Percentage(m_cpu.ProcessUsage).c_str());
-        ImGui::Text("CPU Time: %s", Utils::Format::Milliseconds((float)m_cpuTime / 1000000).c_str());
-        ImGui::Text("GPU Time: %s", Utils::Format::Milliseconds((float)m_gpuTime / 1000000).c_str());
+        ImGui::Text("CPU Usage: %s", FormatUtils::Percentage(m_cpu.ProcessUsage).c_str());
+        ImGui::Text("CPU Time: %s", FormatUtils::Milliseconds((float)m_cpuTime / 1000000).c_str());
+        ImGui::Text("GPU Time: %s", FormatUtils::Milliseconds((float)m_gpuTime / 1000000).c_str());
+        ImGui::Text("FPS: %lu", m_fps);
         ImGui::Separator();
 
-        ImGui::Text("Triangles: %llu", m_primitives);
-        ImGui::Text("Indices: %llu", m_primitives * 3);
+        ImGui::Text("Triangles: %lu", m_primitives);
+        ImGui::Text("Indices: %lu", m_primitives * 3);
 
         ImGui::End();
     }
@@ -54,6 +60,7 @@ namespace Calyx::Editor {
         m_primitives = m_primitivesQuery->GetValueU64();
         m_gpuTime = m_timeElapsedQuery->GetValueU64();
         m_cpuTime = Chrono::duration_cast<Chrono::Nanoseconds>(Clock::now() - m_lastCPUTime).count();
+        m_fps++;
     }
 
 }

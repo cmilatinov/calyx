@@ -12,7 +12,7 @@ using std::filesystem::path;
 
 namespace Calyx {
 
-    class GLShader : public Shader {
+    class CALYX_API GLShader : public Shader {
 
     public:
         GLShader(const String& name, const String& vertexSrc, const String& fragmentSrc);

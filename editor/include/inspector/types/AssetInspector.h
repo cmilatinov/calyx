@@ -7,7 +7,7 @@ namespace Calyx::Editor {
 
     class AssetInspector : public TypeInspector<Ref<IAsset>> {
         CX_BEGIN_REFLECT();
-        void CX_ON_INSPECTOR_GUI(IdentifierT typeID, Ref<IAsset>& value);
+        void CX_ON_INSPECTOR_GUI(IdentifierType typeID, Ref<IAsset>& value);
     };
 
 }

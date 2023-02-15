@@ -31,6 +31,8 @@ namespace ch = std::chrono;
 namespace fs = std::filesystem;
 
 #include "Macros.h"
+#include "StringUtils.h"
+
 #include "interfaces/IDeclProcessor.h"
 #include "interfaces/IJSONSerializer.h"
 #include "definitions/Member.h"

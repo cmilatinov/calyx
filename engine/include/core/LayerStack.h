@@ -1,10 +1,10 @@
 #pragma once
 
-#include "core/ILayer.h"
+#include "core/Layer.h"
 
 namespace Calyx {
 
-    class LayerStack {
+    class CALYX_API LayerStack {
 
     public:
         LayerStack() = default;

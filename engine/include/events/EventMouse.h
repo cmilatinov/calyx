@@ -14,7 +14,7 @@ namespace Calyx {
         float GetY() const { return m_mouseY; }
 
         String ToString() const override {
-            std::stringstream ss;
+            StringStream ss;
             ss << "EventMouseMove: " << m_mouseX << ", " << m_mouseY;
             return ss.str();
         }
@@ -35,7 +35,7 @@ namespace Calyx {
         float GetYOffset() const { return m_offsetY; }
 
         String ToString() const override {
-            std::stringstream ss;
+            StringStream ss;
             ss << "EventMouseScroll: " << GetXOffset() << ", " << GetYOffset();
             return ss.str();
         }
@@ -66,7 +66,7 @@ namespace Calyx {
             : EventMouseButton(button) {}
 
         String ToString() const override {
-            std::stringstream ss;
+            StringStream ss;
             ss << "EventMouseButtonPress: " << m_button;
             return ss.str();
         }
@@ -80,7 +80,7 @@ namespace Calyx {
             : EventMouseButton(button) {}
 
         String ToString() const override {
-            std::stringstream ss;
+            StringStream ss;
             ss << "EventMouseButtonRelease: " << m_button;
             return ss.str();
         }

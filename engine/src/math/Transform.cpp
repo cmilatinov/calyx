@@ -122,8 +122,7 @@ namespace Calyx {
         }
 
         // Check cache contains matrix
-        auto entry = cache.find(this);
-        if (entry != cache.end()) {
+        CX_MAP_FIND(cache, this, entry) {
             return entry->second;
         }
 
@@ -148,8 +147,7 @@ namespace Calyx {
         }
 
         // Check cache contains matrix
-        auto entry = cache.find(this);
-        if (entry != cache.end()) {
+        CX_MAP_FIND(cache, this, entry) {
             return entry->second;
         }
 

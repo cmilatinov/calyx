@@ -6,42 +6,42 @@
 namespace Calyx {
 
     const WindowMode WindowMode::FULLSCREEN = {
-        CX_DISPLAY_CENTER,
-        CX_DISPLAY_CENTER,
-        CX_DISPLAY_MAX_SIZE,
-        CX_DISPLAY_MAX_SIZE,
-        CursorMode::NORMAL,
-        false,
-        false,
-        true,
-        false,
-        true
+        .x = CX_DISPLAY_CENTER,
+        .y = CX_DISPLAY_CENTER,
+        .width = CX_DISPLAY_MAX_SIZE,
+        .height = CX_DISPLAY_MAX_SIZE,
+        .cursorMode = CursorMode::NORMAL,
+        .decorated = false,
+        .resizable = false,
+        .vsync = true,
+        .alwaysOnTop = false,
+        .fullscreen = true
     };
 
     const WindowMode WindowMode::BORDERLESS_FULLSCREEN = {
-        CX_DISPLAY_CENTER,
-        CX_DISPLAY_CENTER,
-        CX_DISPLAY_MAX_SIZE,
-        CX_DISPLAY_MAX_SIZE,
-        CursorMode::NORMAL,
-        true,
-        false,
-        true,
-        false,
-        false
+        .x = CX_DISPLAY_CENTER,
+        .y = CX_DISPLAY_CENTER,
+        .width = CX_DISPLAY_MAX_SIZE,
+        .height = CX_DISPLAY_MAX_SIZE,
+        .cursorMode = CursorMode::NORMAL,
+        .decorated = true,
+        .resizable = false,
+        .vsync = true,
+        .alwaysOnTop = false,
+        .fullscreen = false
     };
 
     const WindowMode WindowMode::DEFAULT = {
-        CX_DISPLAY_CENTER,
-        CX_DISPLAY_CENTER,
-        1920,
-        1080,
-        CursorMode::NORMAL,
-        true,
-        false,
-        true,
-        false,
-        false
+        .x = CX_DISPLAY_CENTER,
+        .y = CX_DISPLAY_CENTER,
+        .width = 1920,
+        .height = 1080,
+        .cursorMode = CursorMode::NORMAL,
+        .decorated = true,
+        .resizable = false,
+        .vsync = true,
+        .alwaysOnTop = false,
+        .fullscreen = false
     };
 
 }

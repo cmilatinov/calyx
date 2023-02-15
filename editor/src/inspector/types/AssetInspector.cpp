@@ -6,7 +6,7 @@
 
 namespace Calyx::Editor {
 
-    void AssetInspector::CX_ON_INSPECTOR_GUI(IdentifierT typeID, Ref<IAsset>& value) {
+    void AssetInspector::CX_ON_INSPECTOR_GUI(IdentifierType typeID, Ref<IAsset>& value) {
         InspectorGUI::GameAssetControl("Asset", typeID, value);
     }
 

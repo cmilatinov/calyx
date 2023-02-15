@@ -6,7 +6,7 @@
 
 namespace Calyx {
 
-    class GLRenderbuffer : public Renderbuffer {
+    class CALYX_API GLRenderbuffer : public Renderbuffer {
 
     public:
         GLRenderbuffer(uint32 width, uint32 height, uint32 samples, TextureFormat format);

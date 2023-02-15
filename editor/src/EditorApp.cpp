@@ -1,4 +1,5 @@
 #include "EditorApp.h"
+#include "layers/EditorLayer.h"
 
 namespace Calyx::Editor {
 
@@ -12,8 +13,8 @@ namespace Calyx::Editor {
 
 namespace Calyx {
 
-    Application* CreateApplication() {
-        return new Editor::EditorApp();
+    Scope<Application> CreateApplication(int argc, char** argv) {
+        return CreateScope<Editor::EditorApp>();
     }
 
 }

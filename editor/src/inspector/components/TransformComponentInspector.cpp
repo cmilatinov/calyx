@@ -4,13 +4,13 @@
 
 namespace Calyx::Editor {
 
-    void TransformComponentInspector::CX_ON_INSPECTOR_CONTEXT_GUI(IdentifierT typeID, TransformComponent& tc) {
+    void TransformComponentInspector::CX_ON_INSPECTOR_CONTEXT_GUI(TransformComponent& tc) {
         if (ImGui::MenuItem("Reset")) {
             tc.GetTransform().Reset();
         }
     }
 
-    void TransformComponentInspector::CX_ON_INSPECTOR_GUI(IdentifierT typeID, TransformComponent& tc) {
+    void TransformComponentInspector::CX_ON_INSPECTOR_GUI(TransformComponent& tc) {
         auto& transform = tc.GetTransform();
 
         vec3 translation, rotation, scale;

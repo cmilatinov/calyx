@@ -6,7 +6,7 @@
 
 namespace Calyx {
 
-    class GLVertexArray : public VertexArray {
+    class CALYX_API GLVertexArray : public VertexArray {
 
     public:
         GLVertexArray();
