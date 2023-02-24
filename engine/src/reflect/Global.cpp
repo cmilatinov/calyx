@@ -1,3 +1,6 @@
+
+#include "assets/Assembly.h"
+
 CX_REFLECT_REGISTRATION {
     using namespace entt::literals;
 

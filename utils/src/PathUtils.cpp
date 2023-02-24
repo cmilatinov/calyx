@@ -2,21 +2,8 @@
 
 namespace Calyx::PathUtils {
 
-    std::filesystem::path RemoveTrailingSeparator(const std::filesystem::path& path) {
-        if (path.empty())
-            return path;
-        auto size = std::distance(path.begin(), path.end());
-        auto it = path.begin();
-        std::advance(it, size - 1);
-        if (!(*it).empty())
-            return path;
-        return path.parent_path();
-    }
-
     std::filesystem::path Normalize(const std::filesystem::path& path) {
-        if (path.empty())
-            return path;
-        return PathUtils::RemoveTrailingSeparator(std::filesystem::absolute(path));
+        return std::filesystem::weakly_canonical(path);
     }
 
     std::filesystem::path FirstExistingFile(const std::filesystem::path& path) {

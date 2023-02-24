@@ -20,7 +20,8 @@ namespace Calyx::Editor {
         }
 
         if (Time::Timer("FPS") >= 1.0f) {
-            m_fps = 0;
+            m_fps = m_fpsCounter;
+            m_fpsCounter = 0;
             Time::ResetTimer("FPS");
         }
 
@@ -60,7 +61,7 @@ namespace Calyx::Editor {
         m_primitives = m_primitivesQuery->GetValueU64();
         m_gpuTime = m_timeElapsedQuery->GetValueU64();
         m_cpuTime = Chrono::duration_cast<Chrono::Nanoseconds>(Clock::now() - m_lastCPUTime).count();
-        m_fps++;
+        m_fpsCounter++;
     }
 
 }

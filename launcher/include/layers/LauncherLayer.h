@@ -30,6 +30,7 @@ namespace Calyx::Launcher {
         void OpenProject(const String& file);
 
     private:
+        bool m_updateProjectList = false;
         String m_searchFilter;
         List<ProjectMeta> m_recentProjectsFiltered;
 

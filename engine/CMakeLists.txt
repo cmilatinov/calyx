@@ -1,44 +1,35 @@
-# Minimum Version
-cmake_minimum_required(VERSION 3.20)
-
-# C++ standard
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-# Compiler flags
-set(CMAKE_C_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DCX_DEBUG")
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DCX_DEBUG")
-
 # Includes
-include(../build/include/reflect.cmake)
+include(../cmake/include/reflect.cmake)
 
 # Required libraries
-find_package(assimp CONFIG REQUIRED)
-find_package(cxxopts CONFIG REQUIRED)
-find_package(efsw CONFIG REQUIRED)
-find_package(EnTT CONFIG REQUIRED)
-find_package(glad CONFIG REQUIRED)
-find_package(glfw3 CONFIG REQUIRED)
-find_package(glm CONFIG REQUIRED)
-find_package(imgui CONFIG REQUIRED)
-find_package(imguizmo CONFIG REQUIRED)
-find_package(implot CONFIG REQUIRED)
-find_package(nameof CONFIG REQUIRED)
-find_package(spdlog CONFIG REQUIRED)
-find_path(STB_INCLUDE_DIRS "stb_image.h")
+find_package(assimp REQUIRED)
+find_package(cxxopts REQUIRED)
+find_package(efsw REQUIRED)
+find_package(EnTT REQUIRED)
+find_package(glad REQUIRED)
+find_package(glfw3 REQUIRED)
+find_package(glm REQUIRED)
+find_package(imgui REQUIRED)
+find_package(imguizmo REQUIRED)
+find_package(implot REQUIRED)
+find_package(nameof REQUIRED)
+find_package(spdlog REQUIRED)
+find_path(STB_INCLUDE_DIRS "stb_image.h" REQUIRED)
 
 # Clump source files from src
 file(GLOB_RECURSE ENGINE_SRC "src/**.cpp")
 
 # Create library from source
-add_library("Engine_STATIC" STATIC ${ENGINE_SRC})
-add_library("Engine" SHARED /dev/null)
+add_library("CalyxEngine" SHARED ${ENGINE_SRC})
 
-# Link static target
-target_link_libraries("Engine_STATIC" PUBLIC
-        ReflectLib
-        Utils
-        IconFonts
+# Link shared library
+target_link_libraries("CalyxEngine"
+        PRIVATE
+        -Wl,--whole-archive
+        CalyxUtils
+        CalyxReflectLib
+        -Wl,--no-whole-archive
+        PUBLIC
         assimp::assimp
         cxxopts::cxxopts
         efsw::efsw
@@ -51,21 +42,29 @@ target_link_libraries("Engine_STATIC" PUBLIC
         implot::implot
         nameof::nameof
         spdlog::spdlog_header_only)
-target_include_directories("Engine_STATIC" PUBLIC include ${STB_INCLUDE_DIRS})
-target_precompile_headers("Engine_STATIC" PRIVATE include/pch.h)
+set(ENGINE_INCLUDE_DIRS
+        "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/utils/include>"
+        "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/reflect/lib/include>"
+        "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+        "$<INSTALL_INTERFACE:include/calyx>"
+        ${STB_INCLUDE_DIRS})
+target_include_directories("CalyxEngine" PUBLIC ${ENGINE_INCLUDE_DIRS})
+target_precompile_headers("CalyxEngine" PRIVATE include/pch.h)
 if(UNIX)
-    set_target_properties("Engine_STATIC" PROPERTIES POSITION_INDEPENDENT_CODE ON)
+    set_target_properties("CalyxEngine" PROPERTIES POSITION_INDEPENDENT_CODE ON)
 endif()
 
-# Linked shared target
-target_link_libraries("Engine" PUBLIC Engine_STATIC)
-target_precompile_headers("Engine" PRIVATE include/pch.h)
+# Add header file set
+file(GLOB_RECURSE ENGINE_HEADERS "include/**.h")
+list(FILTER ENGINE_HEADERS EXCLUDE REGEX ".*/pch.h$")
+target_sources("CalyxEngine" PUBLIC FILE_SET HEADERS BASE_DIRS include FILES ${ENGINE_HEADERS})
 
 # Add reflection
-add_reflected_target("Engine")
-add_reflected_headers("Engine" "include"
+add_reflected_target("CalyxEngine")
+add_reflected_headers("CalyxEngine" "include"
         "include/assets/Asset.h"
         "include/assets/Mesh.h"
+        "include/assets/Assembly.h"
         "include/render/objects/Shader.h"
         "include/render/objects/Texture2D.h"
         "include/ecs/Component.h"
@@ -75,18 +74,13 @@ add_reflected_headers("Engine" "include"
         "include/math/Transform.h"
         "include/serialization/DefaultSerializers.h"
         "include/serialization/types/AssetSerializer.h")
-target_sources("Engine" PRIVATE "src/reflect/Global.cpp")
+target_sources("CalyxEngine" PRIVATE "src/reflect/Global.cpp")
 
 # Compile definitions based on platform
 if(WIN32)
-    target_compile_definitions("Engine" PUBLIC CX_BUILD_DLL)
-    target_compile_definitions("Engine" PRIVATE CX_DLL_EXPORT)
+    target_compile_definitions("CalyxEngine" PUBLIC CX_BUILD_DLL)
+    target_compile_definitions("CalyxEngine" PRIVATE CX_DLL_EXPORT)
     
-    add_file_copy("Engine" "${PROJECT_BINARY_DIR}/sandbox" "$<TARGET_FILE_DIR:Engine>/Engine.dll")
-    add_file_copy("Engine" "${PROJECT_BINARY_DIR}/sandbox" "$<TARGET_FILE_DIR:Engine>/Engine.pdb")
+    add_file_copy("CalyxEngine" "${PROJECT_BINARY_DIR}/sandbox" "$<TARGET_FILE_DIR:CalyxEngine>/CalyxEngine.dll")
+    add_file_copy("CalyxEngine" "${PROJECT_BINARY_DIR}/sandbox" "$<TARGET_FILE_DIR:CalyxEngine>/CalyxEngine.pdb")
 endif()
-
-# Copy assets to build folder
-add_dir_copy("Engine" "${PROJECT_BINARY_DIR}/sandbox" "assets")
-add_dir_copy("Engine" "${PROJECT_BINARY_DIR}/editor" "assets")
-add_dir_copy("Engine" "${PROJECT_BINARY_DIR}/launcher" "assets")

@@ -2,8 +2,8 @@
 
 #include <imgui.h>
 #include <imgui_stdlib.h>
-#include <IconsMaterialDesign.h>
 
+#include "icons/MaterialDesign.h"
 #include "ui/Definitions.h"
 #include "ui/FileDialog.h"
 
@@ -28,7 +28,7 @@ namespace Calyx {
         static bool InputText(const String& label, String& value, int flags = ImGuiInputTextFlags_None, const String& tooltip = "");
         static bool InputTextWithHint(const String& label, const String& hint, String& value, int flags = ImGuiInputTextFlags_None, const String& tooltip = "");
         static bool InputTextWithAppend(const String& label, const String& append, String& value, int flags = ImGuiInputTextFlags_None, const String& tooltip = "");
-        static bool InputSearch(const String& label, const String& hint, String& value, int flags = ImGuiInputTextFlags_None);
+        static bool InputSearch(const String& label, const String& hint, String& value, int flags = ImGuiInputTextFlags_None, bool focus = false);
         static bool InputFilePath(const String& label, FileSelectionContext& context, const String& tooltip = "");
         static bool PathBreadCrumbs(Path& path);
         static bool FileDialog(const String& title, FileSelectionContext& context);

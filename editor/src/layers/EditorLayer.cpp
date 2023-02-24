@@ -1,14 +1,13 @@
 #include "layers/EditorLayer.h"
-
 #include "scene/serialization/SceneExporter.h"
+#include "project/ProjectManager.h"
 
 namespace Calyx::Editor {
 
     void EditorLayer::OnAttach() {
-        AssetRegistry::AddSearchPath("assets");
         m_reflectedComponents = Reflect::Core::GetDerivedClasses<IComponent>();
 
-        const Window& window = Application::GetInstance().GetWindow();
+        const auto& window = Window::GetMainWindow();
 
         m_msaaFramebuffer = Framebuffer::Create(
             {
@@ -39,13 +38,7 @@ namespace Calyx::Editor {
         m_sceneRenderer = CreateScope<SceneRenderer>();
         m_scene = CreateScope<Scene>();
         m_sceneHierarchyPanel = CreateScope<SceneHierarchyPanel>(m_scene.get());
-        String assets = "./assets";
-        String gameAssets = "./GameAssets";
-        FileSystem::create_directories(assets);
-        FileSystem::create_directories(gameAssets);
-        AssetRegistry::AddSearchPath(assets);
-        AssetRegistry::AddSearchPath(gameAssets);
-        m_contentBrowserPanel = CreateScope<ContentBrowserPanel>(gameAssets);
+        m_contentBrowserPanel = CreateScope<ContentBrowserPanel>(ProjectManager::GetAssetDirectory());
         m_statsPanel = CreateScope<StatisticsPanel>();
 
         m_editorCamera = CreateScope<CameraEditor>();

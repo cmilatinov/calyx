@@ -4,6 +4,7 @@
 #include "render/objects/Shader.h"
 #include "render/objects/Texture2D.h"
 #include "assets/Mesh.h"
+#include "assets/Assembly.h"
 #include "reflect/ClassRegistry.h"
 
 namespace Calyx {
@@ -14,6 +15,7 @@ namespace Calyx {
         : m_assetWatcher(CreateScope<efsw::FileWatcher>()) {
         InitAssetTypes();
         RegisterCoreComponents();
+        _AddSearchPath("./assets");
         m_assetWatcher->watch();
     }
 
@@ -72,7 +74,8 @@ namespace Calyx {
     }
 
     void AssetRegistry::_AddSearchPath(const String& path) {
-        Path normalizedPath = NormalizePath(FileSystem::absolute(path).string());
+        Path normalizedPath = PathUtils::Normalize(path);
+        if (!FileSystem::is_directory(normalizedPath)) return;
         m_searchPaths.push_back(
             {
                 .path = normalizedPath,
@@ -187,6 +190,7 @@ namespace Calyx {
         _RegisterAssetType<Mesh>(".obj", ".fbx", ".3ds", ".blend", ".ply");
         _RegisterAssetType<Shader>(".glsl");
         _RegisterAssetType<Texture2D>(".png", ".jpg", ".bmp");
+        _RegisterAssetType<Assembly>(".cxasm");
     }
 
     void AssetRegistry::ClearAssetMeta(AssetSearchPath& searchPath) {
@@ -219,14 +223,14 @@ namespace Calyx {
             UUID assetID;
             json meta;
             if (LoadMetaFile(file.path(), meta)) {
-                String id = meta.at("id");
+                auto id = meta["id"].get<String>();
                 assetID = UUID::from_string(id).value_or(UUIDUtils::Generate());
                 m_assetNames_IDs[assetName] = assetID;
                 m_assetMeta[assetID] = {
                     .id = assetID,
                     .type = assetType,
                     .name = assetName,
-                    .displayName = meta.at("display_name"),
+                    .displayName = meta["display_name"].get<String>(),
                     .path = FileSystem::absolute(file)
                 };
             } else {
@@ -262,11 +266,12 @@ namespace Calyx {
     void AssetRegistry::WriteMetaFile(const Path& assetFile, const AssetMeta& meta) {
         Path metaFile = GetMetaFile(assetFile);
         std::ofstream stream(metaFile);
+        if (!stream.is_open()) return;
         json metaJSON = {
             { "id", uuids::to_string(meta.id) },
             { "display_name", meta.displayName }
         };
-        stream << metaJSON.dump(4) << std::endl;
+        stream << std::setw(4) << metaJSON;
     }
 
     void AssetRegistry::RegisterCoreComponents() {

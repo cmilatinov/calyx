@@ -144,7 +144,7 @@ namespace Calyx {
         return ret;
     }
 
-    bool Widgets::InputSearch(const String& label, const String& hint, String& value, int flags) {
+    bool Widgets::InputSearch(const String& label, const String& hint, String& value, int flags, bool focus) {
         ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, s_frameBorderSize);
         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 0, 0 });
         ImGui::BeginChildFrame(ImGui::GetID(label.c_str()), { 0.0f, Widgets::GetFrameHeight() });
@@ -165,6 +165,8 @@ namespace Calyx {
             ImGui::PopStyleVar();
             ImGui::TableNextColumn();
             Widgets::NextItemFullWidth();
+            if (focus)
+                ImGui::SetKeyboardFocusHere();
             changed |= ImGui::InputTextWithHint(label.c_str(), hint.c_str(), &value, flags);
             if (!value.empty()) {
                 ImGui::TableNextColumn();

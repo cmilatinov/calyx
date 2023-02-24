@@ -3,6 +3,7 @@
 int main(int argc, char** argv) {
     Log::Init();
 
+    CX_CORE_INFO("Current Directory: {}", FileSystem::current_path().string());
     CX_CORE_INFO("Creating Calyx application ...");
     auto app = Calyx::CreateApplication(argc, argv);
 

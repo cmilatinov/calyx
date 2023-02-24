@@ -13,9 +13,9 @@ namespace Calyx::FormatUtils {
     std::string Number(T value, const std::string& suffix = "", int precision = 3) {
         static_assert(std::is_arithmetic_v<T>, "T must be an arithmetic type!");
         if constexpr (std::is_floating_point_v<T>) {
-            char buffer[50];
-            snprintf(buffer, sizeof(buffer), ("%." + std::to_string(precision) + "f" + suffix).c_str(), value);
-            return buffer;
+            static char s_buffer[50];
+            snprintf(s_buffer, sizeof(s_buffer), ("%." + std::to_string(precision) + "f" + suffix).c_str(), value);
+            return s_buffer;
         }
         return fmt::format("{}{}", value, suffix.c_str());
     }

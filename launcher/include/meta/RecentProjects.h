@@ -19,12 +19,14 @@ namespace Calyx::Launcher {
     public:
         CX_SINGLETON_EXPOSE_METHOD(_SearchProjects, List<ProjectMeta> SearchProjects(const String& query), query);
         CX_SINGLETON_EXPOSE_METHOD(_AddProject, void AddProject(const String& name, const Path& file), name, file);
+        CX_SINGLETON_EXPOSE_METHOD(_RemoveProject, void RemoveProject(const Path& file), file);
 
     private:
         void LoadProjects();
         void SaveProjects();
 
         void _AddProject(const String& name, const Path& file);
+        void _RemoveProject(const Path& file);
 
         List<ProjectMeta> _SearchProjects(const String& query);
 

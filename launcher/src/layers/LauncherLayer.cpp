@@ -126,15 +126,16 @@ namespace Calyx::Launcher {
                               !ValidationUtils::ValidateRequired(m_projectFile) ||
                               !m_createProject.GetSelection().IsOK())) {
                     if (m_projectFile.ends_with(".cxproj")) {
-                        m_projectFile = m_projectFile.substr(0, m_projectFile.size() - sizeof(".cxproj"));
+                        m_projectFile = m_projectFile.substr(0, m_projectFile.size() - StringView(".cxproj").size());
                     }
                     Path projectDirectory = m_createProject.GetSelection().First();
-                    ProjectGenerator generator(projectDirectory, m_projectFile + ".cxproj", m_projectName);
+                    Calyx::Editor::ProjectGenerator generator(projectDirectory, m_projectFile + ".cxproj", m_projectName);
                     if (generator.Generate()) {
                         RecentProjects::AddProject(m_projectName, projectDirectory / (m_projectFile + ".cxproj"));
                         m_projectInfoLinked = true;
                         m_projectName = m_projectFile = "";
                         m_createProject.Reset();
+                        m_updateProjectList = true;
                         ImGui::CloseCurrentPopup();
                     } else {
                         ImGui::OpenPopup("Project Creation Failed");
@@ -151,8 +152,9 @@ namespace Calyx::Launcher {
     }
 
     void LauncherLayer::RecentProjectList() {
-        if (TopActionBar()) {
+        if (TopActionBar() || m_updateProjectList) {
             m_recentProjectsFiltered = RecentProjects::SearchProjects(m_searchFilter);
+            m_updateProjectList = false;
         }
 
         ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { 0, 8.0f });
@@ -176,11 +178,17 @@ namespace Calyx::Launcher {
         static constexpr float s_itemPadding = 10.0f;
 
         auto cursor = ImGui::GetCursorPos();
-        if (ImGui::Selectable(("##" + meta.name).c_str(), false, ImGuiSelectableFlags_None, { 0, s_itemHeight + 2 * s_itemPadding })) {
+        if (ImGui::Selectable(
+            ("##" + meta.name).c_str(), false, ImGuiSelectableFlags_None,
+            { 0, s_itemHeight + 2 * s_itemPadding }
+        )) {
             OpenProject(meta.file);
         }
-        if (ImGui::BeginPopupContextWindow()) {
-            ImGui::MenuItem("Remove from list");
+        if (ImGui::BeginPopupContextWindow(meta.file.c_str())) {
+            if (ImGui::MenuItem("Remove from list")) {
+                RecentProjects::RemoveProject(meta.file);
+                m_updateProjectList = true;
+            }
             ImGui::EndPopup();
         }
         auto finalCursor = ImGui::GetCursorPos();
@@ -197,7 +205,9 @@ namespace Calyx::Launcher {
         char first[2] = { meta.name[0], 0 };
         ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[CX_FONT_BOLD + CX_FONT_SIZE_LARGE]);
         auto letterSize = ImGui::CalcTextSize(first);
-        ImGui::SetCursorPos({ cursor.x + (s_itemHeight - letterSize.x) / 2, cursor.y + (s_itemHeight - letterSize.y) / 2 });
+        ImGui::SetCursorPos(
+            { cursor.x + (s_itemHeight - letterSize.x) / 2, cursor.y + (s_itemHeight - letterSize.y) / 2 }
+        );
         Widgets::Text(first);
         ImGui::PopFont();
 
@@ -211,7 +221,8 @@ namespace Calyx::Launcher {
     }
 
     void LauncherLayer::OpenProject(const String& file) {
-        boost::process::child editor(CX_EDITOR_PATH, file);
+        Path workingDir = PathUtils::Normalize(CX_EDITOR_PATH).parent_path();
+        boost::process::child editor(CX_EDITOR_PATH, file, boost::process::start_dir(workingDir));
         editor.detach();
         Application::GetInstance().Close();
     }

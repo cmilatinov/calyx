@@ -36,6 +36,7 @@ namespace Calyx::Editor {
         uint64 m_gpuTime = 0;
         uint64 m_cpuTime = 0;
         uint64 m_primitives = 0;
+        uint64 m_fpsCounter = 0;
         uint64 m_fps = 0;
 
     };

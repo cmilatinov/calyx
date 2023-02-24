@@ -28,15 +28,17 @@
 #include <fmt/format.h>
 #include <fmt/chrono.h>
 #include <nlohmann/json.hpp>
+#include <cxxopts.hpp>
 
 #include "Macros.h"
 #include "Reflect.h"
 
 #include "ChronoUtils.h"
-#include "StringUtils.h"
-#include "UUIDUtils.h"
+#include "FileUtils.h"
 #include "FormatUtils.h"
 #include "PathUtils.h"
+#include "StringUtils.h"
+#include "UUIDUtils.h"
 #include "ValidationUtils.h"
 
 namespace Calyx {

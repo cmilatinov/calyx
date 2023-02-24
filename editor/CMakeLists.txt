@@ -1,34 +1,22 @@
-# Minimum Version
-cmake_minimum_required(VERSION 3.20)
-
-# C++ standard
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-# Compiler flags
-set(CMAKE_C_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DCX_DEBUG")
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DCX_DEBUG")
-if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -Wno-invalid-offsetof")
-endif ()
-
 # Includes
-include(../build/include/utils.cmake)
+include(../cmake/include/reflect.cmake)
 
 # Clump source files from src
 file(GLOB_RECURSE EDITOR_SRC "src/**.cpp")
 
 # Create executable from source
-add_executable("Editor" ${EDITOR_SRC})
+add_executable("CalyxEditor" ${EDITOR_SRC})
 
 # Link target
-target_link_libraries("Editor" PUBLIC "Engine")
-target_include_directories("Editor" PUBLIC "include")
-target_precompile_headers("Editor" PRIVATE "include/pch.h")
+target_link_libraries("CalyxEditor" PUBLIC CalyxEngine CalyxProject)
+target_include_directories("CalyxEditor" PUBLIC
+        "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+        "$<INSTALL_INTERFACE:include/calyx>")
+target_precompile_headers("CalyxEditor" PRIVATE "include/pch.h")
 
 # Add reflection
-add_reflected_target("Editor")
-add_reflected_headers("Editor" "include"
+add_reflected_target("CalyxEditor")
+add_reflected_headers("CalyxEditor" "include"
         "include/inspector/TypeInspector.h"
         "include/inspector/types/StringInspector.h"
         "include/inspector/types/Vec2Inspector.h"
@@ -38,4 +26,4 @@ add_reflected_headers("Editor" "include"
         "include/inspector/components/TransformComponentInspector.h")
 
 # Copy assets
-add_dir_copy("Editor" "$<TARGET_FILE_DIR:Editor>" "assets")
+add_dir_copy("CalyxEditor" "${PROJECT_SOURCE_DIR}/assets" "$<TARGET_FILE_DIR:CalyxEditor>/assets")

@@ -1,0 +1,24 @@
+@PACKAGE_INIT@
+
+# Required libraries
+find_dependency(assimp CONFIG REQUIRED)
+find_dependency(Boost CONFIG REQUIRED COMPONENTS system filesystem)
+find_dependency(Clang CONFIG REQUIRED)
+find_dependency(cxxopts CONFIG REQUIRED)
+find_dependency(efsw CONFIG REQUIRED)
+find_dependency(EnTT CONFIG REQUIRED)
+find_dependency(glad CONFIG REQUIRED)
+find_dependency(glfw3 CONFIG REQUIRED)
+find_dependency(glm CONFIG REQUIRED)
+find_dependency(imgui CONFIG REQUIRED)
+find_dependency(imguizmo CONFIG REQUIRED)
+find_dependency(implot CONFIG REQUIRED)
+find_dependency(inja CONFIG REQUIRED)
+find_dependency(nameof CONFIG REQUIRED)
+find_dependency(nlohmann_json CONFIG REQUIRED)
+find_dependency(spdlog CONFIG REQUIRED)
+find_path(STB_INCLUDE_DIRS "stb_image.h" REQUIRED)
+
+include("${CMAKE_CURRENT_LIST_DIR}/@CMAKE_PROJECT_NAME@Targets.cmake")
+
+check_required_components(@CMAKE_PROJECT_NAME@)

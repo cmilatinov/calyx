@@ -7,13 +7,13 @@ namespace Calyx::Editor {
     ContentBrowserPanel::ContentBrowserPanel(const Path& basePath)
         : m_objFileTexture(AssetRegistry::LoadAsset<Texture2D>("icons/block.png")),
           m_folderTexture(AssetRegistry::LoadAsset<Texture2D>("icons/folder-grey.png")),
-          m_rootDirectory(std::filesystem::absolute(basePath)),
+          m_rootDirectory(PathUtils::Normalize(basePath)),
           m_currentDirectory(m_rootDirectory) {}
 
     ContentBrowserPanel::ContentBrowserPanel(const String& basePath)
         : m_objFileTexture(AssetRegistry::LoadAsset<Texture2D>("icons/block.png")),
           m_folderTexture(AssetRegistry::LoadAsset<Texture2D>("icons/folder-grey.png")),
-          m_rootDirectory(std::filesystem::absolute(basePath)),
+          m_rootDirectory(PathUtils::Normalize(basePath)),
           m_currentDirectory(m_rootDirectory) {}
 
     void ContentBrowserPanel::Draw() {

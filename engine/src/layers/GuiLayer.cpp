@@ -1,6 +1,5 @@
 #include "layers/GuiLayer.h"
-
-#include <IconsMaterialDesign.h>
+#include "icons/MaterialDesign.h"
 
 namespace Calyx {
 

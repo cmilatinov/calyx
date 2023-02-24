@@ -1,10 +1,3 @@
-# Minimum Version
-cmake_minimum_required(VERSION 3.20)
-
-# C++ standard
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
 # Required libraries
 find_package(Boost REQUIRED)
 
@@ -12,11 +5,22 @@ find_package(Boost REQUIRED)
 file(GLOB_RECURSE LAUNCHER_SRC "src/**.cpp")
 
 # Create executable from source
-add_executable("Launcher" ${LAUNCHER_SRC})
+add_executable("CalyxLauncher" ${LAUNCHER_SRC})
 
 # Link target
-target_link_libraries("Launcher" PUBLIC Engine_STATIC Boost::boost)
-target_include_directories("Launcher" PUBLIC "include")
-target_precompile_headers("Launcher" PRIVATE "include/pch.h")
-target_compile_definitions("Launcher" PRIVATE "CX_EDITOR_PATH=\"$<TARGET_FILE:Editor>\"")
-add_dependencies("Launcher" Editor)
+target_link_libraries("CalyxLauncher" PUBLIC CalyxEngine CalyxProject Boost::boost)
+target_include_directories("CalyxLauncher" PUBLIC include)
+target_precompile_headers("CalyxLauncher" PRIVATE include/pch.h)
+target_compile_definitions("CalyxLauncher" PRIVATE "CX_EDITOR_PATH=\"./CalyxEditor\"")
+
+# Create symlink to editor
+add_dependencies("CalyxLauncher" CalyxEditor)
+add_custom_command(
+        TARGET "CalyxLauncher" PRE_LINK
+        COMMAND ${CMAKE_COMMAND} -E create_symlink
+        "$<TARGET_FILE:CalyxEditor>"
+        "${CMAKE_CURRENT_BINARY_DIR}/CalyxEditor"
+        BYPRODUCTS "${CMAKE_CURRENT_BINARY_DIR}/CalyxEditor")
+
+# Copy assets
+add_dir_copy("CalyxLauncher" "${PROJECT_SOURCE_DIR}/assets" "$<TARGET_FILE_DIR:CalyxLauncher>/assets")

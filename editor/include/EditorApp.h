@@ -5,7 +5,7 @@ namespace Calyx::Editor {
     class EditorApp : public Application {
 
     public:
-        EditorApp();
+        EditorApp(int argc, char** argv);
         ~EditorApp() override = default;
 
     };

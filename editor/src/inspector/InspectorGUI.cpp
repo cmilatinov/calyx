@@ -1,5 +1,6 @@
 #include "inspector/InspectorGUI.h"
 
+#include "ui/Widgets.h"
 #include "ecs/GameObject.h"
 
 #include <imgui.h>
@@ -16,14 +17,18 @@ namespace Calyx::Editor {
             ImGui::OpenPopup("##ComonentPicker");
         }
 
+        ImGui::SetNextWindowSizeConstraints({ 400, 0 }, { INFINITY, INFINITY });
         if (ImGui::BeginPopup("##ComonentPicker")) {
             if (ImGui::IsWindowAppearing()) {
                 s_componentList.clear();
                 AssetRegistry::SearchComponents(s_componentSearch, excluded, s_componentList);
-                ImGui::SetKeyboardFocusHere();
             }
 
-            if (ImGui::InputText("##ComponentSearch", &s_componentSearch, ImGuiInputTextFlags_AutoSelectAll)) {
+            if (Widgets::InputSearch(
+                "##ComponentSearch", "Filter by name...",
+                s_componentSearch, ImGuiInputTextFlags_AutoSelectAll,
+                ImGui::IsWindowAppearing()
+            )) {
                 s_componentList.clear();
                 AssetRegistry::SearchComponents(s_componentSearch, excluded, s_componentList);
             }
@@ -43,41 +48,46 @@ namespace Calyx::Editor {
         static String s_assetSearch{};
         static List<AssetRegistry::AssetMeta> s_assetList{};
 
+        bool changed = false;
         auto displayName = AssetRegistry::GetAssetDisplayName(value);
         if (ImGui::BeginCombo("##AssetSelect", displayName.c_str())) {
             if (ImGui::IsWindowAppearing()) {
                 s_assetList.clear();
                 AssetRegistry::SearchAssets(assetType, s_assetSearch, s_assetList);
-                ImGui::SetKeyboardFocusHere();
             }
 
-            ImGui::SetNextItemWidth(-FLT_MIN);
-            if (ImGui::InputText("##AssetSearch", &s_assetSearch, ImGuiInputTextFlags_AutoSelectAll)) {
+            if (Widgets::InputSearch(
+                "##AssetSearch", "Filter by name...",
+                s_assetSearch, ImGuiInputTextFlags_AutoSelectAll,
+                ImGui::IsWindowAppearing()
+            )) {
                 s_assetList.clear();
                 AssetRegistry::SearchAssets(assetType, s_assetSearch, s_assetList);
             }
 
             if (ImGui::Selectable("None", !value)) {
                 value = Ref<IAsset>();
+                changed = true;
             }
 
             for (const auto& asset: s_assetList) {
                 auto id = AssetRegistry::GetAssetID(value);
                 if (ImGui::Selectable(asset.displayName.c_str(), asset.id == id)) {
                     value = AssetRegistry::LoadAsset(asset.id);
+                    changed = true;
                 }
             }
             ImGui::EndCombo();
         }
 
-        return false;
+        return changed;
     }
 
     bool InspectorGUI::TextControl(const String& name, String& value, bool readonly) {
         ImGuiInputTextFlags flags = ImGuiInputTextFlags_AutoSelectAll;
         if (readonly)
             flags |= ImGuiInputTextFlags_ReadOnly;
-        return ImGui::InputText(("##" + name).c_str(), &value, flags);
+        return Widgets::InputText("##" + name, value, flags);
     }
 
     bool InspectorGUI::Vec3Control(const String& name, vec3& value, float speed) {

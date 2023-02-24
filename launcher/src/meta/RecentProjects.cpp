@@ -79,7 +79,7 @@ namespace Calyx::Launcher {
             );
         }
 
-        file << projects.dump(4);
+        file << std::setw(4) << projects;
     }
 
     void RecentProjects::_AddProject(const String& name, const Path& file) {
@@ -94,6 +94,10 @@ namespace Calyx::Launcher {
                 .color = s_materialColors[i]
             }
         );
+    }
+
+    void RecentProjects::_RemoveProject(const Path& file) {
+        std::erase_if(m_projectList, [&file](const auto& project) { return project.file == file; });
     }
 
     List<ProjectMeta> RecentProjects::_SearchProjects(const String& query) {
