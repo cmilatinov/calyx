@@ -1,7 +1,5 @@
 #pragma once
 
-#include "math/Transform.h"
-
 namespace Calyx {
 
     class CALYX_API Camera {

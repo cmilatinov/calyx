@@ -1,6 +1,7 @@
 @PACKAGE_INIT@
 
 # Required libraries
+include(CMakeFindDependencyMacro)
 find_dependency(assimp CONFIG REQUIRED)
 find_dependency(Boost CONFIG REQUIRED COMPONENTS system filesystem)
 find_dependency(Clang CONFIG REQUIRED)

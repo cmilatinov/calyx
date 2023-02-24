@@ -1,6 +1,7 @@
 #pragma once
 
 #include "render/Camera.h"
+#include "math/Transform.h"
 
 namespace Calyx::Editor {
 
