@@ -29,7 +29,8 @@ install(TARGETS CalyxUtils CalyxReflectLib CalyxEngine CalyxProject CalyxEditor
         ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
         LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
         INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/calyx")
-install(TARGETS CalyxLauncher
+install(TARGETS CalyxReflectTool CalyxLauncher
+        EXPORT CalyxTargets
         RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}/calyx")
 install(DIRECTORY "${CMAKE_BINARY_DIR}/editor/assets" DESTINATION "${CMAKE_INSTALL_BINDIR}/calyx")
 
@@ -50,6 +51,8 @@ configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/Config.cmake.in
 install(FILES
         "${CMAKE_CURRENT_BINARY_DIR}/CalyxConfig.cmake"
         "${CMAKE_CURRENT_BINARY_DIR}/CalyxConfigVersion.cmake"
+        "${CMAKE_CURRENT_SOURCE_DIR}/cmake/include/reflect.cmake"
+        "${CMAKE_CURRENT_SOURCE_DIR}/cmake/include/utils.cmake"
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME_LOWER})
 
 # Add ldconfig file on UNIX platforms

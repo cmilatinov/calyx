@@ -6,9 +6,10 @@ namespace Calyx {
 
     void Time::UpdateTime() {
         auto currentTime = Clock::now();
-        m_deltaTime = DurationCast<Microseconds>(currentTime - m_lastTime).count() / 1e6;
-        m_staticTime += m_deltaTime;
-        m_time += m_deltaTime * m_timeScale;
+        m_staticDeltaTime = DurationCast<Microseconds>(currentTime - m_lastTime).count() / 1e6;
+        m_deltaTime = m_staticDeltaTime * m_timeScale;
+        m_staticTime += m_staticDeltaTime;
+        m_time += m_deltaTime;
         m_lastTime = currentTime;
     }
 

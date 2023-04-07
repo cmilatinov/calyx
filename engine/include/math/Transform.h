@@ -1,6 +1,7 @@
 #pragma once
 
 #include "math/Math.h"
+#include "serialization/TypeSerializerFunctions.h"
 
 namespace Calyx {
 
@@ -22,8 +23,9 @@ namespace Calyx {
         vec3 Left() const;
         vec3 Right() const;
 
+        void LookAt(const vec3& position);
+
         void Reset();
-        void UpdateTransform() { return UpdateMatrix(); }
 
         void SetParent(Transform* parent) { m_parent = parent; }
         void SetPosition(const vec3& position);
@@ -64,6 +66,8 @@ namespace Calyx {
 
         void UpdateMatrix();
         void UpdateComponents();
+
+        void CX_ON_POST_DESERIALIZE();
 
     };
 

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ecs/ComponentDefinitions.h"
 #include "ecs/GameObject.h"
 #include "assets/Asset.h"
 
@@ -23,7 +24,15 @@ namespace Calyx {
 
     private:
         virtual entt::meta_any Emplace(entt::entity entity, entt::registry& registry) = 0;
+        virtual entt::meta_any EmplaceCopy(
+            entt::entity entity,
+            entt::registry& registry,
+            const entt::meta_any& src
+        ) = 0;
         virtual void Erase(entt::entity entity, entt::registry& registry) = 0;
+
+    protected:
+        GameObject* m_gameObject = nullptr;
 
     };
 
@@ -68,12 +77,34 @@ namespace Calyx {
             return m_gameObject->GetComponent<C>();
         }
 
-    protected:
-        GameObject* m_gameObject = nullptr;
+        GameObject* Instantiate(const String& name = "Game Object", GameObject* parent = nullptr) {
+            return m_gameObject->m_scene->CreateGameObject(name, parent);
+        }
+
+        void Destroy() {
+            m_gameObject->m_scene->DeleteGameObject(m_gameObject);
+        }
 
     private:
         entt::meta_any Emplace(entt::entity entity, entt::registry& registry) override {
-            return entt::forward_as_any(registry.emplace<T>(entity));
+            auto type = entt::resolve<T>();
+            if (auto storage = registry.storage(type.id());
+                storage != nullptr && storage->contains(entity)) {
+                return entt::resolve<T>().from_void(storage->get(entity));
+            }
+            auto& component = registry.emplace<T>(entity);
+            return type.from_void(&component);
+        }
+
+        entt::meta_any EmplaceCopy(
+            entt::entity entity,
+            entt::registry& registry,
+            const entt::meta_any& src
+        ) override {
+            auto component = Emplace(entity, registry);
+            CX_CORE_ASSERT(src.type() == entt::resolve<T>(), "Component type mismatch!");
+            component.assign(src);
+            return component;
         }
 
         void Erase(entt::entity entity, entt::registry& registry) override {

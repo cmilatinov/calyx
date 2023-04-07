@@ -1,8 +1,9 @@
 #include "layers/LauncherLayer.h"
-#include "project/ProjectGenerator.h"
+#include "generators/ProjectGenerator.h"
 
 #include <imgui.h>
 #include <imgui_stdlib.h>
+#include <boost/process.hpp>
 
 namespace Calyx::Launcher {
 

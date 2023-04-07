@@ -7,10 +7,16 @@
 #define CX_ASSET_REGISTRY_FRIEND()                          \
 friend class ::Calyx::AssetRegistry;
 
+namespace Calyx::Editor {
+    class AssemblyBuilder;
+}
+
 namespace Calyx {
 
     class AssetRegistry : public efsw::FileWatchListener {
     CX_SINGLETON(AssetRegistry);
+
+        friend class Editor::AssemblyBuilder;
 
     public:
         struct AssetMeta {
@@ -228,7 +234,8 @@ namespace Calyx {
         const AssetMeta* _GetAssetMeta(const IAsset* ptr);
         const AssetMeta* _GetAssetMeta(const Ref<IAsset>& ref);
 
-        void RegisterCoreComponents();
+        void RemoveComponents();
+        void RegisterComponents();
 
     private:
         Scope<efsw::FileWatcher> m_assetWatcher;

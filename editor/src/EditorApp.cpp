@@ -1,12 +1,14 @@
 #include "EditorApp.h"
 #include "layers/EditorLayer.h"
 #include "project/ProjectManager.h"
+#include "background/BackgroundTaskManager.h"
 
 namespace Calyx::Editor {
 
     EditorApp::EditorApp(int argc, char** argv) {
         ProjectManager::Init();
         Inspector::Init();
+        BackgroundTaskManager::Init();
         Window::GetMainWindow().SetTitle("Calyx Editor");
 
         cxxopts::Options options("Calyx Editor", "Calyx game engine editor application.");

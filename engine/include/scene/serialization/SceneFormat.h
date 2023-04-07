@@ -7,10 +7,6 @@
 
 namespace Calyx {
 
-    struct SceneObject {
-        uint128 id;
-    };
-
     struct SceneHeader {
         uint64 magic;
         struct {
@@ -19,12 +15,5 @@ namespace Calyx {
         } version;
         uint64 objectCount;
     };
-
-
-
-    struct SceneData {
-
-    };
-
 
 };

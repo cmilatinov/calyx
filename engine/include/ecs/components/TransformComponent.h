@@ -9,8 +9,6 @@ namespace Calyx {
         CX_BEGIN_REFLECT();
 
     public:
-        TransformComponent() = default;
-
         String GetDisplayName() const override { return "Transform"; }
         Transform& GetTransform() { return m_transform; }
 

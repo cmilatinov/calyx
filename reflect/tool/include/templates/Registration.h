@@ -11,6 +11,10 @@ CX_REFLECT_REGISTRATION {
     // Class '{{class.fullName}}'
     entt::meta<{{class.fullName}}>()
         .type("{{class.fullName}}"_hs)
+        .prop(CX_REFLECT_TYPE_TRAITS,
+            CX_TRAIT(CX_TRAIT_TRIVIALLY_COPYABLE, std::is_trivially_copyable_v<{{class.fullName}}>) |
+            CX_TRAIT(CX_TRAIT_DEFAULT_CONSTRUCTIBLE, std::is_default_constructible_v<{{class.fullName}}>)
+        )
         .prop(CX_REFLECT_FIELD_META, Core::FieldMetaMap({
 ## for field in class.fields
             {
@@ -39,10 +43,6 @@ CX_REFLECT_REGISTRATION {
 ## endfor
         ;
 
-## for base in class.bases
-    Core::RegisterDerivedClass(entt::resolve<{{base}}>(), entt::resolve<{{class.fullName}}>());
-## endfor
-
 ## if length(class.ref_conversions) > 0
     entt::meta<Ref<{{class.fullName}}>>()
 ## for ref in class.ref_conversions
@@ -51,6 +51,26 @@ CX_REFLECT_REGISTRATION {
         .conv<entt::overload<Ref<{{ref}}> (const Ref<{{class.fullName}}>&)>(&std::static_pointer_cast<{{ref}}, {{class.fullName}}>)>()
 ## endfor
         ;
+## endif
+
+## for base in class.bases
+    Core::RegisterDerivedClass(entt::resolve<{{base}}>(), entt::resolve<{{class.fullName}}>());
+## endfor
+## endfor
+}
+
+CX_REFLECT_DEREGISTRATION {
+    using namespace Calyx::Reflect;
+    using namespace entt::literals;
+
+## for class in classes
+    // Class '{{class.fullName}}'
+## for base in class.bases
+    Core::RemoveDerivedClass(entt::resolve<{{base}}>(), entt::resolve<{{class.fullName}}>());
+## endfor
+    entt::meta_reset<{{class.fullName}}>();
+## if length(class.ref_conversions) > 0
+    entt::meta_reset<Ref<{{class.fullName}}>>();
 ## endif
 ## endfor
 })";

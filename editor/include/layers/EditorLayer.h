@@ -8,28 +8,23 @@
 
 #include "math/ScreenSpaceUtils.h"
 #include "input/Input.h"
-#include "render/CameraEditor.h"
-#include "scene/SceneRenderer.h"
-#include "windows/SceneHierarchyPanel.h"
-#include "windows/ContentBrowserPanel.h"
-#include "windows/StatisticsPanel.h"
 #include "inspector/Inspector.h"
 #include "inspector/InspectorGUI.h"
 #include "assets/Assets.h"
 
-namespace Calyx::Editor {
+#include "windows/SceneHierarchyPanel.h"
+#include "windows/ContentBrowserPanel.h"
+#include "windows/StatisticsPanel.h"
+#include "windows/ViewportPanel.h"
+#include "windows/InspectorPanel.h"
 
-    struct ViewportState {
-        vec2 size;
-        vec4 bounds;
-        bool pressed;
-        bool hovered;
-        bool focused;
-    };
+namespace Calyx::Editor {
 
     class EditorLayer : public ILayer {
 
     public:
+        ~EditorLayer() override;
+
         void OnAttach() override;
         void OnUpdate() override;
         void OnGUI() override;
@@ -39,40 +34,14 @@ namespace Calyx::Editor {
 
     private:
         // Scene
-        Scope<SceneRenderer> m_sceneRenderer;
-        Scope<Scene> m_scene;
-        Scope<CameraEditor> m_editorCamera;
-        Scope<SceneHierarchyPanel> m_sceneHierarchyPanel;
-        Scope<ContentBrowserPanel> m_contentBrowserPanel;
-        Scope<StatisticsPanel> m_statsPanel;
-
-        // Grid
-        Ref<Mesh> m_grid;
-        Ref<Shader> m_gridShader;
-
-        // Framebuffers
-        Ref<Framebuffer> m_framebuffer;
-        Ref<Framebuffer> m_msaaFramebuffer;
-
-        // Viewport
-        ViewportState m_viewport{};
-
-        // Gizmos
-        int m_gizmoType = ImGuizmo::OPERATION::TRANSLATE;
-
-        // Components
-        List<entt::meta_type> m_reflectedComponents;
-
-        // TODO: Remove
-        GameObject* m_cube;
+        SceneHierarchyPanel m_sceneHierarchyPanel;
+        ContentBrowserPanel m_contentBrowserPanel;
+        StatisticsPanel m_statsPanel;
+        ViewportPanel m_viewportPanel;
+        InspectorPanel m_inspectorPanel;
 
         void BeginDockspace();
         void MenuBar();
-        void Viewport();
-        void SceneHierarchy();
-        void Statistics();
-        void Inspector();
-        void ContentBrowser();
         void EndDockspace();
 
     };

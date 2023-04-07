@@ -4,8 +4,19 @@ namespace Calyx::Reflect {
 
     void Core::RegisterDerivedClass(const entt::meta_type& base, const entt::meta_type& derived) {
         auto& derivedClasses = GetDerivedClassMap();
-        if (derived) {
-            derivedClasses[base.id()].push_back(derived);
+        auto& baseClasses = GetBaseClassMap();
+        if (base && derived) {
+            derivedClasses[base.id()].insert(derived.id());
+            baseClasses[derived.id()].insert(base.id());
+        }
+    }
+
+    void Core::RemoveDerivedClass(const entt::meta_type& base, const entt::meta_type& derived) {
+        auto& derivedClasses = GetDerivedClassMap();
+        auto& baseClasses = GetBaseClassMap();
+        if (base && derived) {
+            derivedClasses[base.id()].erase(derived.id());
+            baseClasses[derived.id()].erase(base.id());
         }
     }
 
@@ -17,9 +28,10 @@ namespace Calyx::Reflect {
 
     void Core::CollectDerivedClasses(const entt::meta_type& type, std::vector<entt::meta_type>& derivedList) {
         auto& derivedClasses = GetDerivedClassMap();
-        for (auto& derived: derivedClasses[type.id()]) {
-            derivedList.push_back(derived);
-            CollectDerivedClasses(derived, derivedList);
+        for (const auto& derived: derivedClasses[type.id()]) {
+            auto derivedType = entt::resolve(derived);
+            derivedList.push_back(derivedType);
+            CollectDerivedClasses(derivedType, derivedList);
         }
     }
 
@@ -54,6 +66,34 @@ namespace Calyx::Reflect {
         return static_cast<uint8_t*>(instancePtr) + fieldOffset;
     }
 
+    bool Core::HasBase(const entt::meta_type& type, const entt::meta_type& base) {
+        auto& baseClasses = GetBaseClassMap();
+        if (baseClasses[type.id()].contains(base.id()))
+            return true;
+        return std::ranges::any_of(
+            baseClasses[type.id()],
+            [&base](auto& b) { return HasBase(entt::resolve(b), base); }
+        );
+    }
+
+    bool Core::HasTypeTrait(const entt::meta_type& type, uint32_t trait) {
+        using namespace entt::literals;
+
+        auto prop = type.prop(CX_REFLECT_TYPE_TRAITS);
+        if (!prop)
+            return false;
+
+        auto typeTraitsAny = prop.value();
+        if (!typeTraitsAny)
+            return false;
+
+        auto* typeTraits = typeTraitsAny.try_cast<const uint32_t>();
+        if (typeTraits == nullptr)
+            return false;
+
+        return *typeTraits & trait;
+    }
+
     entt::meta_any Core::CreateOpaqueReference(const entt::meta_type& type, void* ref) {
         return type.from_void(ref);
     }
@@ -80,18 +120,27 @@ namespace Calyx::Reflect {
     const Core::FieldMeta* Core::GetFieldMeta(const entt::meta_type& type, entt::id_type fieldId) {
         using namespace entt::literals;
 
-        auto fieldMetaAny = type.prop(CX_REFLECT_FIELD_META).value();
+        auto prop = type.prop(CX_REFLECT_FIELD_META);
+        if (!prop)
+            return nullptr;
+
+        auto fieldMetaAny = prop.value();
         if (!fieldMetaAny)
             return nullptr;
 
         const auto* fieldMeta = fieldMetaAny.try_cast<const FieldMetaMap>();
-        if (fieldMeta == nullptr || !fieldMeta->count(fieldId))
+        if (fieldMeta == nullptr || !fieldMeta->contains(fieldId))
             return nullptr;
 
         return &fieldMeta->at(fieldId);
     }
 
     Core::ClassMap& Core::GetDerivedClassMap() {
+        static ClassMap map{};
+        return map;
+    }
+
+    Core::ClassMap& Core::GetBaseClassMap() {
         static ClassMap map{};
         return map;
     }

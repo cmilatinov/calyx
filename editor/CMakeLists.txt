@@ -1,4 +1,5 @@
 # Includes
+include(../cmake/include/utils.cmake)
 include(../cmake/include/reflect.cmake)
 
 # Clump source files from src
@@ -19,6 +20,7 @@ add_reflected_target("CalyxEditor")
 add_reflected_headers("CalyxEditor" "include"
         "include/inspector/TypeInspector.h"
         "include/inspector/types/StringInspector.h"
+        "include/inspector/types/FloatInspector.h"
         "include/inspector/types/Vec2Inspector.h"
         "include/inspector/types/Vec3Inspector.h"
         "include/inspector/types/AssetInspector.h"

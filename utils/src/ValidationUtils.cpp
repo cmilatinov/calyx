@@ -6,4 +6,9 @@ namespace Calyx::ValidationUtils {
         return !value.empty();
     }
 
+    bool ValidateAlphaOnly(const std::string& value) {
+        std::regex rgx("[^a-zA-Z]");
+        return !std::regex_match(value, rgx);
+    }
+
 }

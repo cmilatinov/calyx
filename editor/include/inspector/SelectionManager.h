@@ -58,6 +58,9 @@ namespace Calyx::Editor {
         bool IsGameObjectSelection() const { return m_type.id() == entt::resolve<GameObject>().id(); }
 
         template<typename T>
+        bool IsOfType() const { return m_type == entt::resolve<T>(); }
+
+        template<typename T>
         bool IsItemSelected(T* item) const { return m_selectedItems.contains(reinterpret_cast<void*>(item)); }
 
         const entt::meta_type& GetType() const { return m_type; }
@@ -80,12 +83,12 @@ namespace Calyx::Editor {
     public:
         SelectionManager() = default;
 
+        CX_SINGLETON_EXPOSE_METHOD(_ClearSelection, void ClearSelection());
         CX_SINGLETON_EXPOSE_METHOD(
             _SetCurrentSelection,
             void SetCurrentSelection(const Selection& selection),
             selection
         );
-        CX_SINGLETON_EXPOSE_METHOD(_SetCurrentSelection, void SetCurrentSelection(Selection&& selection), selection);
         CX_SINGLETON_EXPOSE_METHOD(_GetCurrentSelection, const Selection& GetCurrentSelection());
 
         template<typename T>
@@ -94,8 +97,8 @@ namespace Calyx::Editor {
     private:
         Selection m_currentSelection;
 
+        void _ClearSelection() { m_currentSelection = Selection(); }
         void _SetCurrentSelection(const Selection& selection) { m_currentSelection = selection; }
-        void _SetCurrentSelection(Selection&& selection) { m_currentSelection = selection; }
         const Selection& _GetCurrentSelection() const { return m_currentSelection; }
 
         template<typename T>

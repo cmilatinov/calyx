@@ -1,11 +1,17 @@
 #include "windows/SceneHierarchyPanel.h"
+#include "inspector/SelectionManager.h"
+#include "scene/SceneManager.h"
+#include "ui/Widgets.h"
+
+#include <imgui.h>
 
 namespace Calyx::Editor {
 
-    SceneHierarchyPanel::SceneHierarchyPanel(Scene* scene)
-        : m_scene(scene) {}
-
     void SceneHierarchyPanel::Draw() {
+        m_scene = SceneManager::GetSimulationOrCurrentScene();
+        if (m_scene == nullptr)
+            return;
+
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
         ImGui::Begin("Scene Objects", nullptr, ImGuiWindowFlags_NoCollapse);
         ImGui::PopStyleVar();
@@ -19,7 +25,7 @@ namespace Calyx::Editor {
 
         if (ImGui::BeginTable(
             "Scene Objects", 1,
-            ImGuiTableFlags_BordersOuterH |
+            ImGuiTableFlags_BordersH |
             ImGuiTableFlags_RowBg |
             ImGuiTableFlags_NoPadInnerX
         )) {
@@ -27,9 +33,12 @@ namespace Calyx::Editor {
             ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_NoHide);
             ImGui::PopStyleVar();
             ImGui::TableHeadersRow();
+            ImGui::PushStyleColor(ImGuiCol_Header, CX_COLOR_PRIMARY);
+            ImGui::PushStyleColor(ImGuiCol_HeaderHovered, CX_COLOR_PRIMARY_HOVERED);
             for (auto* rootGameObject: m_scene->GetRootGameObjects()) {
                 DrawGameObjectNode(rootGameObject);
             }
+            ImGui::PopStyleColor(2);
             ImGui::EndTable();
         }
 
@@ -40,12 +49,18 @@ namespace Calyx::Editor {
         ImGui::TableNextRow();
         ImGui::TableNextColumn();
         bool isSelected = SelectionManager::IsSelected(gameObject);
+        if (isSelected) {
+            ImGui::PushStyleColor(ImGuiCol_HeaderHovered, CX_COLOR_PRIMARY);
+        }
         int flags = (gameObject->GetChildren().empty() ? ImGuiTreeNodeFlags_Leaf : 0) |
                     (isSelected ? ImGuiTreeNodeFlags_Selected : 0) |
                     ImGuiTreeNodeFlags_OpenOnArrow |
                     ImGuiTreeNodeFlags_OpenOnDoubleClick |
                     ImGuiTreeNodeFlags_SpanFullWidth;
         bool open = ImGui::TreeNodeEx(gameObject, flags, "%s", gameObject->GetName().c_str());
+        if (isSelected) {
+            ImGui::PopStyleColor();
+        }
 
         if (ImGui::IsItemClicked(ImGuiMouseButton_Left)) {
             if (isSelected)

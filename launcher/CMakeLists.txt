@@ -9,7 +9,9 @@ add_executable("CalyxLauncher" ${LAUNCHER_SRC})
 
 # Link target
 target_link_libraries("CalyxLauncher" PUBLIC CalyxEngine CalyxProject Boost::boost)
-target_include_directories("CalyxLauncher" PUBLIC include)
+target_include_directories("CalyxLauncher" PUBLIC
+        "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+        "$<INSTALL_INTERFACE:include/calyx>")
 target_precompile_headers("CalyxLauncher" PRIVATE include/pch.h)
 target_compile_definitions("CalyxLauncher" PRIVATE "CX_EDITOR_PATH=\"./CalyxEditor\"")
 

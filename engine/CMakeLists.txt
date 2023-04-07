@@ -1,4 +1,5 @@
 # Includes
+include(../cmake/include/utils.cmake)
 include(../cmake/include/reflect.cmake)
 
 # Required libraries
@@ -65,6 +66,7 @@ add_reflected_headers("CalyxEngine" "include"
         "include/assets/Asset.h"
         "include/assets/Mesh.h"
         "include/assets/Assembly.h"
+        "include/render/Camera.h"
         "include/render/objects/Shader.h"
         "include/render/objects/Texture2D.h"
         "include/ecs/Component.h"
@@ -72,8 +74,8 @@ add_reflected_headers("CalyxEngine" "include"
         "include/ecs/components/MeshComponent.h"
         "include/ecs/components/TransformComponent.h"
         "include/math/Transform.h"
-        "include/serialization/DefaultSerializers.h"
-        "include/serialization/types/AssetSerializer.h")
+        "include/serialization/types/AssetSerializer.h"
+        "include/serialization/types/StringSerializer.h")
 target_sources("CalyxEngine" PRIVATE "src/reflect/Global.cpp")
 
 # Compile definitions based on platform

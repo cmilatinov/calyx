@@ -21,5 +21,20 @@ set(ASSEMBLY_{{ assembly.name }}_SRC
 )
 add_library(Assembly{{ assembly.name }} SHARED ${ASSEMBLY_{{ assembly.name }}_SRC})
 target_include_directories(Assembly{{ assembly.name }} PUBLIC "${ASSET_DIR}")
+target_link_libraries(Assembly{{ assembly.name }} PUBLIC Calyx::CalyxEngine)
+target_precompile_headers(Assembly{{ assembly.name }} PRIVATE pch.h)
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    target_compile_options(Assembly{{ assembly.name }} PRIVATE "-fno-gnu-unique")
+endif()
+
+## if length(assembly.source_headers) > 0
+# Assembly '{{ assembly.name }}' reflection
+add_reflected_target(Assembly{{ assembly.name }})
+add_reflected_headers(Assembly{{ assembly.name }} "${ASSET_DIR}"
+## for source_header in assembly.source_headers
+    "{{ source_header }}"
+## endfor
+)
+## endif
 ## endfor
 )";

@@ -325,16 +325,15 @@ namespace Calyx {
                     ImGui::TableNextColumn();
 
                     String icon = file->type == FileSystem::file_type::directory ? ICON_MD_FOLDER : ICON_MD_DESCRIPTION;
-                    icon += " ";
-                    ImGui::PushStyleColor(ImGuiCol_Header, { CX_RGBA_FROM_HEX(0xFF0277BD) });
+                    ImGui::PushStyleColor(ImGuiCol_Header, CX_COLOR_PRIMARY);
                     bool selected = context.m_dialogSelection.Contains(file->path.lexically_normal().string());
                     if (selected) {
-                        ImGui::PushStyleColor(ImGuiCol_HeaderHovered, { CX_RGBA_FROM_HEX(0xFF0277BD) });
+                        ImGui::PushStyleColor(ImGuiCol_HeaderHovered, CX_COLOR_PRIMARY);
                     } else {
-                        ImGui::PushStyleColor(ImGuiCol_HeaderHovered, { CX_RGBA_FROM_HEX(0x600277BD) });
+                        ImGui::PushStyleColor(ImGuiCol_HeaderHovered, CX_COLOR_PRIMARY_HOVERED);
                     }
                     if (ImGui::Selectable(
-                        (icon + file->name).c_str(),
+                        (icon + " " + file->name).c_str(),
                         selected, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_DontClosePopups |
                                   ImGuiSelectableFlags_AllowDoubleClick
                     )) {
@@ -479,6 +478,19 @@ namespace Calyx {
         ImGui::EndTable();
         ImGui::PopStyleVar();
         s_isWindowActions = false;
+    }
+
+    void Widgets::OpenPopup(const StringView& name) {
+        ImGui::OpenPopup(name.data());
+    }
+
+    bool Widgets::BeginPopupModal(const StringView& name, float minWidth, ImGuiWindowFlags flags) {
+        ImGui::SetNextWindowSizeConstraints({ minWidth, -1.0f },{ INFINITY, -1.0f });
+        return ImGui::BeginPopupModal(name.data(), nullptr, flags);
+    }
+
+    void Widgets::EndPopup() {
+        ImGui::EndPopup();
     }
 
     void Widgets::PushFrameStyle(bool button) {

@@ -69,9 +69,9 @@ namespace Calyx {
 
     void GuiLayer::SetupImGuiTheme() {
         // Add fonts
-        const float fontSizeNormal = 22.0f;
-        const float fontSizeSmall = 18.0f;
-        const float fontSizeLarge = 30.0f;
+        const float fontSizeNormal = 20.0f;
+        const float fontSizeSmall = 16.0f;
+        const float fontSizeLarge = 32.0f;
         static const ImWchar iconRanges[] = { 1, ICON_MAX_16_MD, 0 };
         auto& io = ImGui::GetIO();
         io.Fonts->AddFontFromFileTTF("assets/fonts/inconsolata/Inconsolata-Regular.ttf", fontSizeSmall, nullptr, iconRanges);
@@ -107,8 +107,8 @@ namespace Calyx {
 
         // Tabs
         colors[ImGuiCol_Tab] = ImVec4{ 0.15f, 0.1505f, 0.151f, 1.0f };
-        colors[ImGuiCol_TabHovered] = ImVec4{ 0.38f, 0.3805f, 0.381f, 1.0f };
-        colors[ImGuiCol_TabActive] = ImVec4{ 0.28f, 0.2805f, 0.281f, 1.0f };
+        colors[ImGuiCol_TabHovered] = ImVec4{ CX_RGBA_FROM_HEX(0x600277BD) };
+        colors[ImGuiCol_TabActive] = ImVec4{ CX_RGBA_FROM_HEX(0xFF0277BD) };
         colors[ImGuiCol_TabUnfocused] = ImVec4{ 0.15f, 0.1505f, 0.151f, 1.0f };
         colors[ImGuiCol_TabUnfocusedActive] = ImVec4{ 0.2f, 0.205f, 0.21f, 1.0f };
 

@@ -1,9 +1,17 @@
 #pragma once
 
+#include "serialization/TypeSerializerFunctions.h"
+
 namespace Calyx {
+
+    namespace Editor {
+        class CameraComponentInspector;
+    }
 
     class CALYX_API Camera {
         CX_BEGIN_REFLECT();
+
+        friend class Editor::CameraComponentInspector;
 
     public:
         explicit Camera(
@@ -30,8 +38,6 @@ namespace Calyx {
         void SetNearPlane(float nearPlane);
         void SetFarPlane(float farPlane);
 
-        void Update() { return UpdateProjectionMatrix(); }
-
     protected:
         CX_PROPERTY(CX_SERIALIZE)
         float m_fov;
@@ -46,6 +52,8 @@ namespace Calyx {
 
     private:
         void UpdateProjectionMatrix();
+
+        void CX_ON_POST_DESERIALIZE();
 
     };
 

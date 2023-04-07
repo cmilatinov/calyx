@@ -5,8 +5,16 @@
 namespace Calyx {
 
     class IComponent;
+    template<typename T>
+    class Component;
+
     class SceneExporter;
     class SceneImporter;
+
+    namespace Editor {
+        class EditorLayer;
+        class InspectorPanel;
+    }
 
     class CALYX_API GameObject {
 
@@ -14,6 +22,10 @@ namespace Calyx {
         friend class SceneExporter;
         friend class SceneImporter;
         friend class Editor::EditorLayer;
+        friend class Editor::InspectorPanel;
+
+        template<typename T>
+        friend class Component;
 
         template<typename T, typename ... Args>
         friend constexpr Scope<T> Calyx::CreateScope(Args&& ... args);
@@ -30,7 +42,7 @@ namespace Calyx {
             return &component;
         }
 
-        void AddComponent(const entt::meta_type& type);
+        entt::meta_any AddComponent(const entt::meta_type& type, const entt::meta_any& src = entt::meta_any());
 
         template<typename T>
         void RemoveComponent() {
@@ -46,12 +58,14 @@ namespace Calyx {
             return nullptr;
         }
 
-        bool HasComponent(const entt::meta_type& type);
+        entt::meta_any GetComponent(const entt::meta_type& type);
 
         template<typename T>
         bool HasComponent() {
             return m_scene->m_entityRegistry.all_of<T>(m_entityID);
         }
+
+        bool HasComponent(const entt::meta_type& type);
 
         void AddChild(GameObject* child);
         void SetParent(GameObject* parent);

@@ -38,7 +38,16 @@ namespace Calyx {
         static void NextAction();
         static void EndActions();
 
+        static void OpenPopup(const StringView& name);
+        static bool BeginPopupModal(
+            const StringView& name,
+            float minWidth = 500.0f,
+            ImGuiWindowFlags flags = ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings
+        );
+        static void EndPopup();
+
         static constexpr float GetItemSpacing() { return s_itemSpacing; }
+        static constexpr float GetFramePadding() { return s_framePadding; }
         static float GetFrameHeight();
         static float GetFrameHeightWithSpacing();
         static vec2 GetIconButtonSize(const String& buttonLabel);
@@ -46,11 +55,11 @@ namespace Calyx {
         static void PushFont(int font);
         static void PopFont();
 
-    private:
         static void PushFrameStyle(bool button = false);
         static void PopFrameStyle();
         static void NextItemFullWidth();
 
+    private:
         static String RenderInputLabel(const String& label, const String& tooltip = "");
 
     private:

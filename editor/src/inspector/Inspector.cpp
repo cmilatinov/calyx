@@ -19,7 +19,7 @@ namespace Calyx::Editor {
         List<entt::meta_type> derivedClasses = Reflect::Core::GetDerivedClasses(type);
 
         // TODO: Find a way around this
-        for (const auto& component: ClassRegistry::GetComponentClasses()) {
+        for (const auto& [component, _]: ClassRegistry::GetComponentClasses()) {
             auto it = std::remove(derivedClasses.begin(), derivedClasses.end(), component);
             derivedClasses.erase(it);
         }

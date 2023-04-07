@@ -56,6 +56,14 @@ namespace Calyx {
         return TransformDirection(vec3(1, 0, 0));
     }
 
+    void Transform::LookAt(const vec3& position) {
+        auto diff = m_position - position;
+        if (glm::length(diff) <= 0.00001f) return;
+        quat rotation = glm::quatLookAt(glm::normalize(diff), vec3(0, 1, 0));
+        m_rotation = glm::degrees(glm::eulerAngles(rotation));
+        UpdateMatrix();
+    }
+
     void Transform::Reset() {
         return SetWorldMatrix(glm::identity<mat4>());
     }
@@ -163,6 +171,10 @@ namespace Calyx {
 
     void Transform::UpdateComponents() {
         Math::DecomposeTransform(m_matrix, m_position, m_rotation, m_scale);
+    }
+
+    void Transform::CX_ON_POST_DESERIALIZE() {
+        UpdateComponents();
     }
 
 }

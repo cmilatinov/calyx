@@ -18,6 +18,11 @@ namespace Calyx {
             return reinterpret_cast<const char*>(ptr);
         }
 
+        template<typename T>
+        static inline void Write(std::ostream& stream, const T& src) {
+            stream.write(reinterpret_cast<const char*>(&src), sizeof(src));
+        }
+
     private:
         const Scene& m_scene;
 

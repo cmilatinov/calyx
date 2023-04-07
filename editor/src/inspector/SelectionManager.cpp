@@ -11,8 +11,7 @@ namespace Calyx::Editor {
         : m_selection(selection), m_iterator(iterator) {}
 
     Selection::Iterator::value_type Selection::Iterator::operator*() const {
-        void* elem = *m_iterator;
-        return m_selection->m_type.from_void(elem);
+        return Reflect::Core::CreateOpaqueReference(m_selection->m_type, *m_iterator);
     }
 
     Selection::Iterator Selection::Iterator::operator++() {

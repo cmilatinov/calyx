@@ -14,7 +14,7 @@ namespace Calyx {
     AssetRegistry::AssetRegistry()
         : m_assetWatcher(CreateScope<efsw::FileWatcher>()) {
         InitAssetTypes();
-        RegisterCoreComponents();
+        RegisterComponents();
         _AddSearchPath("./assets");
         m_assetWatcher->watch();
     }
@@ -274,8 +274,22 @@ namespace Calyx {
         stream << std::setw(4) << metaJSON;
     }
 
-    void AssetRegistry::RegisterCoreComponents() {
-        for (const auto& component: ClassRegistry::GetComponentClasses()) {
+    void AssetRegistry::RemoveComponents() {
+        List<UUID> components;
+        for (const auto& [id, meta]: m_assetMeta) {
+            if (meta.isComponent) {
+                components.push_back(id);
+            }
+        }
+        for (const auto& id: components) {
+            m_assetNames_IDs.erase(m_assetMeta[id].name);
+            m_assetMeta.erase(id);
+        }
+    }
+
+    void AssetRegistry::RegisterComponents() {
+        RemoveComponents();
+        for (const auto& [component, _]: ClassRegistry::GetComponentClasses()) {
             auto temp = component.construct();
             if (!temp)
                 continue;

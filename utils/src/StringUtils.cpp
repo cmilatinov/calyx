@@ -35,6 +35,11 @@ namespace Calyx::StringUtils {
         return std::strcmp(first.c_str(), second.c_str());
     }
 
+    bool RegexMatch(const std::string& str, const std::string_view& regex) {
+        std::regex rgx(regex.data());
+        return std::regex_match(str, rgx);
+    }
+
     bool IsSearchMatch(const std::string& query, const std::string& target) {
         auto words = Split(query, "\\s+");
         std::transform(

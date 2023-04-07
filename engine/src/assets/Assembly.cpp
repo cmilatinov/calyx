@@ -9,11 +9,14 @@ namespace Calyx {
     }
 
     json Assembly::ToJSON() {
-        return json::object({
-            { CX_ASSEMBLY_NAME, m_name },
-            { CX_ASSEMBLY_SOURCES, m_sources },
-            { CX_ASSEMBLY_SOURCE_FILES, m_sourceFiles }
-        });
+        return json::object(
+            {
+                { CX_ASSEMBLY_NAME, m_name },
+                { CX_ASSEMBLY_SOURCES, m_sources },
+                { CX_ASSEMBLY_SOURCE_FILES, m_sourceFiles },
+                { CX_ASSEMBLY_SOURCE_HEADERS, m_sourceHeaders }
+            }
+        );
     }
 
     Assembly* Assembly::Create(const String& file) {
@@ -39,6 +42,40 @@ namespace Calyx {
         result.m_name = "Default";
         result.m_sources.emplace_back("**.cpp");
         return result;
+    }
+
+    void Assembly::UpdateSourceHeaders(const Path& projectFolder) {
+        Set<String> headers;
+        m_sourceHeaders.clear();
+        std::transform(
+            m_sourceFiles.begin(), m_sourceFiles.end(),
+            std::inserter(headers, headers.end()),
+            [](const auto& file) {
+                Path path(file);
+                path = path.parent_path() / (path.stem().string() + ".h");
+                return path.string();
+            }
+        );
+        std::copy_if(
+            headers.begin(), headers.end(),
+            std::inserter(m_sourceHeaders, m_sourceHeaders.begin()),
+            [&projectFolder](const auto& header) { return FileSystem::is_regular_file(projectFolder / header); }
+        );
+    }
+
+    String Assembly::GetBinaryName() const {
+#ifdef CX_PLATFORM_LINUX
+        return fmt::format("libAssembly{}.so", m_name);
+#elif defined(CX_PLATFORM_WINDOWS)
+        return fmt::format("Assembly{}.dll", m_name);
+#else
+        return fmt::format("Assembly{}", m_name);
+#endif
+    }
+
+    void Assembly::SetSourceFiles(const Path& projectFolder, const Set<String>& sourceFiles) {
+        m_sourceFiles = sourceFiles;
+        UpdateSourceHeaders(projectFolder);
     }
 
 }

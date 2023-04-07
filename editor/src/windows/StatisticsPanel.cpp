@@ -25,9 +25,6 @@ namespace Calyx::Editor {
             Time::ResetTimer("FPS");
         }
 
-        Utils::Graph::Line("CPU Usage (%)", m_cpuCollector);
-        ImGui::Separator();
-
         ImGui::Text("RAM Total: %s", FormatUtils::ByteSize(m_memory.Total).c_str());
         ImGui::Text("RAM Used: %s", FormatUtils::ByteSize(m_memory.Used).c_str());
         ImGui::Text(

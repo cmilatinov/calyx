@@ -15,10 +15,14 @@
 #include <array>
 #include <vector>
 #include <list>
+#include <queue>
 #include <deque>
 #include <unordered_map>
 #include <unordered_set>
 #include <regex>
+#include <mutex>
+#include <condition_variable>
+#include <future>
 #include <thread>
 
 #include <glm/glm.hpp>
@@ -60,6 +64,9 @@ namespace Calyx {
     template<typename T>
     using Deque = std::deque<T>;
 
+    template<typename T>
+    using Queue = std::queue<T>;
+
     template<typename K, typename V>
     using Map = std::unordered_map<K, V>;
 
@@ -94,6 +101,14 @@ namespace Calyx {
 
     namespace ThisThread = std::this_thread;
     using Thread = std::thread;
+    using Mutex = std::mutex;
+    using ConditionVariable = std::condition_variable;
+
+    template<typename T>
+    using Future = std::future<T>;
+
+    template<typename T>
+    using UniqueLock = std::unique_lock<T>;
 
     namespace Integer {
         using uint8 = uint8_t;

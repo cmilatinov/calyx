@@ -16,9 +16,14 @@ namespace {                                                                     
 static const CX_REFLECT_REGISTRATION_STRUCT_NAME CX_REFLECT_REGISTRATION_STRUCT_VARIABLE;   \
 static void CX_REFLECT_REGISTRATION_FN_NAME()
 
+// Automatic deregistration function
+#define CX_REFLECT_DEREGISTRATION_FN_NAME reflect_auto_deregister_reflection_function_
+#define CX_REFLECT_DEREGISTRATION                                                           \
+static void __attribute__((destructor)) CX_REFLECT_DEREGISTRATION_FN_NAME()
+
 // Class registration macro and forward decl
 #define CX_BEGIN_REFLECT() friend void ::CX_REFLECT_REGISTRATION_FN_NAME()
-static void CX_REFLECT_REGISTRATION_FN_NAME();
+static void  CX_REFLECT_REGISTRATION_FN_NAME();
 
 // Automatic Ref<...> conversion
 #define CX_REFLECT_CONVERTIBLE_REF_FN_NAME reflect_convertible_ref_

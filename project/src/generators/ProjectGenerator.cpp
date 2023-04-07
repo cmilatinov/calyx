@@ -1,6 +1,10 @@
-#include "project/ProjectGenerator.h"
+#include "generators/ProjectGenerator.h"
 #include "assets/Assembly.h"
+
 #include "templates/RootCMake.h"
+#include "templates/PrecompiledHeader.h"
+
+#include <inja/inja.hpp>
 
 namespace Calyx::Editor {
 
@@ -48,9 +52,14 @@ namespace Calyx::Editor {
         if (!rootStream.is_open()) return false;
         env.render_to(rootStream, rootTemplate, templateInput);
 
+        // Generate precompiled header
+        std::ofstream pchStream(m_projectDirectory / "pch.h");
+        if (!pchStream.is_open()) return false;
+        pchStream << TEMPLATE_PRECOMPILED_HEADER << std::endl;
+
         // Generate default assembly
         auto assembly = Assembly::CreateDefaultAssembly(
-            m_projectDirectory / CX_PROJECT_DIRECTORY_ASSETS_DEFAULT / "default.cxasm"
+            m_projectDirectory / directories[CX_PROJECT_DIRECTORY_ASSETS].get<String>() / "default.cxasm"
         );
         assembly.WriteFile();
 

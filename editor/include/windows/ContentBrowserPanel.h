@@ -9,10 +9,18 @@ namespace Calyx::Editor {
     class ContentBrowserPanel {
 
     public:
-        explicit ContentBrowserPanel(const Path& basePath);
-        explicit ContentBrowserPanel(const String& basePath);
+        ContentBrowserPanel();
 
         void Draw();
+
+    private:
+        void ContextMenu();
+
+        void NewFolder();
+        void ResetNewFolder();
+
+        void NewComponent();
+        void ResetNewComponent();
 
     private:
         Ref<Texture2D> m_objFileTexture;
@@ -21,7 +29,10 @@ namespace Calyx::Editor {
         Path m_currentDirectory;
         float m_thumbnailSize = 120;
         float m_padding = 8;
-        float m_zoomScale = 1.0f;
+
+        String m_componentNamespace = "Calyx";
+        String m_componentName;
+        String m_folderName;
 
         void SetDirectory(const Path& path);
 

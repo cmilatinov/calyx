@@ -7,8 +7,7 @@
 
 #include "Registration.h"
 #include "Annotations.h"
-
-#define CX_REFLECT_FIELD_META "field_meta"_hs
+#include "Props.h"
 
 namespace Calyx::Reflect {
 
@@ -22,11 +21,12 @@ namespace Calyx::Reflect {
             int32_t offset;
         };
 
-        using ClassMap = std::unordered_map<entt::id_type, std::vector<entt::meta_type>>;
+        using ClassMap = std::unordered_map<entt::id_type, std::unordered_set<entt::id_type>>;
         using FieldMetaMap = std::unordered_map<entt::id_type, FieldMeta>;
 
     public:
         static void RegisterDerivedClass(const entt::meta_type& base, const entt::meta_type& derived);
+        static void RemoveDerivedClass(const entt::meta_type& base, const entt::meta_type& derived);
 
         static std::vector<entt::meta_type> GetDerivedClasses(const entt::meta_type& type);
 
@@ -39,6 +39,15 @@ namespace Calyx::Reflect {
         static std::string GetFieldDisplayName(const entt::meta_type& type, entt::id_type fieldId);
         static int32_t GetFieldOffset(const entt::meta_type& type, entt::id_type fieldId);
         static void* GetFieldPointer(const entt::meta_any& instance, entt::id_type fieldId);
+
+        static bool HasBase(const entt::meta_type& type, const entt::meta_type& base);
+        static bool HasTypeTrait(const entt::meta_type& type, uint32_t trait);
+
+        template<typename Base>
+        static bool HasBase(const entt::meta_type& type) {
+            auto base = entt::resolve<Base>();
+            return HasBase(type, base);
+        }
 
         template<typename T>
         static entt::meta_any CreateReference(T* ref) {
@@ -55,6 +64,7 @@ namespace Calyx::Reflect {
 
     private:
         static ClassMap& GetDerivedClassMap();
+        static ClassMap& GetBaseClassMap();
         static const FieldMeta* GetFieldMeta(const entt::meta_type& type, entt::id_type fieldId);
         static void CollectDerivedClasses(const entt::meta_type& type, std::vector<entt::meta_type>& derivedList);
 

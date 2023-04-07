@@ -38,7 +38,7 @@ namespace Calyx {
         .height = 1080,
         .cursorMode = CursorMode::NORMAL,
         .decorated = true,
-        .resizable = false,
+        .resizable = true,
         .vsync = true,
         .alwaysOnTop = false,
         .fullscreen = false

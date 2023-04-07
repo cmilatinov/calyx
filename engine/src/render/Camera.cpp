@@ -36,4 +36,8 @@ namespace Calyx {
         m_projectionMatrix = glm::perspective(fovy, m_aspect, m_nearPlane, m_farPlane);
     }
 
+    void Camera::CX_ON_POST_DESERIALIZE() {
+        UpdateProjectionMatrix();
+    }
+
 }

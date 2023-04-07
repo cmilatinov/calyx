@@ -20,7 +20,7 @@ namespace Calyx {
         template<typename T = TimeType>
         static T DeltaTime() { return s_instance->m_deltaTime; }
         template<typename T = TimeType>
-        static T FixedDeltaTime() { return s_instance->m_fixedDeltaTime; }
+        static T StaticDeltaTime() { return s_instance->m_staticDeltaTime; }
         template<typename T = TimeType>
         static T CurrentTime() { return s_instance->m_time; }
 
@@ -30,9 +30,9 @@ namespace Calyx {
     private:
         TimeType m_timeScale = 1.0f;
         TimeType m_deltaTime = 0.0f;
-        TimeType m_fixedDeltaTime = 0.0f;
+        TimeType m_staticDeltaTime = 0.0f;
 
-        Chrono::time_point<Clock> m_lastTime;
+        Chrono::time_point<Clock> m_lastTime = Clock::now();
         TimeType m_time = 0.0f;
         TimeType m_staticTime = 0.0f;
 

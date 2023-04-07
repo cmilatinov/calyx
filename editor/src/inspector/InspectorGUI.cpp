@@ -13,7 +13,7 @@ namespace Calyx::Editor {
         static String s_componentSearch{};
         static List<AssetRegistry::AssetMeta> s_componentList{};
 
-        if (ImGui::Button("Add Component")) {
+        if (Widgets::Button("Add Component")) {
             ImGui::OpenPopup("##ComonentPicker");
         }
 
@@ -50,6 +50,7 @@ namespace Calyx::Editor {
 
         bool changed = false;
         auto displayName = AssetRegistry::GetAssetDisplayName(value);
+        Widgets::PushFrameStyle();
         if (ImGui::BeginCombo("##AssetSelect", displayName.c_str())) {
             if (ImGui::IsWindowAppearing()) {
                 s_assetList.clear();
@@ -79,6 +80,7 @@ namespace Calyx::Editor {
             }
             ImGui::EndCombo();
         }
+        Widgets::PopFrameStyle();
 
         return changed;
     }
@@ -99,7 +101,10 @@ namespace Calyx::Editor {
     }
 
     bool InspectorGUI::FloatControl(const String& name, float& value, float speed, float min, float max) {
-        return ImGui::DragFloat(("##" + name).c_str(), &value, speed, min, max);
+        Widgets::PushFrameStyle();
+        bool ret = ImGui::DragFloat(("##" + name).c_str(), &value, speed, min, max);
+        Widgets::PopFrameStyle();
+        return ret;
     }
 
     bool InspectorGUI::BeginPropertyTable(const String& name) {
@@ -118,7 +123,7 @@ namespace Calyx::Editor {
     void InspectorGUI::Property(const String& label) {
         ImGui::TableNextRow();
         ImGui::TableNextColumn();
-        ImGui::Text(label.c_str());
+        Widgets::PaddedText(label, vec2(0, Widgets::GetFramePadding() - 1));
         ImGui::TableNextColumn();
         ImGui::SetNextItemWidth(-FLT_MIN);
     }
@@ -133,6 +138,7 @@ namespace Calyx::Editor {
 
         ImGuiContext& g = *GImGui;
         bool value_changed = false;
+        Widgets::PushFrameStyle();
         ImGui::BeginGroup();
         ImGui::PushID(label);
         ImGui::PushMultiItemsWidths(components, ImGui::CalcItemWidth());
@@ -161,6 +167,7 @@ namespace Calyx::Editor {
         }
         ImGui::PopID();
         ImGui::EndGroup();
+        Widgets::PopFrameStyle();
 
         return value_changed;
     }

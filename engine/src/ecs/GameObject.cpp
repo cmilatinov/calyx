@@ -9,23 +9,23 @@ namespace Calyx {
           m_entityID(entityID),
           m_name(name) {}
 
-    bool GameObject::HasComponent(const entt::meta_type& type) {
-        auto storage = m_scene->m_entityRegistry.storage(type.id());
-        if (storage == nullptr)
-            return false;
-        return storage->get(m_entityID) != nullptr;
-    }
-
-    void GameObject::AddComponent(const entt::meta_type& type) {
+    entt::meta_any GameObject::AddComponent(const entt::meta_type& type, const entt::meta_any& src) {
         auto instance = type.construct();
         if (!instance)
-            return;
+            return {};
 
         auto instancePtr = instance.try_cast<IComponent>();
         if (instancePtr == nullptr)
-            return;
+            return {};
 
-        instancePtr->Emplace(m_entityID, m_scene->m_entityRegistry);
+        auto component = static_cast<bool>(src) ?
+            instancePtr->EmplaceCopy(m_entityID, m_scene->m_entityRegistry, src) :
+            instancePtr->Emplace(m_entityID, m_scene->m_entityRegistry);
+        if (auto* componentPtr = component.try_cast<IComponent>(); componentPtr != nullptr) {
+            componentPtr->m_gameObject = this;
+        }
+
+        return component;
     }
 
     void GameObject::RemoveComponent(const entt::meta_type& type) {
@@ -38,6 +38,24 @@ namespace Calyx {
             return;
 
         instancePtr->Erase(m_entityID, m_scene->m_entityRegistry);
+    }
+
+    bool GameObject::HasComponent(const entt::meta_type& type) {
+        auto storage = m_scene->m_entityRegistry.storage(type.id());
+        if (storage == nullptr)
+            return false;
+        return storage->get(m_entityID) != nullptr;
+    }
+
+    entt::meta_any GameObject::GetComponent(const entt::meta_type& type) {
+        auto storage = m_scene->m_entityRegistry.storage(type.id());
+        if (storage == nullptr)
+            return {};
+
+        if (!storage->contains(m_entityID))
+            return {};
+
+        return type.from_void(storage->get(m_entityID));
     }
 
     void GameObject::AddChild(GameObject* child) {

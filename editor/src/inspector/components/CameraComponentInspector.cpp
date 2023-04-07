@@ -21,7 +21,7 @@ namespace Calyx::Editor {
         }
 
         if (changed) {
-            camera.Update();
+            camera.UpdateProjectionMatrix();
         }
     }
 

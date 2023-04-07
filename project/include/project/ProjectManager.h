@@ -17,6 +17,7 @@ namespace Calyx::Editor {
         CX_SINGLETON_EXPOSE_METHOD(_GetProjectInfo, const ProjectInfo& GetProjectInfo());
         CX_SINGLETON_EXPOSE_METHOD(_GetAssetDirectory, const Path& GetAssetDirectory());
         CX_SINGLETON_EXPOSE_METHOD(_GetBuildDirectory, const Path& GetBuildDirectory());
+        CX_SINGLETON_EXPOSE_METHOD(_GetCMakeDirectory, const Path& GetCMakeDirectory());
         CX_SINGLETON_EXPOSE_METHOD(_GetProjectName, const String& GetProjectName());
 
     private:
