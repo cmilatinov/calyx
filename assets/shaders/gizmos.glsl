@@ -1,9 +1,8 @@
 #pragma shader vertex
 #version 330 core
+#extension GL_ARB_shading_language_include: require
 
-layout (location = 0) in vec3 vertex;
-layout (location = 1) in vec3 normal;
-layout (location = 6) in mat4 transform;
+#include "mesh"
 
 out vec3 pass_position;
 out vec3 pass_normal;
