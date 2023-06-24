@@ -48,11 +48,11 @@ namespace Calyx {
         bool normalized = false;
         uint32 offset = 0;
 
-        uint32 GetSize() {
+        uint32 GetSize() const {
             return ShaderDataTypeSize(type);
         }
 
-        uint32 GetComponentCount() {
+        uint32 GetComponentCount() const {
             return ShaderDataTypeComponentCount(type);
         }
     };
@@ -60,7 +60,7 @@ namespace Calyx {
     class CALYX_API BufferLayout {
 
     public:
-        BufferLayout() {}
+        BufferLayout() = default;
 
         BufferLayout(std::initializer_list<BufferElement> elements)
             : m_elements(elements) {

@@ -55,12 +55,14 @@ namespace Calyx {
                 case ShaderDataType::Float3:
                 case ShaderDataType::Float4: {
                     glEnableVertexAttribArray(m_nextVertexAttribIndex);
-                    glVertexAttribPointer(m_nextVertexAttribIndex,
-                                          element.GetComponentCount(),
-                                          ShaderDataTypeToOpenGLType(element.type),
-                                          element.normalized ? GL_TRUE : GL_FALSE,
-                                          layout.GetStride(),
-                                          const_cast<const void*>(reinterpret_cast<void*>(static_cast<uint64>(element.offset))));
+                    glVertexAttribPointer(
+                        m_nextVertexAttribIndex,
+                        element.GetComponentCount(),
+                        ShaderDataTypeToOpenGLType(element.type),
+                        element.normalized ? GL_TRUE : GL_FALSE,
+                        layout.GetStride(),
+                        const_cast<const void*>(reinterpret_cast<void*>(static_cast<uint64>(element.offset)))
+                    );
                     m_nextVertexAttribIndex++;
                     break;
                 }
@@ -70,11 +72,13 @@ namespace Calyx {
                 case ShaderDataType::Int4:
                 case ShaderDataType::Bool: {
                     glEnableVertexAttribArray(m_nextVertexAttribIndex);
-                    glVertexAttribIPointer(m_nextVertexAttribIndex,
-                                           element.GetComponentCount(),
-                                           ShaderDataTypeToOpenGLType(element.type),
-                                           layout.GetStride(),
-                                           const_cast<const void*>(reinterpret_cast<void*>(static_cast<uint64>(element.offset))));
+                    glVertexAttribIPointer(
+                        m_nextVertexAttribIndex,
+                        element.GetComponentCount(),
+                        ShaderDataTypeToOpenGLType(element.type),
+                        layout.GetStride(),
+                        const_cast<const void*>(reinterpret_cast<void*>(static_cast<uint64>(element.offset)))
+                    );
                     m_nextVertexAttribIndex++;
                     break;
                 }
@@ -84,12 +88,13 @@ namespace Calyx {
                     uint32 count = element.GetComponentCount();
                     for (uint32 i = 0; i < count; i++) {
                         glEnableVertexAttribArray(m_nextVertexAttribIndex);
-                        glVertexAttribPointer(m_nextVertexAttribIndex,
-                                              count,
-                                              ShaderDataTypeToOpenGLType(element.type),
-                                              element.normalized ? GL_TRUE : GL_FALSE,
-                                              layout.GetStride(),
-                                              (const void*) (element.offset + sizeof(float) * count * i));
+                        glVertexAttribPointer(
+                            m_nextVertexAttribIndex,
+                            count,
+                            ShaderDataTypeToOpenGLType(element.type),
+                            element.normalized ? GL_TRUE : GL_FALSE,
+                            layout.GetStride(),
+                            (const void*)(element.offset + sizeof(float) * count * i));
                         glVertexAttribDivisor(m_nextVertexAttribIndex, 1);
                         m_nextVertexAttribIndex++;
                     }
@@ -109,6 +114,14 @@ namespace Calyx {
         glBindVertexArray(m_vertexArrayID);
         indexBuffer->Bind();
         m_indexBuffer = indexBuffer;
+    }
+
+    void GLVertexArray::SetVertexBufferEnabled(uint32 index, bool enabled) {
+        if (enabled) {
+            glEnableVertexAttribArray(index);
+        } else {
+            glDisableVertexAttribArray(index);
+        }
     }
 
 }

@@ -1,10 +1,12 @@
 #include "scene/SceneRenderer.h"
 #include "assets/Assets.h"
 
+#include <glad/glad.h>
+
 namespace Calyx {
 
     SceneRenderer::SceneRenderer()
-        : m_shader(AssetRegistry::LoadAsset<Shader>("shaders/basic.glsl")),
+        : m_shader(AssetRegistry::LoadAsset<Shader>("shaders/pbr.glsl")),
           m_gridShader(AssetRegistry::LoadAsset<Shader>("shaders/grid.glsl")),
           m_screenSpaceQuad(Assets::ScreenSpaceQuad()) {}
 
@@ -18,10 +20,15 @@ namespace Calyx {
 
         // Draw scene meshes
         for (auto [entity, meshComponent]: scene.m_entityRegistry.view<MeshComponent>().each()) {
+            auto mesh = meshComponent.GetMesh();
+            if (!mesh) continue;
+
             GameObject* gameObject = scene.m_gameObjects.find(entity)->second.get();
-            mat4 model = gameObject->GetTransform().GetMatrix(m_transformCache);
-            m_shader->SetMat4("model", model);
-            meshComponent.DrawMesh();
+            auto& instances = mesh->GetInstances();
+            instances.resize(1);
+            instances[0] = gameObject->GetTransform().GetMatrix(m_transformCache);
+            mesh->RebuildInstances();
+            mesh->DrawIndexedInstanced(1);
         }
 
         m_shader->Unbind();
@@ -35,7 +42,7 @@ namespace Calyx {
         m_gridShader->SetMat4("invView", invView);
         m_gridShader->SetFloat("nearPlane", camera.GetNearPlane());
         m_gridShader->SetFloat("farPlane", camera.GetFarPlane());
-        m_screenSpaceQuad->Draw();
+        m_screenSpaceQuad->DrawIndexed();
         m_gridShader->Unbind();
     }
 

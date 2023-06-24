@@ -16,7 +16,7 @@ namespace Calyx {
             return Scope<Scene>();
 
         if (header.version.major != CX_SCENE_VERSION_MAJOR || header.version.minor != CX_SCENE_VERSION_MINOR)
-            return  Scope<Scene>();
+            return Scope<Scene>();
 
         Scope<Scene> scene = CreateScope<Scene>();
         struct SceneObject {
@@ -32,10 +32,12 @@ namespace Calyx {
             Serializer::Deserialize(stream, parentID);
             Serializer::Deserialize(stream, name);
             auto* gameObject = scene->CreateGameObject(name, nullptr, id);
-            gameObjects.push_back({
-                .parentID = parentID,
-                .gameObject = gameObject
-            });
+            gameObjects.push_back(
+                {
+                    .parentID = parentID,
+                    .gameObject = gameObject
+                }
+            );
         }
 
         for (int i = 0; i < header.objectCount; i++) {
@@ -48,7 +50,9 @@ namespace Calyx {
                 auto type = entt::resolve(componentID);
                 auto instance = gameObject->AddComponent(type);
                 CX_ASSERT(instance, "Failed to instantiate component!");
-                Serializer::Deserialize(stream, instance);
+                if (instance) {
+                    Serializer::Deserialize(stream, instance);
+                }
             }
         }
 

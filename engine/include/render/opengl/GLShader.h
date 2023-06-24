@@ -17,12 +17,13 @@ namespace Calyx {
     public:
         GLShader(const String& name, const String& vertexSrc, const String& fragmentSrc);
         GLShader(const String& name, const String& vertexSrc, const String& geometrySrc, const String& fragmentSrc);
-        GLShader(const String& filepath);
+        explicit GLShader(const String& filepath);
         ~GLShader() override;
 
         void Bind() const override;
         void Unbind() const override;
 
+        void SetBool(const String& name, bool value) override;
         void SetInt(const String& name, int value) override;
         void SetIntArray(const String& name, uint32 count, int* values) override;
         void SetFloat(const String& name, float value) override;
@@ -37,7 +38,7 @@ namespace Calyx {
         bool IsFunctional() const override;
 
     private:
-        uint32 m_shaderProgramID;
+        uint32 m_shaderProgramID = 0;
         List<uint32> m_shaderIDs;
         String m_name;
 

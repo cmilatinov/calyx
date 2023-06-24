@@ -1,0 +1,19 @@
+const int MAX_LIGHTS = 3;
+
+layout (std140) struct PointLight {
+    vec4 color;
+    vec3 position;
+    float radius;
+};
+
+layout (std140) struct DirectionalLight {
+    vec4 color;
+    vec3 direction;
+};
+
+layout (std140) uniform Lights {
+    int num_point_lights;
+    PointLight point_lights[MAX_LIGHTS];
+    int num_directional_lights;
+    DirectionalLight directional_lights[MAX_LIGHTS];
+};

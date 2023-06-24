@@ -55,6 +55,7 @@ namespace Calyx {
         glfwWindowHint(GLFW_DECORATED, m_windowMode.decorated ? GLFW_TRUE : GLFW_FALSE);
         glfwWindowHint(GLFW_FLOATING, m_windowMode.alwaysOnTop ? GLFW_TRUE : GLFW_FALSE);
         glfwWindowHint(GLFW_RESIZABLE, m_windowMode.resizable ? GLFW_TRUE : GLFW_FALSE);
+        glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
         SetContextWindowHints();
 
         // Get video mode
@@ -74,8 +75,10 @@ namespace Calyx {
 
         // Set fullscreen or position
         if (m_windowMode.fullscreen)
-            glfwSetWindowMonitor(m_windowHandle, glfwGetPrimaryMonitor(), m_windowMode.x, m_windowMode.y,
-                                 m_windowMode.width, m_windowMode.height, GLFW_DONT_CARE);
+            glfwSetWindowMonitor(
+                m_windowHandle, glfwGetPrimaryMonitor(), m_windowMode.x, m_windowMode.y,
+                m_windowMode.width, m_windowMode.height, GLFW_DONT_CARE
+            );
         else
             glfwSetWindowPos(m_windowHandle, m_windowMode.x, m_windowMode.y);
 
@@ -116,7 +119,7 @@ namespace Calyx {
             glfwTerminate();
     }
 
-    inline void WindowGLFW::DispatchEvent(Event & event) {
+    inline void WindowGLFW::DispatchEvent(Event& event) {
         if (m_eventCallback == nullptr)
             return;
         m_eventCallback(event);

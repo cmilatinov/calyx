@@ -27,6 +27,7 @@
 
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
+#include <glm/gtx/euler_angles.hpp>
 #include <nameof.hpp>
 #include <stduuid/uuid.h>
 #include <fmt/format.h>

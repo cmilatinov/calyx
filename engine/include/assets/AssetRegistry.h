@@ -7,8 +7,11 @@
 #define CX_ASSET_REGISTRY_FRIEND()                          \
 friend class ::Calyx::AssetRegistry;
 
-namespace Calyx::Editor {
-    class AssemblyBuilder;
+namespace Calyx {
+    class Application;
+    namespace Editor {
+        class AssemblyBuilder;
+    }
 }
 
 namespace Calyx {
@@ -16,7 +19,8 @@ namespace Calyx {
     class AssetRegistry : public efsw::FileWatchListener {
     CX_SINGLETON(AssetRegistry);
 
-        friend class Editor::AssemblyBuilder;
+        friend class ::Calyx::Application;
+        friend class ::Calyx::Editor::AssemblyBuilder;
 
     public:
         struct AssetMeta {
@@ -39,6 +43,8 @@ namespace Calyx {
         struct RegisteredAssetType {
             AssetType type;
             IAsset* (* loadAssetFn)(const String&);
+            bool autoload;
+            List<Ref<IAsset>> loadedAssets;
         };
 
         template<typename T>
@@ -49,7 +55,10 @@ namespace Calyx {
             explicit AssetDeleter(const UUID& id) : m_id(id) {}
 
             void operator()(const T* ptr) {
-                auto& registry = AssetRegistry::GetInstance();
+                if (!AssetRegistry::s_instance)
+                    return;
+
+                auto& registry = *AssetRegistry::s_instance;
                 registry.m_loadedAssets.erase(m_id);
                 registry.m_assetPointers_IDs.erase(static_cast<const IAsset*>(ptr));
                 CX_MAP_FIND(registry.m_assetMeta, m_id, i_assetMeta) {
@@ -126,6 +135,7 @@ namespace Calyx {
         bool FindAssetFile(const String& asset, Path& outFilePath);
         void BuildAssetMeta(AssetSearchPath& searchPath);
         void ClearAssetMeta(AssetSearchPath& searchPath);
+        void LoadAllAssetsOfType(AssetType type, AssetSearchPath& searchPath);
 
         Path GetMetaFile(const Path& assetFile);
         bool LoadMetaFile(const Path& assetFile, json& meta);
@@ -201,7 +211,7 @@ namespace Calyx {
         Ref<IAsset> _LoadAsset(const UUID& id);
 
         template<typename T, typename ...Ext>
-        void _RegisterAssetType(const Ext& ... extensions) {
+        void _RegisterAssetType(bool autoload, const Ext& ... extensions) {
             static_assert(std::is_base_of_v<IAsset, T>, "T must extend IAsset!");
             List<String> exts = { extensions... };
             auto assetType = GetAssetType<T>();
@@ -209,7 +219,8 @@ namespace Calyx {
                 .type = assetType,
                 .loadAssetFn = reinterpret_cast<IAsset* (*)(const String&)>(
                     entt::overload<T*(const String&)>(&T::Create)
-                )
+                ),
+                .autoload = autoload
             };
             for (const auto& ext: exts) {
                 m_assetExtensions_Types[ext] = assetType;

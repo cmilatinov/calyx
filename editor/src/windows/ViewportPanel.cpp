@@ -7,6 +7,9 @@
 #include "input/Input.h"
 #include "icons/MaterialDesign.h"
 #include "ui/Widgets.h"
+#include "gizmos/Gizmos.h"
+#include "render/Color.h"
+#include "reflect/ClassRegistry.h"
 
 namespace Calyx::Editor {
 
@@ -60,6 +63,32 @@ namespace Calyx::Editor {
             m_editorCamera.GetTransform(),
             *SceneManager::GetSimulationOrCurrentScene()
         );
+
+        // Gizmos
+        Gizmos::GetInstance().BeginFrame(m_editorCamera, m_editorCamera.GetTransform());
+        auto scene = SceneManager::GetSimulationOrCurrentScene();
+        for (const auto& [_, info]: ClassRegistry::GetComponentClasses()) {
+            auto storage = scene->m_entityRegistry.storage(info.type.id());
+            if (storage == nullptr)
+                continue;
+
+            bool doDrawGizmos = static_cast<bool>(info.functions.drawGizmos);
+            bool doDrawGizmosSelected = static_cast<bool>(info.functions.drawGizmosSelected);
+            if (!doDrawGizmos && !doDrawGizmosSelected)
+                continue;
+
+            for (const auto& entity: *storage) {
+                auto ref = Reflect::Core::CreateOpaqueReference(info.type, storage->get(entity));
+                if (SelectionManager::IsSelected(scene->m_gameObjects[entity].get()) && doDrawGizmosSelected) {
+                    info.functions.drawGizmosSelected.invoke(ref);
+                } else if (doDrawGizmos) {
+                    info.functions.drawGizmos.invoke(ref);
+                }
+            }
+        }
+        Gizmos::GetInstance().EndFrame();
+
+        // Grid
         m_sceneRenderer->RenderGrid(m_editorCamera, m_editorCamera.GetTransform());
 
         // Blit and resolve MSAA samples

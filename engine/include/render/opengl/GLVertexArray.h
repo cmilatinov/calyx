@@ -18,6 +18,8 @@ namespace Calyx {
         void AddVertexBuffer(const Ref<VertexBuffer>& vertexBuffer) override;
         void SetIndexBuffer(const Ref<IndexBuffer>& indexBuffer) override;
 
+        void SetVertexBufferEnabled(uint32 index, bool enabled) override;
+
         const List<Ref<VertexBuffer>>& GetVertexBuffers() const override { return m_vertexBuffers; };
         const Ref<IndexBuffer>& GetIndexBuffer() const override { return m_indexBuffer; };
 

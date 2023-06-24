@@ -1,0 +1,6 @@
+layout (std140) uniform Camera {
+    mat4 proj;
+    mat4 proj_inverse;
+    mat4 view;
+    mat4 view_inverse;
+};

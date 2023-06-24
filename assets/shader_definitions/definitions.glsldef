@@ -1,0 +1,7 @@
+#define VERTEX_POSITION     0
+#define VERTEX_NORNMAL      1
+#define VERTEX_UV0          2
+#define VERTEX_UV1          3
+#define VERTEX_UV2          4
+#define VERTEX_UV3          5
+#define VERTEX_TRANSFORM    6

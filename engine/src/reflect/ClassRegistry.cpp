@@ -14,15 +14,17 @@ namespace Calyx::Reflect {
         auto components = Reflect::Core::GetDerivedClasses<IComponent>();
         m_componentClasses.clear();
         for (const auto& component: components) {
-            m_componentClasses.push_back({
+            m_componentClasses[component.id()] = {
                 .type = component,
                 .functions = {
                     .update = FindFunction(component, CX_UPDATE_HS),
                     .reset = FindFunction(component, CX_RESET_HS),
                     .start = FindFunction(component, CX_START_HS),
-                    .destroy = FindFunction(component, CX_DESTROY_HS)
+                    .destroy = FindFunction(component, CX_DESTROY_HS),
+                    .drawGizmos = FindFunction(component, CX_DRAW_GIZMOS_HS),
+                    .drawGizmosSelected = FindFunction(component, CX_DRAW_GIZMOS_SELECTED_HS)
                 }
-            });
+            };
         }
     }
 

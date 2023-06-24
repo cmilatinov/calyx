@@ -1,7 +1,16 @@
 #pragma once
 
+#include "render/Renderer.h"
 #include "render/objects/VertexArray.h"
 #include "assets/AssetRegistry.h"
+
+#define CX_MESH_VERTICES    0
+#define CX_MESH_NORMALS     1
+#define CX_MESH_UV0         2
+#define CX_MESH_UV1         3
+#define CX_MESH_UV2         4
+#define CX_MESH_UV3         5
+#define CX_MESH_INSTANCES   6
 
 namespace Calyx {
 
@@ -13,19 +22,28 @@ namespace Calyx {
     public:
         void Clear();
         bool Load(const String& file);
-        bool Load(const List<uint32>& indices, const List<vec3>& vertices);
 
         void Draw() const;
+        void DrawIndexed() const;
+        void DrawInstanced(uint32 instanceCount) const;
+        void DrawIndexedInstanced(uint32 instanceCount) const;
 
-        void SetIndices(const List<uint32>& indices);
-        void SetVertices(const List<vec3>& vertices);
-        void SetNormals(const List<vec3>& normals);
-        void SetUV0(const List<vec2>& uvs0);
-        void SetUV1(const List<vec2>& uvs1);
-        void SetUV2(const List<vec2>& uvs2);
-        void SetUV3(const List<vec2>& uvs3);
+        void Rebuild();
+        void RebuildInstances();
+
+        List<uint32>& GetIndices() { return m_indices; }
+        List<vec3>& GetVertices() { return m_vertices; }
+        List<vec3>& GetNormals() { return m_normals; }
+        List<vec2>& GetUV0() { return m_uvs0; }
+        List<vec2>& GetUV1() { return m_uvs1; }
+        List<vec2>& GetUV2() { return m_uvs2; }
+        List<vec2>& GetUV3() { return m_uvs3; }
+        List<mat4>& GetInstances() { return m_instances; }
+
+        void SetPrimitiveType(PrimitiveType type) { m_primitiveType = type; }
 
     private:
+        PrimitiveType m_primitiveType = PrimitiveType::TRIANGLE;
         List<uint32> m_indices;
         List<vec3> m_vertices;
         List<vec3> m_normals;
@@ -33,10 +51,10 @@ namespace Calyx {
         List<vec2> m_uvs1;
         List<vec2> m_uvs2;
         List<vec2> m_uvs3;
+        List<mat4> m_instances;
         Ref<VertexArray> m_vertexArray;
 
         void CreateVAO();
-        void UpdateVAO();
 
         static Mesh* Create(const String& file);
 

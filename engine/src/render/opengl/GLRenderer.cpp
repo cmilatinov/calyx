@@ -1,4 +1,5 @@
 #include "render/opengl/GLRenderer.h"
+#include "render/opengl/GLUtils.h"
 
 namespace Calyx {
 
@@ -27,9 +28,42 @@ namespace Calyx {
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
     }
 
-    void GLRenderer::DrawIndexed(const Ref<VertexArray>& vertexArray, uint32 indexCount) {
+    void GLRenderer::Draw(
+        const Ref<VertexArray>& vertexArray,
+        uint32 vertexCount,
+        PrimitiveType type
+    ) {
         vertexArray->Bind();
-        glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, nullptr);
+        glDrawArrays(GLPrimitiveType(type), 0, vertexCount);
+    }
+
+    void GLRenderer::DrawIndexed(
+        const Ref<VertexArray>& vertexArray,
+        uint32 indexCount,
+        PrimitiveType type
+    ) {
+        vertexArray->Bind();
+        glDrawElements(GLPrimitiveType(type), indexCount, GL_UNSIGNED_INT, nullptr);
+    }
+
+    void GLRenderer::DrawInstanced(
+        const Ref<VertexArray>& vertexArray,
+        uint32 vertexCount,
+        uint32 instanceCount,
+        PrimitiveType type
+    ) {
+        vertexArray->Bind();
+        glDrawArraysInstanced(GLPrimitiveType(type), 0, vertexCount, instanceCount);
+    }
+
+    void GLRenderer::DrawIndexedInstanced(
+        const Ref<VertexArray>& vertexArray,
+        uint32 indexCount,
+        uint32 instanceCount,
+        PrimitiveType type
+    ) {
+        vertexArray->Bind();
+        glDrawElementsInstanced(GLPrimitiveType(type), indexCount, GL_UNSIGNED_INT, nullptr, instanceCount);
     }
 
 }

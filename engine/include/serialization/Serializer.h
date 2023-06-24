@@ -8,11 +8,15 @@ namespace Calyx {
     class Serializer : public TypeTracker<ITypeSerializer> {
     CX_SINGLETON(Serializer);
 
+        friend class Application;
+
     public:
         Serializer();
 
-        CX_SINGLETON_EXPOSE_METHOD(_Serialize, void Serialize(std::ostream& stream, const entt::meta_any& object), stream, object);
-        CX_SINGLETON_EXPOSE_METHOD(_Deserialize, void Deserialize(std::istream& stream, entt::meta_any& object), stream, object);
+        CX_SINGLETON_EXPOSE_METHOD(_Serialize, void Serialize(std::ostream& stream, const entt::meta_any& object),
+            stream, object);
+        CX_SINGLETON_EXPOSE_METHOD(_Deserialize, void Deserialize(std::istream& stream, entt::meta_any& object), stream,
+            object);
 
         template<typename T>
         static void DefaultSerialize(std::ostream& stream, const T& value) {

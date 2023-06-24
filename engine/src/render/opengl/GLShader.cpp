@@ -3,21 +3,26 @@
 
 namespace Calyx {
 
-    GLShader::GLShader(const String& name, const String& vertexSrc, const String& fragmentSrc) {
-        m_name = name;
+    GLShader::GLShader(
+        const String& name,
+        const String& vertexSrc,
+        const String& fragmentSrc
+    ) : m_name(name) {
         LoadShader(vertexSrc, fragmentSrc);
     }
 
     GLShader::GLShader(
-        const String& name, const String& vertexSrc, const String& geometrySrc,
+        const String& name,
+        const String& vertexSrc,
+        const String& geometrySrc,
         const String& fragmentSrc
-    ) {
-        m_name = name;
+    ) : m_name(name) {
         LoadShader(vertexSrc, geometrySrc, fragmentSrc);
     }
 
-    GLShader::GLShader(const String& filepath) {
-        m_name = path(filepath).stem().string();
+    GLShader::GLShader(const String& filepath)
+        : m_name(path(filepath).stem().string()) {
+        CX_CORE_TRACE("Compiling shader '{}' ...", m_name);
         LoadShader(filepath);
     }
 
@@ -33,6 +38,10 @@ namespace Calyx {
         glUseProgram(0);
     }
 
+    void GLShader::SetBool(const String& name, bool value) {
+        glUniform1i(glGetUniformLocation(m_shaderProgramID, name.c_str()), value ? GL_TRUE : GL_FALSE);
+    }
+
     void GLShader::SetInt(const String& name, int value) {
         glUniform1i(glGetUniformLocation(m_shaderProgramID, name.c_str()), value);
     }
@@ -42,25 +51,38 @@ namespace Calyx {
     }
 
     void GLShader::SetFloat(const String& name, float value) {
-        glUniform1f(glGetUniformLocation(m_shaderProgramID, name.c_str()), value);
+        glUniform1f(
+            glGetUniformLocation(m_shaderProgramID, name.c_str()),
+            value
+        );
     }
 
     void GLShader::SetFloat2(const String& name, const vec2& value) {
-        glUniform2f(glGetUniformLocation(m_shaderProgramID, name.c_str()), value.x, value.y);
+        glUniform2f(
+            glGetUniformLocation(m_shaderProgramID, name.c_str()),
+            value.x, value.y
+        );
     }
 
     void GLShader::SetFloat3(const String& name, const vec3& value) {
-        glUniform3f(glGetUniformLocation(m_shaderProgramID, name.c_str()), value.x, value.y, value.z);
+        glUniform3f(
+            glGetUniformLocation(m_shaderProgramID, name.c_str()),
+            value.x, value.y, value.z
+        );
     }
 
     void GLShader::SetFloat4(const String& name, const vec4& value) {
-        glUniform4f(glGetUniformLocation(m_shaderProgramID, name.c_str()), value.x, value.y, value.z, value.w);
+        glUniform4f(
+            glGetUniformLocation(m_shaderProgramID, name.c_str()),
+            value.x, value.y, value.z, value.w
+        );
     }
 
     void GLShader::SetMat4(const String& name, const mat4& value) {
         glUniformMatrix4fv(
-            glGetUniformLocation(m_shaderProgramID, name.c_str()), 1, GL_FALSE,
-            reinterpret_cast<const GLfloat*>(&value));
+            glGetUniformLocation(m_shaderProgramID, name.c_str()),
+            1, GL_FALSE, reinterpret_cast<const GLfloat*>(&value)
+        );
     }
 
     bool GLShader::IsFunctional() const {
@@ -92,26 +114,23 @@ namespace Calyx {
 
     Map<GLenum, String> GLShader::SplitShaderSrc(const String& source) {
         Map<GLenum, std::string> shaderSources;
-        const char* typeToken = "#type";
+        const char* typeToken = "#pragma shader";
         size_t typeTokenLength = strlen(typeToken);
-        size_t pos = source.find(typeToken, 0); // Start of shader type declaration line
+        size_t pos = source.find(typeToken, 0);
 
         while (pos != String::npos) {
-            size_t eol = source.find_first_of("\r\n", pos); // End of shader type declaration line
+            size_t eol = source.find_first_of("\r\n", pos);
             CX_CORE_ASSERT(eol != String::npos, "Syntax error");
 
-            size_t begin = pos + typeTokenLength + 1; // Start of shader type name (after "#type " keyword)
+            size_t begin = pos + typeTokenLength + 1;
             String type = source.substr(begin, eol - begin);
             GLenum shaderType = GLShaderType(type);
             CX_CORE_ASSERT(shaderType, "Invalid shader type specified");
 
-            size_t nextLinePos = source.find_first_not_of(
-                "\r\n",
-                eol
-            ); // Start of shader code after shader type declaration line
+            size_t nextLinePos = source.find_first_not_of("\r\n", eol);
             CX_CORE_ASSERT(nextLinePos != String::npos, "Syntax error");
 
-            pos = source.find(typeToken, nextLinePos); // Start of next shader type declaration line
+            pos = source.find(typeToken, nextLinePos);
             shaderSources[shaderType] = (pos == String::npos) ? source.substr(nextLinePos) : source.substr(
                 nextLinePos,
                 pos -
@@ -158,25 +177,27 @@ namespace Calyx {
         }
 
         // Delete shaders
-        for (auto shader: m_shaderIDs)
+        for (auto shader: m_shaderIDs) {
             glDeleteShader(shader);
+        }
     }
 
     uint32 GLShader::CreateShader(GLuint shaderType, const String& src) {
         const char* shaderSrc = src.c_str();
         uint32 shaderID = glCreateShader(shaderType);
         glShaderSource(shaderID, 1, &shaderSrc, nullptr);
-        glCompileShader(shaderID);
+        static const char* path[] = { "/" };
+        glCompileShaderIncludeARB(shaderID, 1, path, nullptr);
 
         int success;
         glGetShaderiv(shaderID, GL_COMPILE_STATUS, &success);
-        CX_CORE_ASSERT(success, "Shader compilation failed!");
         if (!success) {
             char infoLog[512];
             glGetShaderInfoLog(shaderID, sizeof(infoLog), nullptr, infoLog);
             CX_CORE_ERROR("Shader Compilation Error:");
             CX_CORE_ERROR(infoLog);
         }
+        CX_CORE_ASSERT(success, "Shader compilation failed!");
 
         m_shaderIDs.push_back(shaderID);
 

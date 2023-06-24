@@ -75,6 +75,15 @@ namespace Calyx {
         }
 
         // Destroy object
+        for (const auto& [_, info]: ClassRegistry::GetComponentClasses()) {
+            if (!info.functions.destroy)
+                continue;
+            auto* storage = m_entityRegistry.storage(info.type.id());
+            if (storage != nullptr && storage->contains(id)) {
+                auto ref = Reflect::Core::CreateOpaqueReference(info.type, storage->get(id));
+                info.functions.destroy.invoke(ref);
+            }
+        }
         m_entityRegistry.destroy(id);
         m_gameObjects.erase(id);
         m_rootGameObjects.erase(gameObject);
@@ -124,20 +133,22 @@ namespace Calyx {
     }
 
     void Scene::Update() {
-        for (const auto& [component, functions]: ClassRegistry::GetComponentClasses()) {
-            auto* storage = m_entityRegistry.storage(component.id());
+        for (const auto& [id, info]: ClassRegistry::GetComponentClasses()) {
+            auto* storage = m_entityRegistry.storage(id);
             if (storage == nullptr)
                 continue;
 
-            bool doStart = m_firstFrame && static_cast<bool>(functions.start);
-            bool doUpdate = static_cast<bool>(functions.update);
+            bool doStart = m_firstFrame && static_cast<bool>(info.functions.start);
+            bool doUpdate = static_cast<bool>(info.functions.update);
+            if (!doStart && !doUpdate)
+                continue;
+
             for (const auto& entity: *storage) {
-                auto ref = Reflect::Core::CreateOpaqueReference(component, storage->get(entity));
+                auto ref = Reflect::Core::CreateOpaqueReference(info.type, storage->get(entity));
                 if (doStart) {
-                    functions.start.invoke(ref);
-                }
-                if (doUpdate) {
-                    functions.update.invoke(ref);
+                    info.functions.start.invoke(ref);
+                } else if (doUpdate) {
+                    info.functions.update.invoke(ref);
                 }
             }
         }

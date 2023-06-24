@@ -15,6 +15,8 @@ namespace Calyx {
         virtual void AddVertexBuffer(const Ref<VertexBuffer>& vertexBuffer) = 0;
         virtual void SetIndexBuffer(const Ref<IndexBuffer>& indexBuffer) = 0;
 
+        virtual void SetVertexBufferEnabled(uint32 index, bool enabled) = 0;
+
         virtual const List<Ref<VertexBuffer>>& GetVertexBuffers() const = 0;
         virtual const Ref<IndexBuffer>& GetIndexBuffer() const = 0;
 

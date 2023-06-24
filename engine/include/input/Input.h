@@ -5,8 +5,12 @@
 
 namespace Calyx {
 
+    class Application;
+
     class CALYX_API Input {
     CX_SINGLETON(Input);
+
+        friend class ::Calyx::Application;
 
     public:
         CX_SINGLETON_EXPOSE_METHOD(_OnEvent, void OnEvent(Event& event), event);

@@ -14,7 +14,31 @@ namespace Calyx {
         void SetClearColor(const vec4& color) override;
         void Clear() override;
 
-        void DrawIndexed(const Ref<VertexArray>& vertexArray, uint32 indexCount) override;
+        void Draw(
+            const Ref<VertexArray>& vertexArray,
+            uint32 vertexCount,
+            PrimitiveType type = PrimitiveType::TRIANGLE
+        ) override;
+
+        void DrawIndexed(
+            const Ref<VertexArray>& vertexArray,
+            uint32 indexCount,
+            PrimitiveType type = PrimitiveType::TRIANGLE
+        ) override;
+
+        void DrawInstanced(
+            const Ref<VertexArray>& vertexArray,
+            uint32 vertexCount,
+            uint32 instanceCount,
+            PrimitiveType type = PrimitiveType::TRIANGLE
+        ) override;
+
+        void DrawIndexedInstanced(
+            const Ref<VertexArray>& vertexArray,
+            uint32 indexCount,
+            uint32 instanceCount,
+            PrimitiveType type = PrimitiveType::TRIANGLE
+        ) override;
 
     };
 

@@ -23,6 +23,7 @@ add_reflected_headers("CalyxEditor" "include"
         "include/inspector/types/FloatInspector.h"
         "include/inspector/types/Vec2Inspector.h"
         "include/inspector/types/Vec3Inspector.h"
+        "include/inspector/types/Vec4Inspector.h"
         "include/inspector/types/AssetInspector.h"
         "include/inspector/components/CameraComponentInspector.h"
         "include/inspector/components/TransformComponentInspector.h")

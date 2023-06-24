@@ -31,10 +31,12 @@ namespace Calyx::Editor {
 
         AssetRegistry::AddSearchPath(m_projectInfo.directories.assets);
 
-        BackgroundTaskManager::GetInstance().GetThreadPool().Enqueue([this]() {
-            LoadAssemblies();
-            m_assemblyBuilder.BuildAssemblies();
-        });
+        BackgroundTaskManager::GetInstance().GetThreadPool().Enqueue(
+            [this]() {
+                LoadAssemblies();
+                m_assemblyBuilder.BuildAssemblies();
+            }
+        );
 
         return true;
     }
@@ -49,6 +51,5 @@ namespace Calyx::Editor {
             }
         }
     }
-
 
 }

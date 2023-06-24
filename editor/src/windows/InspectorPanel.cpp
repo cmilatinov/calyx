@@ -35,23 +35,16 @@ namespace Calyx::Editor {
 
             // Components
             Set<AssetType> componentSet;
-            for (const auto& [component, _]: ClassRegistry::GetComponentClasses()) {
-                auto storage = scene->m_entityRegistry.storage(component.info().hash());
+            for (const auto& [id, info]: ClassRegistry::GetComponentClasses()) {
+                auto storage = scene->m_entityRegistry.storage(id);
                 if (storage != nullptr && storage->contains(selected->m_entityID)) {
-                    Inspector::DrawComponentInspector(selected, component, storage->get(selected->m_entityID));
-                    componentSet.insert(component.id());
+                    Inspector::DrawComponentInspector(selected, info.type, storage->get(selected->m_entityID));
+                    componentSet.insert(id);
                 }
             }
 
             // Add components
             InspectorGUI::ComponentPicker(selected, componentSet);
-
-            // TODO: Remove
-            if (Widgets::Button("List Scene Components")) {
-                for (const auto& [id, set]: scene->m_entityRegistry.storage()) {
-                    CX_CORE_INFO(entt::resolve(id).info().name());
-                }
-            }
         }
         ImGui::End();
     }

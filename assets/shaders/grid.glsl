@@ -1,7 +1,8 @@
-#type vertex
+#pragma shader vertex
 #version 330 core
+#extension GL_ARB_shading_language_include: require
 
-layout (location = 0) in vec3 vertex;
+#include "mesh"
 
 out vec3 nearPoint;
 out vec3 farPoint;
@@ -20,7 +21,7 @@ void main() {
     gl_Position = vec4(point, 0.0, 1.0);
 }
 
-#type fragment
+#pragma shader fragment
 #version 330 core
 
 in vec3 nearPoint;
@@ -35,12 +36,12 @@ uniform float farPlane;
 vec4 Grid(vec3 fragPos, vec3 gridColor, float lineWidth, float scale) {
     vec2 coord = fragPos.xz * scale;
     vec2 derivative = fwidth(coord);
-    vec2 grid = max(abs(fract(coord - 0.5) - 0.5) - lineWidth, 0) / derivative;
+    vec2 grid = max(abs(fract(coord - 0.5) - 0.5) - lineWidth, 0.0) / derivative;
     float line = min(grid.x, grid.y);
     vec4 color = vec4(gridColor, 1.0 - min(line, 1.0));
 
-    float minX = min(derivative.x, 1);
-    float minZ = min(derivative.y, 1);
+    float minX = min(derivative.x, 1.0);
+    float minZ = min(derivative.y, 1.0);
     if (fragPos.x > -minX && fragPos.x < minX) {
         color.xyz = vec3(0.1, 0.1, 1.0);
     } else if (fragPos.z > -minZ && fragPos.z < minZ) {
@@ -63,7 +64,7 @@ float LinearizeDepth(float depth) {
 void main() {
     float t = -nearPoint.y / (farPoint.y - nearPoint.y);
     if (t <= 0)
-        discard;
+    discard;
 
     vec3 fragPos = nearPoint + t * (farPoint - nearPoint);
     color = Grid(fragPos, vec3(0.5), 0, 1) + Grid(fragPos, vec3(0.1), 0.0001, 0.1);

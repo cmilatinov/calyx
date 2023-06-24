@@ -35,7 +35,13 @@ namespace Calyx::Editor {
 
             for (const auto& component: s_componentList) {
                 if (ImGui::Selectable(component.displayName.c_str(), false)) {
-                    gameObject->AddComponent(entt::resolve(component.type));
+                    auto ref = gameObject->AddComponent(entt::resolve(component.type));
+                    const auto& components = ClassRegistry::GetComponentClasses();
+                    CX_MAP_FIND(components, ref.type().id(), i_component) {
+                        if (i_component->second.functions.reset) {
+                            i_component->second.functions.reset.invoke(ref);
+                        }
+                    }
                 }
             }
 
@@ -102,7 +108,14 @@ namespace Calyx::Editor {
 
     bool InspectorGUI::FloatControl(const String& name, float& value, float speed, float min, float max) {
         Widgets::PushFrameStyle();
-        bool ret = ImGui::DragFloat(("##" + name).c_str(), &value, speed, min, max);
+        bool ret = ImGui::DragFloat(name.c_str(), &value, speed, min, max);
+        Widgets::PopFrameStyle();
+        return ret;
+    }
+
+    bool InspectorGUI::ColorControl(const String& name, vec4& value) {
+        Widgets::PushFrameStyle();
+        bool ret = ImGui::ColorEdit4(name.c_str(), glm::value_ptr(value));
         Widgets::PopFrameStyle();
         return ret;
     }

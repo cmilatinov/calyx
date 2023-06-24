@@ -23,6 +23,7 @@ namespace Calyx {
 
         mat4 GetProjectionMatrix() const { return m_projectionMatrix; }
 
+        float GetVerticalRadFOV() const { return 2 * glm::atan(glm::tan(glm::radians(m_fov) / 2) / m_aspect); };
         float GetFOV() const { return m_fov; }
         float GetAspect() const { return m_aspect; }
         float GetNearPlane() const { return m_nearPlane; }

@@ -22,12 +22,9 @@ namespace Calyx {
         return ShaderType::NONE;
     }
 
-    class ShaderLibrary;
-
     class CALYX_API Shader : public Asset<Shader> {
         CX_BEGIN_REFLECT();
         CX_ASSET_REGISTRY_FRIEND();
-        friend class ShaderLibrary;
 
     public:
         ~Shader() override = default;
@@ -35,6 +32,7 @@ namespace Calyx {
         virtual void Bind() const = 0;
         virtual void Unbind() const = 0;
 
+        virtual void SetBool(const String& name, bool value) = 0;
         virtual void SetInt(const String& name, int value) = 0;
         virtual void SetIntArray(const String& name, uint32 count, int* values) = 0;
         virtual void SetFloat(const String& name, float value) = 0;
@@ -47,28 +45,8 @@ namespace Calyx {
         virtual const String& GetName() const = 0;
         virtual bool IsFunctional() const = 0;
 
-        static Scope<Shader> Create(const String& name, const String& vertexSrc, const String& fragmentSrc);
-
     private:
         static Shader* Create(const String& file);
-
-    };
-
-    class CALYX_API ShaderLibrary {
-
-    public:
-        void Add(const String& name, const Ref<Shader>& shader);
-        void Add(const Ref<Shader>& shader);
-
-        Ref<Shader> Load(const String& filepath);
-        Ref<Shader> Load(const String& name, const String& filepath);
-
-        Ref<Shader> Get(const String& name);
-
-        bool Exists(const String& name) const;
-
-    private:
-        Map<String, Ref<Shader>> m_shaders;
 
     };
 

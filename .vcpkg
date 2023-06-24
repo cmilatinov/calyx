@@ -2,7 +2,7 @@ assimp
 cxxopts
 efsw
 entt
-glad
+glad[extensions]
 glfw3
 glm
 imgui[docking-experimental,glfw-binding,opengl3-binding,wchar32]

@@ -19,11 +19,11 @@ namespace Calyx {
         auto cubeMesh = AssetRegistry::LoadAsset<Mesh>("meshes/cube.obj");
 
         auto* cube1 = m_currentScene->CreateGameObject("Cube 1");
-        cube1->AddComponent<MeshComponent>(cubeMesh);
+        cube1->AddComponent<MeshComponent>()->SetMesh(cubeMesh);
         cube1->GetTransform().Translate(vec3(1, 0, 0));
 
         auto* cube2 = m_currentScene->CreateGameObject("Cube 2");
-        cube2->AddComponent<MeshComponent>(cubeMesh);
+        cube2->AddComponent<MeshComponent>()->SetMesh(cubeMesh);
         cube2->GetTransform().Translate(vec3(0, 2, 0));
         cube2->SetParent(cube1);
     }
@@ -43,7 +43,9 @@ namespace Calyx {
     }
 
     void SceneManager::StartSimulation() {
-        m_simulationScene = CreateScope<Scene>(*m_currentScene);
+        if (!m_simulationLoaded) {
+            m_simulationScene = CreateScope<Scene>(*m_currentScene);
+        }
         m_simulationLoaded = true;
         m_simulationRunning = true;
     }

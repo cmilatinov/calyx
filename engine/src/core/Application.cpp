@@ -9,13 +9,15 @@
 #include "reflect/ClassRegistry.h"
 #include "assets/AssetRegistry.h"
 #include "serialization/Serializer.h"
+#include "gizmos/Gizmos.h"
 
 namespace Calyx {
 
     Application* Application::s_instance = nullptr;
 
-    Application::Application()
-        : m_window(Window::Create(WindowMode::DEFAULT)) {
+    Application::Application(const WindowMode& windowMode)
+        : m_window(Window::Create(windowMode)),
+          m_layerStack(CreateScope<LayerStack>()) {
         // Singleton application instance
         CX_CORE_ASSERT(s_instance == nullptr, "Application already running!");
         s_instance = this;
@@ -23,13 +25,8 @@ namespace Calyx {
         Init();
     }
 
-    Application::Application(const WindowMode& windowMode)
-        : m_window(Window::Create(windowMode)) {
-        // Singleton application instance
-        CX_CORE_ASSERT(s_instance == nullptr, "Application already running!");
-        s_instance = this;
-
-        Init();
+    Application::~Application() {
+        Destroy();
     }
 
     void Application::Init() {
@@ -45,11 +42,23 @@ namespace Calyx {
         // Initialize registries
         ClassRegistry::Init();
         AssetRegistry::Init();
+        AssetRegistry::AddSearchPath("./assets");
         Serializer::Init();
+        Gizmos::Init();
 
         // Gui layer
         m_guiLayer = new GuiLayer();
-        m_layerStack.PushOverlay(m_guiLayer);
+        m_layerStack->PushOverlay(m_guiLayer);
+    }
+
+    void Application::Destroy() {
+        m_layerStack.reset();
+        Gizmos::s_instance.reset();
+        Serializer::s_instance.reset();
+        AssetRegistry::s_instance.reset();
+        ClassRegistry::s_instance.reset();
+        Input::s_instance.reset();
+        Renderer::s_renderer.reset();
     }
 
     void Application::Run() {
@@ -62,13 +71,13 @@ namespace Calyx {
             m_window->OnUpdate();
 
             // Layers
-            for (auto* layer: m_layerStack) {
+            for (auto* layer: *m_layerStack) {
                 layer->OnUpdate();
             }
 
             // Layer GUIs
             m_guiLayer->Begin();
-            for (auto* layer: m_layerStack) {
+            for (auto* layer: *m_layerStack) {
                 layer->OnGUI();
             }
             m_guiLayer->End();
@@ -88,7 +97,7 @@ namespace Calyx {
 
         Input::OnEvent(event);
 
-        for (auto& i_layer: std::ranges::reverse_view(m_layerStack)) {
+        for (auto& i_layer: std::ranges::reverse_view(*m_layerStack)) {
             if (event.handled)
                 break;
             i_layer->OnEvent(event);
@@ -106,19 +115,19 @@ namespace Calyx {
     }
 
     void Application::PushOverlay(ILayer* layer) {
-        m_layerStack.PushOverlay(layer);
+        m_layerStack->PushOverlay(layer);
     }
 
     void Application::PushUnderlay(ILayer* layer) {
-        m_layerStack.PushUnderlay(layer);
+        m_layerStack->PushUnderlay(layer);
     }
 
     void Application::EmplaceLayer(uint32 index, ILayer* layer) {
-        m_layerStack.EmplaceLayer(index, layer);
+        m_layerStack->EmplaceLayer(index, layer);
     }
 
     void Application::PopLayer(ILayer* layer) {
-        m_layerStack.PopLayer(layer);
+        m_layerStack->PopLayer(layer);
     }
 
 }

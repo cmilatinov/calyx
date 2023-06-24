@@ -1,0 +1,9 @@
+#include "definitions"
+
+layout (location = VERTEX_POSITION) in vec3 vertex;
+layout (location = VERTEX_NORNMAL) in vec3 normal;
+layout (location = VERTEX_UV0) in vec2 uv0;
+layout (location = VERTEX_UV1) in vec2 uv1;
+layout (location = VERTEX_UV2) in vec2 uv2;
+layout (location = VERTEX_UV3) in vec2 uv3;
+layout (location = VERTEX_TRANSFORM) in mat4 transform;

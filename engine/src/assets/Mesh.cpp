@@ -1,5 +1,4 @@
 #include "assets/Mesh.h"
-#include "render/Renderer.h"
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
@@ -9,17 +8,12 @@ namespace Calyx {
 
     void Mesh::Clear() {
         m_indices.clear();
-        m_indices.shrink_to_fit();
-
         m_vertices.clear();
-        m_vertices.shrink_to_fit();
-
         m_normals.clear();
-        m_normals.shrink_to_fit();
-
         m_uvs0.clear();
-        m_uvs0.shrink_to_fit();
-
+        m_uvs1.clear();
+        m_uvs2.clear();
+        m_uvs3.clear();
         m_vertexArray.reset();
     }
 
@@ -46,10 +40,10 @@ namespace Calyx {
             }
         }
 
-        // Resize vertex, normal and UV vectors
+        // Resize vertex, normal, colors and UV vectors
         m_vertices.resize(mesh->mNumVertices);
         m_normals.resize(mesh->mNumVertices);
-        int numUVs = std::min((int) mesh->GetNumUVChannels(), 4);
+        int numUVs = std::min((int)mesh->GetNumUVChannels(), 4);
         List<vec2>* uvChannels[4] = { &m_uvs0, &m_uvs1, &m_uvs2, &m_uvs3 };
         for (int j = 0; j < numUVs; j++) {
             uvChannels[j]->resize(mesh->mNumVertices);
@@ -68,22 +62,25 @@ namespace Calyx {
             }
         }
 
-        UpdateVAO();
-
-        return true;
-    }
-
-    bool Mesh::Load(const List<uint32>& indices, const List<vec3>& vertices) {
-        m_indices = indices;
-        m_vertices = vertices;
-
-        UpdateVAO();
+        Rebuild();
 
         return true;
     }
 
     void Mesh::Draw() const {
-        RenderCommand::DrawIndexed(m_vertexArray, m_indices.size());
+        RenderCommand::Draw(m_vertexArray, m_vertices.size(), m_primitiveType);
+    }
+
+    void Mesh::DrawIndexed() const {
+        RenderCommand::DrawIndexed(m_vertexArray, m_indices.size(), m_primitiveType);
+    }
+
+    void Mesh::DrawInstanced(uint32 instanceCount) const {
+        RenderCommand::DrawInstanced(m_vertexArray, m_vertices.size(), instanceCount, m_primitiveType);
+    }
+
+    void Mesh::DrawIndexedInstanced(uint32 instanceCount) const {
+        RenderCommand::DrawIndexedInstanced(m_vertexArray, m_indices.size(), instanceCount, m_primitiveType);
     }
 
     void Mesh::CreateVAO() {
@@ -129,59 +126,47 @@ namespace Calyx {
             m_vertexArray->AddVertexBuffer(uvBuffer);
         }
 
+        auto instanceBuffer = VertexBuffer::Create(
+            m_instances.size() * sizeof(mat4),
+            glm::value_ptr(*m_instances.data())
+        );
+        instanceBuffer->SetLayout(
+            {
+                { ShaderDataType::Mat4, "transform" }
+            }
+        );
+        m_vertexArray->AddVertexBuffer(instanceBuffer);
+
         m_vertexArray->Unbind();
     }
 
-    void Mesh::UpdateVAO() {
-        if (m_vertexArray == nullptr) {
+    void Mesh::Rebuild() {
+        if (!m_vertexArray) {
             return CreateVAO();
         }
 
         m_vertexArray->Bind();
         m_vertexArray->GetIndexBuffer()->SetData(m_indices.size(), m_indices.data());
         const auto& buffers = m_vertexArray->GetVertexBuffers();
-        buffers[0]->SetData(m_vertices.size() * sizeof(vec3), m_vertices.data());
-        buffers[1]->SetData(m_normals.size() * sizeof(vec3), m_normals.data());
-        buffers[2]->SetData(m_uvs0.size() * sizeof(vec2), m_uvs0.data());
-        buffers[3]->SetData(m_uvs1.size() * sizeof(vec2), m_uvs1.data());
-        buffers[4]->SetData(m_uvs2.size() * sizeof(vec2), m_uvs2.data());
-        buffers[5]->SetData(m_uvs3.size() * sizeof(vec2), m_uvs3.data());
+        buffers[CX_MESH_VERTICES]->SetData(m_vertices.size() * sizeof(vec3), m_vertices.data());
+        buffers[CX_MESH_NORMALS]->SetData(m_normals.size() * sizeof(vec3), m_normals.data());
+        buffers[CX_MESH_UV0]->SetData(m_uvs0.size() * sizeof(vec2), m_uvs0.data());
+        buffers[CX_MESH_UV1]->SetData(m_uvs1.size() * sizeof(vec2), m_uvs1.data());
+        buffers[CX_MESH_UV2]->SetData(m_uvs2.size() * sizeof(vec2), m_uvs2.data());
+        buffers[CX_MESH_UV3]->SetData(m_uvs3.size() * sizeof(vec2), m_uvs3.data());
+        buffers[CX_MESH_INSTANCES]->SetData(m_instances.size() * sizeof(mat4), m_instances.data());
         m_vertexArray->Unbind();
     }
 
-    void Mesh::SetIndices(const List<uint32>& indices) {
-        m_indices = indices;
-        UpdateVAO();
-    }
+    void Mesh::RebuildInstances() {
+        if (!m_vertexArray) {
+            return CreateVAO();
+        }
 
-    void Mesh::SetVertices(const List<vec3>& vertices) {
-        m_vertices = vertices;
-        UpdateVAO();
-    }
-
-    void Mesh::SetNormals(const List<vec3>& normals) {
-        m_normals = normals;
-        UpdateVAO();
-    }
-
-    void Mesh::SetUV0(const List<vec2>& uvs0) {
-        m_uvs0 = uvs0;
-        UpdateVAO();
-    }
-
-    void Mesh::SetUV1(const List<vec2>& uvs1) {
-        m_uvs1 = uvs1;
-        UpdateVAO();
-    }
-
-    void Mesh::SetUV2(const List<vec2>& uvs2) {
-        m_uvs2 = uvs2;
-        UpdateVAO();
-    }
-
-    void Mesh::SetUV3(const List<vec2>& uvs3) {
-        m_uvs3 = uvs3;
-        UpdateVAO();
+        m_vertexArray->Bind();
+        const auto& buffers = m_vertexArray->GetVertexBuffers();
+        buffers[CX_MESH_INSTANCES]->SetData(m_instances.size() * sizeof(mat4), m_instances.data());
+        m_vertexArray->Unbind();
     }
 
     Mesh* Mesh::Create(const String& file) {

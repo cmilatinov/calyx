@@ -19,8 +19,8 @@ namespace Calyx {
             return {};
 
         auto component = static_cast<bool>(src) ?
-            instancePtr->EmplaceCopy(m_entityID, m_scene->m_entityRegistry, src) :
-            instancePtr->Emplace(m_entityID, m_scene->m_entityRegistry);
+                         instancePtr->EmplaceCopy(m_entityID, m_scene->m_entityRegistry, src) :
+                         instancePtr->Emplace(m_entityID, m_scene->m_entityRegistry);
         if (auto* componentPtr = component.try_cast<IComponent>(); componentPtr != nullptr) {
             componentPtr->m_gameObject = this;
         }
@@ -61,7 +61,7 @@ namespace Calyx {
     void GameObject::AddChild(GameObject* child) {
         CX_CORE_ASSERT(child != nullptr, "GameObject::AddChild called will null child!");
         CX_CORE_ASSERT(m_scene == child->m_scene,
-                       "GameObject::AddChild called with GameObject belonging to another scene!");
+            "GameObject::AddChild called with GameObject belonging to another scene!");
 
         // Swap previous parent
         if (child->m_parent != nullptr)
@@ -76,7 +76,7 @@ namespace Calyx {
     void GameObject::SetParent(GameObject* parent) {
         CX_CORE_ASSERT(parent != nullptr, "GameObject::SetParent called will null parent!");
         CX_CORE_ASSERT(m_scene == parent->m_scene,
-                       "GameObject::SetParent called with GameObject belonging to another scene!");
+            "GameObject::SetParent called with GameObject belonging to another scene!");
 
         // Swap previous parent
         if (m_parent != nullptr)

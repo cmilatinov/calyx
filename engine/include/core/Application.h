@@ -13,9 +13,8 @@ namespace Calyx {
     class CALYX_API Application {
 
     public:
-        Application();
-        explicit Application(const WindowMode& windowMode);
-        virtual ~Application() = default;
+        explicit Application(const WindowMode& windowMode = WindowMode::DEFAULT);
+        virtual ~Application();
 
         virtual void Run();
         virtual void Close();
@@ -30,18 +29,20 @@ namespace Calyx {
         static Application& GetInstance() { return *s_instance; }
 
     private:
-        static Application* s_instance;
-
-        bool m_running = true;
-        Scope<Window> m_window;
-        LayerStack m_layerStack;
-        GuiLayer* m_guiLayer;
-
         void Init();
+        void Destroy();
 
         void OnEvent(Event& event);
         bool OnWindowClose(EventWindowClose& event);
         bool OnWindowResize(EventWindowResize& event);
+
+    private:
+        static Application* s_instance;
+
+        bool m_running = true;
+        Scope<Window> m_window;
+        Scope<LayerStack> m_layerStack;
+        GuiLayer* m_guiLayer = nullptr;
 
     };
 

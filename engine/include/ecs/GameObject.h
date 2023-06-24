@@ -1,6 +1,7 @@
 #pragma once
 
 #include "scene/Scene.h"
+#include "reflect/ClassRegistry.h"
 
 namespace Calyx {
 
@@ -25,7 +26,8 @@ namespace Calyx {
         friend class Editor::InspectorPanel;
 
         template<typename T>
-        friend class Component;
+        friend
+        class Component;
 
         template<typename T, typename ... Args>
         friend constexpr Scope<T> Calyx::CreateScope(Args&& ... args);
@@ -35,7 +37,7 @@ namespace Calyx {
 
     public:
         template<typename T, typename ...Args>
-        T* AddComponent(Args&&... args) {
+        T* AddComponent(Args&& ... args) {
             static_assert(std::is_base_of_v<IComponent, T>, "T must extend IComponent!");
             T& component = m_scene->m_entityRegistry.emplace<T>(m_entityID, std::forward<Args>(args)...);
             component.m_gameObject = this;

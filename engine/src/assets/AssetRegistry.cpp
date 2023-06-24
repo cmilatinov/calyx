@@ -2,6 +2,7 @@
 
 #include "ecs/Component.h"
 #include "render/objects/Shader.h"
+#include "render/objects/ShaderDefinition.h"
 #include "render/objects/Texture2D.h"
 #include "assets/Mesh.h"
 #include "assets/Assembly.h"
@@ -15,7 +16,6 @@ namespace Calyx {
         : m_assetWatcher(CreateScope<efsw::FileWatcher>()) {
         InitAssetTypes();
         RegisterComponents();
-        _AddSearchPath("./assets");
         m_assetWatcher->watch();
     }
 
@@ -83,7 +83,13 @@ namespace Calyx {
                 .assets = {},
             }
         );
-        BuildAssetMeta(m_searchPaths.back());
+        auto& searchPath = m_searchPaths.back();
+        BuildAssetMeta(searchPath);
+        for (const auto& [typeId, type]: m_registeredAssetTypes) {
+            if (type.autoload) {
+                LoadAllAssetsOfType(typeId, m_searchPaths.back());
+            }
+        }
     }
 
     void AssetRegistry::_RemoveSearchPath(const String& path) {
@@ -102,9 +108,11 @@ namespace Calyx {
         }
     }
 
-    void AssetRegistry::_SearchComponents(const String& query, const Set<AssetType>& excluded, List<AssetMeta>& outList) {
+    void
+    AssetRegistry::_SearchComponents(const String& query, const Set<AssetType>& excluded, List<AssetMeta>& outList) {
         for (const auto& [_, meta]: m_assetMeta) {
-            if (meta.isComponent && !excluded.contains(meta.type) && StringUtils::IsSearchMatch(query, meta.displayName))
+            if (meta.isComponent && !excluded.contains(meta.type) &&
+                StringUtils::IsSearchMatch(query, meta.displayName))
                 outList.push_back(meta);
         }
     }
@@ -133,8 +141,8 @@ namespace Calyx {
 
         auto meta = _GetAssetMeta(ptr);
         if (meta == nullptr)
-             return "";
-        
+            return "";
+
         return meta->displayName;
     }
 
@@ -187,10 +195,11 @@ namespace Calyx {
     }
 
     void AssetRegistry::InitAssetTypes() {
-        _RegisterAssetType<Mesh>(".obj", ".fbx", ".3ds", ".blend", ".ply");
-        _RegisterAssetType<Shader>(".glsl");
-        _RegisterAssetType<Texture2D>(".png", ".jpg", ".bmp");
-        _RegisterAssetType<Assembly>(".cxasm");
+        _RegisterAssetType<Mesh>(false, ".obj", ".fbx", ".3ds", ".blend", ".ply");
+        _RegisterAssetType<Shader>(false, ".glsl");
+        _RegisterAssetType<ShaderDefinition>(true, ".glsldef");
+        _RegisterAssetType<Texture2D>(false, ".png", ".jpg", ".bmp");
+        _RegisterAssetType<Assembly>(false, ".cxasm");
     }
 
     void AssetRegistry::ClearAssetMeta(AssetSearchPath& searchPath) {
@@ -250,6 +259,27 @@ namespace Calyx {
         }
     }
 
+    void AssetRegistry::LoadAllAssetsOfType(AssetType type, AssetSearchPath& searchPath) {
+        CX_MAP_FIND(m_registeredAssetTypes, type, i_assetType) {
+            List<String> patterns;
+            for (const auto& [ext, assetType]: m_assetExtensions_Types) {
+                if (assetType == type) {
+                    patterns.push_back(fmt::format("**{}", ext.c_str()));
+                }
+            }
+            auto files = FileUtils::GlobRecursive(searchPath.path, patterns);
+            for (const auto& file: files) {
+                String assetName = FileSystem::relative(file, searchPath.path);
+                CX_MAP_FIND(m_assetNames_IDs, assetName, i_assetID) {
+                    auto ref = LoadAsset(i_assetID->second);
+                    if (ref) {
+                        i_assetType->second.loadedAssets.push_back(ref);
+                    }
+                }
+            }
+        }
+    }
+
     Path AssetRegistry::GetMetaFile(const Path& assetFile) {
         return assetFile.parent_path() / (assetFile.stem().string() + ".meta");
     }
@@ -289,8 +319,8 @@ namespace Calyx {
 
     void AssetRegistry::RegisterComponents() {
         RemoveComponents();
-        for (const auto& [component, _]: ClassRegistry::GetComponentClasses()) {
-            auto temp = component.construct();
+        for (const auto& [_, info]: ClassRegistry::GetComponentClasses()) {
+            auto temp = info.type.construct();
             if (!temp)
                 continue;
 

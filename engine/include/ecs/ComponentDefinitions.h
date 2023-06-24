@@ -11,3 +11,9 @@
 
 #define CX_DESTROY      Destroy
 #define CX_DESTROY_HS   CX_CONCAT(CX_XSTR(CX_DESTROY), _hs)
+
+#define CX_DRAW_GIZMOS      DrawGizmos
+#define CX_DRAW_GIZMOS_HS   CX_CONCAT(CX_XSTR(CX_DRAW_GIZMOS), _hs)
+
+#define CX_DRAW_GIZMOS_SELECTED     DrawGizmosSelected
+#define CX_DRAW_GIZMOS_SELECTED_HS  CX_CONCAT(CX_XSTR(CX_DRAW_GIZMOS_SELECTED), _hs)

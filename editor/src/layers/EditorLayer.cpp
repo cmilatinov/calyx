@@ -66,9 +66,12 @@ namespace Calyx::Editor {
                     SceneManager::LoadEmptyScene();
                 }
                 if (ImGui::MenuItem("Open...", "Ctrl+O")) {
+                    CX_CORE_INFO("Loading scene from disk ...");
                     SceneManager::LoadScene("./test.cxscene");
+                    SelectionManager::ClearSelection();
                 }
                 if (ImGui::MenuItem("Save", "Ctrl+S")) {
+                    CX_CORE_INFO("Saving current scene ...");
                     SceneExporter exporter(*SceneManager::GetCurrentScene());
                     exporter.Save("./test.cxscene");
                 }

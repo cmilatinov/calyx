@@ -5,6 +5,7 @@
 #include "render/objects/Texture.h"
 #include "render/objects/Shader.h"
 #include "render/objects/Query.h"
+#include "render/Renderer.h"
 
 namespace Calyx {
 
@@ -55,6 +56,24 @@ namespace Calyx {
         glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS, &maxColorAttachments);
         CX_CORE_ASSERT(attachmentIndex < maxColorAttachments, "Invalid attachment index!");
         return GL_COLOR_ATTACHMENT0 + attachmentIndex;
+    }
+
+    static GLenum GLPrimitiveType(PrimitiveType type) {
+        switch (type) {
+            case PrimitiveType::TRIANGLE:
+                return GL_TRIANGLES;
+            case PrimitiveType::QUAD:
+                return GL_QUADS;
+            case PrimitiveType::POINT:
+                return GL_POINTS;
+            case PrimitiveType::LINE:
+                return GL_LINES;
+            case PrimitiveType::LINE_LOOP:
+                return GL_LINE_LOOP;
+            default:
+                CX_CORE_ASSERT(false, "Invalid primitive type!");
+                return 0;
+        }
     }
 
     static bool IsDepthFormat(TextureFormat format) {

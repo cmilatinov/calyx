@@ -9,20 +9,13 @@ namespace Calyx {
         CX_BEGIN_REFLECT();
 
     public:
-        MeshComponent()
-            : m_mesh() {}
+        MeshComponent() = default;
 
-        explicit MeshComponent(const Ref<Mesh>& mesh)
-            : m_mesh(mesh) {}
+        String GetDisplayName() const override { return "Mesh Renderer"; }
 
-        String GetDisplayName() const override { return "Mesh Component"; }
+        Ref<Mesh> GetMesh() const { return m_mesh; }
 
         void SetMesh(const Ref<Mesh>& mesh) { m_mesh = mesh; }
-
-        void DrawMesh() const {
-            if (!m_mesh) return;
-            m_mesh->Draw();
-        }
 
     private:
         CX_PROPERTY(CX_SERIALIZE, CX_NAME(Mesh))
