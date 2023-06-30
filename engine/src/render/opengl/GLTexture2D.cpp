@@ -6,7 +6,7 @@
 namespace Calyx {
 
     GLTexture2D::GLTexture2D(const String& file) {
-        Load(file);
+        GLTexture2D::Load(file);
     }
 
     GLTexture2D::GLTexture2D(uint32 width, uint32 height, uint32 samples, TextureFormat format)
@@ -83,7 +83,6 @@ namespace Calyx {
         m_samples = 1;
         GLTexture2D::Init(data);
         stbi_image_free(data);
-
         return true;
     }
 

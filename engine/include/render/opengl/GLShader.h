@@ -15,10 +15,10 @@ namespace Calyx {
     class CALYX_API GLShader : public Shader {
 
     public:
-        GLShader(const String& name, const String& vertexSrc, const String& fragmentSrc);
-        GLShader(const String& name, const String& vertexSrc, const String& geometrySrc, const String& fragmentSrc);
         explicit GLShader(const String& filepath);
         ~GLShader() override;
+
+        bool Load(const String& file) override;
 
         void Bind() const override;
         void Unbind() const override;
@@ -39,17 +39,11 @@ namespace Calyx {
 
     private:
         uint32 m_shaderProgramID = 0;
-        List<uint32> m_shaderIDs;
         String m_name;
 
-        void LoadShader(const String& filepath);
-        void LoadShader(const String& vertexSrc, const String& fragmentSrc);
-        void LoadShader(const String& vertexSrc, const String& geometrySrc, const String& fragmentSrc);
-
-        String LoadShaderSrc(const String& file);
         Map<GLenum, String> SplitShaderSrc(const String& shaderSrc);
 
-        void CreateShaderProgram(const Map<GLenum, String>& shaderSources);
+        bool CreateShaderProgram(const Map<GLenum, String>& shaderSources);
 
         uint32 CreateShader(GLuint shaderType, const String& src);
 

@@ -13,6 +13,8 @@ namespace Calyx {
         GLTexture2D(uint32 width, uint32 height, uint32 m_samples, TextureFormat format);
         ~GLTexture2D() override;
 
+        bool Load(const String& file) override;
+
         void Bind() const override;
         void Unbind() const override;
 
@@ -37,7 +39,6 @@ namespace Calyx {
         void Init(uint8* data = nullptr);
         void Destroy();
 
-        bool Load(const String& file);
         void Resize(uint32 width, uint32 height, uint8* data);
 
     };

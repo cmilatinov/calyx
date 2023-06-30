@@ -32,6 +32,9 @@ namespace Calyx::Assets {
                 vec2(0, 1),
                 vec2(1, 0)
             };
+            quad->SetUV1Enabled(false);
+            quad->SetUV2Enabled(false);
+            quad->SetUV3Enabled(false);
             quad->Rebuild();
         }
         return quad;
@@ -51,6 +54,10 @@ namespace Calyx::Assets {
                 vertices.emplace_back(glm::cos(angle), glm::sin(angle), 0);
                 normals.emplace_back(glm::cos(angle), glm::sin(angle), 0);
             }
+            circle->SetUV0Enabled(false);
+            circle->SetUV1Enabled(false);
+            circle->SetUV2Enabled(false);
+            circle->SetUV3Enabled(false);
             circle->SetPrimitiveType(PrimitiveType::LINE_LOOP);
             circle->Rebuild();
         }
@@ -58,15 +65,15 @@ namespace Calyx::Assets {
     }
 
     Ref<Mesh> WireCube() {
-        auto square = AssetRegistry::LoadAsset<Mesh>(CX_ASSET_WIRE_CUBE);
-        if (!square) {
-            square = AssetRegistry::CreateAsset<Mesh>(CX_ASSET_WIRE_CUBE);
-            square->GetIndices() = {
+        auto cube = AssetRegistry::LoadAsset<Mesh>(CX_ASSET_WIRE_CUBE);
+        if (!cube) {
+            cube = AssetRegistry::CreateAsset<Mesh>(CX_ASSET_WIRE_CUBE);
+            cube->GetIndices() = {
                 0, 1, 1, 2, 2, 3, 3, 0,
                 4, 5, 5, 6, 6, 7, 7, 4,
                 0, 4, 1, 5, 2, 6, 3, 7
             };
-            square->GetVertices() = {
+            cube->GetVertices() = {
                 vec3(-0.5f, -0.5f, -0.5f),
                 vec3(-0.5f, 0.5f, -0.5f),
                 vec3(0.5f, 0.5f, -0.5f),
@@ -76,7 +83,7 @@ namespace Calyx::Assets {
                 vec3(0.5f, 0.5f, 0.5f),
                 vec3(0.5f, -0.5f, 0.5f)
             };
-            square->GetNormals() = {
+            cube->GetNormals() = {
                 vec3(0, 0, 0),
                 vec3(0, 0, 0),
                 vec3(0, 0, 0),
@@ -86,10 +93,14 @@ namespace Calyx::Assets {
                 vec3(0, 0, 0),
                 vec3(0, 0, 0)
             };
-            square->SetPrimitiveType(PrimitiveType::LINE);
-            square->Rebuild();
+            cube->SetUV0Enabled(false);
+            cube->SetUV1Enabled(false);
+            cube->SetUV2Enabled(false);
+            cube->SetUV3Enabled(false);
+            cube->SetPrimitiveType(PrimitiveType::LINE);
+            cube->Rebuild();
         }
-        return square;
+        return cube;
     }
 
 }

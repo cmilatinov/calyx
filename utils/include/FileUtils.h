@@ -4,10 +4,22 @@
 #include <regex>
 #include <vector>
 #include <filesystem>
+#include <sstream>
+#include <fstream>
 
 #include "StringUtils.h"
 
 namespace Calyx::FileUtils {
+
+    bool LongestCommonPrefix(
+        const std::filesystem::path& first,
+        const std::filesystem::path& second,
+        std::filesystem::path& outPrefix
+    );
+
+    bool IsInDirectory(const std::filesystem::path& directory, const std::filesystem::path& file);
+
+    std::string ReadEntireFile(const std::string& path);
 
     template<typename OutContainer>
     void GlobCollect(

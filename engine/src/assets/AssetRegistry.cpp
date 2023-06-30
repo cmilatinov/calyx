@@ -5,7 +5,6 @@
 #include "render/objects/ShaderDefinition.h"
 #include "render/objects/Texture2D.h"
 #include "assets/Mesh.h"
-#include "assets/Assembly.h"
 #include "reflect/ClassRegistry.h"
 
 namespace Calyx {
@@ -26,6 +25,7 @@ namespace Calyx {
         efsw::Action action,
         std::string oldFilename
     ) {
+        Path file = Path(dir) / filename;
         switch (action) {
             case efsw::Actions::Add:
                 CX_CORE_TRACE("DIR ({}) FILE ({}) has event ADD", dir, filename);
@@ -35,6 +35,15 @@ namespace Calyx {
                 break;
             case efsw::Actions::Modified:
                 CX_CORE_TRACE("DIR ({}) FILE ({}) has event MODIFIED", dir, filename);
+                for (const auto& searchPath: m_searchPaths) {
+                    if (FileUtils::IsInDirectory(searchPath.path, file)) {
+                        String name = FileSystem::relative(file, searchPath.path).string();
+                        CX_MAP_FIND(m_assetNames_IDs, name, i_assetID) {
+                            m_dirtyAssets.insert(i_assetID->second);
+                        }
+                        break;
+                    }
+                }
                 break;
             case efsw::Actions::Moved:
                 CX_CORE_TRACE("DIR ({}) FILE ({}) has event MOVED from ({})", dir, filename, oldFilename);
@@ -42,6 +51,18 @@ namespace Calyx {
             default:
                 break;
         }
+    }
+
+    void AssetRegistry::_ReloadAssets() {
+        for (const auto& assetID: m_dirtyAssets) {
+            CX_MAP_FIND(m_loadedAssets, assetID, i_asset) {
+                CX_MAP_FIND(m_assetMeta, assetID, i_assetMeta) {
+                    CX_CORE_TRACE("Reloading asset '{}' ...", i_assetMeta->second.name);
+                    i_asset->second.lock()->Load(i_assetMeta->second.path.string());
+                }
+            }
+        }
+        m_dirtyAssets.clear();
     }
 
     Ref<IAsset> AssetRegistry::_LoadAsset(const UUID& id) {
@@ -108,8 +129,11 @@ namespace Calyx {
         }
     }
 
-    void
-    AssetRegistry::_SearchComponents(const String& query, const Set<AssetType>& excluded, List<AssetMeta>& outList) {
+    void AssetRegistry::_SearchComponents(
+        const String& query,
+        const Set<AssetType>& excluded,
+        List<AssetMeta>& outList
+    ) {
         for (const auto& [_, meta]: m_assetMeta) {
             if (meta.isComponent && !excluded.contains(meta.type) &&
                 StringUtils::IsSearchMatch(query, meta.displayName))
@@ -199,7 +223,6 @@ namespace Calyx {
         _RegisterAssetType<Shader>(false, ".glsl");
         _RegisterAssetType<ShaderDefinition>(true, ".glsldef");
         _RegisterAssetType<Texture2D>(false, ".png", ".jpg", ".bmp");
-        _RegisterAssetType<Assembly>(false, ".cxasm");
     }
 
     void AssetRegistry::ClearAssetMeta(AssetSearchPath& searchPath) {
@@ -333,7 +356,7 @@ namespace Calyx {
             m_assetNames_IDs[name] = assetID;
             m_assetMeta[assetID] = {
                 .id = assetID,
-                .type = tempComponent->GetAssetType(),
+                .type = tempComponent->GetTypeId(),
                 .name = name,
                 .displayName = tempComponent->GetDisplayName(),
                 .isComponent = true

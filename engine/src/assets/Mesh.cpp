@@ -30,6 +30,7 @@ namespace Calyx {
         if (scene == nullptr || scene->mNumMeshes <= 0)
             return false;
 
+        Clear();
         aiMesh* mesh = scene->mMeshes[0];
 
         // Copy indices
@@ -43,10 +44,13 @@ namespace Calyx {
         // Resize vertex, normal, colors and UV vectors
         m_vertices.resize(mesh->mNumVertices);
         m_normals.resize(mesh->mNumVertices);
-        int numUVs = std::min((int)mesh->GetNumUVChannels(), 4);
-        List<vec2>* uvChannels[4] = { &m_uvs0, &m_uvs1, &m_uvs2, &m_uvs3 };
-        for (int j = 0; j < numUVs; j++) {
-            uvChannels[j]->resize(mesh->mNumVertices);
+        int numUVs = std::min((int)mesh->GetNumUVChannels(), CX_MESH_UV_CHANNELS);
+        List<vec2>* uvChannels[CX_MESH_UV_CHANNELS] = { &m_uvs0, &m_uvs1, &m_uvs2, &m_uvs3 };
+        for (int i = 0; i < numUVs; i++) {
+            uvChannels[i]->resize(mesh->mNumVertices);
+        }
+        for (int i = numUVs; i < CX_MESH_UV_CHANNELS; i++) {
+            SetAttribEnabled(CX_MESH_UV0 + i, false);
         }
 
         // Copy vertices, normals, and UVs
@@ -112,8 +116,8 @@ namespace Calyx {
         );
         m_vertexArray->AddVertexBuffer(normalBuffer);
 
-        List<vec2>* uvs[4] = { &m_uvs0, &m_uvs1, &m_uvs2, &m_uvs3 };
-        for (int i = 0; i < 4; i++) {
+        List<vec2>* uvs[CX_MESH_UV_CHANNELS] = { &m_uvs0, &m_uvs1, &m_uvs2, &m_uvs3 };
+        for (int i = 0; i < CX_MESH_UV_CHANNELS; i++) {
             auto uvBuffer = VertexBuffer::Create(
                 uvs[i]->size() * sizeof(vec2),
                 reinterpret_cast<float*>(uvs[i]->data())
@@ -137,6 +141,10 @@ namespace Calyx {
         );
         m_vertexArray->AddVertexBuffer(instanceBuffer);
 
+        for (uint32 i = 0; i < CX_MESH_NUM_ATTRIBS; i++) {
+            m_vertexArray->SetVertexBufferEnabled(i, m_enabledAttribs.test(i));
+        }
+
         m_vertexArray->Unbind();
     }
 
@@ -155,6 +163,9 @@ namespace Calyx {
         buffers[CX_MESH_UV2]->SetData(m_uvs2.size() * sizeof(vec2), m_uvs2.data());
         buffers[CX_MESH_UV3]->SetData(m_uvs3.size() * sizeof(vec2), m_uvs3.data());
         buffers[CX_MESH_INSTANCES]->SetData(m_instances.size() * sizeof(mat4), m_instances.data());
+        for (uint32 i = 0; i < CX_MESH_NUM_ATTRIBS; i++) {
+            m_vertexArray->SetVertexBufferEnabled(i, m_enabledAttribs.test(i));
+        }
         m_vertexArray->Unbind();
     }
 
@@ -169,10 +180,16 @@ namespace Calyx {
         m_vertexArray->Unbind();
     }
 
+    void Mesh::SetAttribEnabled(uint32 index, bool enabled) {
+        m_enabledAttribs.set(index, enabled);
+    }
+
     Mesh* Mesh::Create(const String& file) {
         auto* mesh = new Mesh();
-        if (!mesh->Load(file))
+        if (!mesh->Load(file)) {
+            delete mesh;
             return nullptr;
+        }
         return mesh;
     }
 

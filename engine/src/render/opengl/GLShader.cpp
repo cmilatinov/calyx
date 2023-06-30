@@ -3,27 +3,8 @@
 
 namespace Calyx {
 
-    GLShader::GLShader(
-        const String& name,
-        const String& vertexSrc,
-        const String& fragmentSrc
-    ) : m_name(name) {
-        LoadShader(vertexSrc, fragmentSrc);
-    }
-
-    GLShader::GLShader(
-        const String& name,
-        const String& vertexSrc,
-        const String& geometrySrc,
-        const String& fragmentSrc
-    ) : m_name(name) {
-        LoadShader(vertexSrc, geometrySrc, fragmentSrc);
-    }
-
-    GLShader::GLShader(const String& filepath)
-        : m_name(path(filepath).stem().string()) {
-        CX_CORE_TRACE("Compiling shader '{}' ...", m_name);
-        LoadShader(filepath);
+    GLShader::GLShader(const String& filepath) {
+        GLShader::Load(filepath);
     }
 
     GLShader::~GLShader() {
@@ -86,30 +67,18 @@ namespace Calyx {
     }
 
     bool GLShader::IsFunctional() const {
-        return false;
+        if (!m_shaderProgramID) return false;
+        int success;
+        glGetProgramiv(m_shaderProgramID, GL_LINK_STATUS, &success);
+        return success;
     }
 
-    void GLShader::LoadShader(const String& filepath) {
-        String src = LoadShaderSrc(filepath);
+    bool GLShader::Load(const String& filepath) {
+        m_name = Path(filepath).stem().string();
+        String src = FileUtils::ReadEntireFile(filepath);
+        if (src.empty()) return false;
         Map<GLenum, String> shaderSources = SplitShaderSrc(src);
-        CreateShaderProgram(shaderSources);
-    }
-
-    void GLShader::LoadShader(const String& vertexSrc, const String& fragmentSrc) {
-        Map<GLenum, String> shaderSources = {
-            { GL_VERTEX_SHADER, vertexSrc },
-            { GL_FRAGMENT_SHADER, fragmentSrc }
-        };
-        CreateShaderProgram(shaderSources);
-    }
-
-    void GLShader::LoadShader(const String& vertexSrc, const String& geometrySrc, const String& fragmentSrc) {
-        Map<GLenum, String> shaderSources = {
-            { GL_VERTEX_SHADER, vertexSrc },
-            { GL_GEOMETRY_SHADER, geometrySrc },
-            { GL_FRAGMENT_SHADER, fragmentSrc }
-        };
-        CreateShaderProgram(shaderSources);
+        return CreateShaderProgram(shaderSources);
     }
 
     Map<GLenum, String> GLShader::SplitShaderSrc(const String& source) {
@@ -141,45 +110,46 @@ namespace Calyx {
         return shaderSources;
     }
 
-    String GLShader::LoadShaderSrc(const String& file) {
-        ifstream fs(file.c_str());
-        bool open = fs.is_open();
-        CX_CORE_ASSERT(open, "Could not read shader file!");
-        stringstream ss;
-        ss << fs.rdbuf();
-        return ss.str();
-    }
+    bool GLShader::CreateShaderProgram(const Map<GLenum, String>& shaderSources) {
+        CX_CORE_TRACE("Compiling shader '{}' ...", m_name);
 
-    void GLShader::CreateShaderProgram(const Map<GLenum, String>& shaderSources) {
         // Create program
-        m_shaderProgramID = glCreateProgram();
+        if (!m_shaderProgramID) {
+            m_shaderProgramID = glCreateProgram();
+        }
 
         // Check num shaders is 2 or 3
         int numShaders = shaderSources.size();
         CX_CORE_ASSERT(numShaders >= 2 && numShaders <= 3, "Invalid number of shader sources!");
 
         // Create shaders
+        List<uint32> shaders;
+        shaders.reserve(shaderSources.size());
         for (auto& entry: shaderSources) {
             uint32 shader = CreateShader(entry.first, entry.second);
+            if (!shader) return false;
             glAttachShader(m_shaderProgramID, shader);
+            shaders.push_back(shader);
         }
 
         // Link & check program
         int success;
         glLinkProgram(m_shaderProgramID);
         glGetProgramiv(m_shaderProgramID, GL_LINK_STATUS, &success);
-        CX_CORE_ASSERT(success, "Shader program linkage failed!");
         if (!success) {
             char infoLog[512];
             glGetProgramInfoLog(m_shaderProgramID, sizeof(infoLog), nullptr, infoLog);
             CX_CORE_ERROR("Shader Linkage Error:");
             CX_CORE_ERROR(infoLog);
+            return false;
         }
 
         // Delete shaders
-        for (auto shader: m_shaderIDs) {
+        for (auto shader: shaders) {
             glDeleteShader(shader);
         }
+
+        return true;
     }
 
     uint32 GLShader::CreateShader(GLuint shaderType, const String& src) {
@@ -196,10 +166,8 @@ namespace Calyx {
             glGetShaderInfoLog(shaderID, sizeof(infoLog), nullptr, infoLog);
             CX_CORE_ERROR("Shader Compilation Error:");
             CX_CORE_ERROR(infoLog);
+            return 0;
         }
-        CX_CORE_ASSERT(success, "Shader compilation failed!");
-
-        m_shaderIDs.push_back(shaderID);
 
         return shaderID;
     }

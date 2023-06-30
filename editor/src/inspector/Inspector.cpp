@@ -20,8 +20,7 @@ namespace Calyx::Editor {
 
         // TODO: Find a way around this
         for (const auto& [_, info]: ClassRegistry::GetComponentClasses()) {
-            auto it = std::remove(derivedClasses.begin(), derivedClasses.end(), info.type);
-            derivedClasses.erase(it);
+            std::erase_if(derivedClasses, [&info](const auto& type) { return type.id() == info.type.id(); });
         }
 
         for (const auto& derived: derivedClasses) {

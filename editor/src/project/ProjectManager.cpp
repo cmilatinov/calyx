@@ -1,5 +1,4 @@
 #include "project/ProjectManager.h"
-#include "assets/Assembly.h"
 #include "background/BackgroundTaskManager.h"
 
 namespace Calyx::Editor {
@@ -33,23 +32,11 @@ namespace Calyx::Editor {
 
         BackgroundTaskManager::GetInstance().GetThreadPool().Enqueue(
             [this]() {
-                LoadAssemblies();
                 m_assemblyBuilder.BuildAssemblies();
             }
         );
-
+        
         return true;
-    }
-
-    void ProjectManager::LoadAssemblies() {
-        auto assemblyFiles = FileUtils::GlobRecursive(m_projectInfo.directories.assets, { "**.cxasm" });
-        for (const auto& file: assemblyFiles) {
-            String assemblyAsset = FileSystem::relative(file, m_projectInfo.directories.assets);
-            auto assembly = AssetRegistry::LoadAsset<Assembly>(assemblyAsset);
-            if (assembly) {
-                m_projectInfo.assemblies.push_back(std::forward<Ref<Assembly>>(assembly));
-            }
-        }
     }
 
 }

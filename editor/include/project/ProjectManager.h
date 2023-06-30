@@ -3,7 +3,6 @@
 #include "project/ProjectDefinitions.h"
 #include "project/ProjectInfo.h"
 #include "assembly/AssemblyBuilder.h"
-#include "render/objects/ShaderDefinition.h"
 
 namespace Calyx::Editor {
 
@@ -23,7 +22,6 @@ namespace Calyx::Editor {
 
     private:
         bool _LoadProject(const String& projectFile);
-        void LoadAssemblies();
 
         const ProjectInfo& _GetProjectInfo() const { return m_projectInfo; }
         const Path& _GetAssetDirectory() const { return m_projectInfo.directories.assets; }

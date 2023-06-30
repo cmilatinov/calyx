@@ -10,6 +10,8 @@ namespace Calyx {
     public:
         virtual ~IAsset() = default;
 
+        virtual bool Load(const String& file) = 0;
+
         virtual AssetType GetAssetType() const = 0;
 
     };

@@ -4,6 +4,10 @@
 #include "render/objects/VertexArray.h"
 #include "assets/AssetRegistry.h"
 
+#include <bitset>
+
+#define CX_MESH_UV_CHANNELS 4
+#define CX_MESH_NUM_ATTRIBS 7
 #define CX_MESH_VERTICES    0
 #define CX_MESH_NORMALS     1
 #define CX_MESH_UV0         2
@@ -21,7 +25,7 @@ namespace Calyx {
 
     public:
         void Clear();
-        bool Load(const String& file);
+        bool Load(const String& file) override;
 
         void Draw() const;
         void DrawIndexed() const;
@@ -40,6 +44,13 @@ namespace Calyx {
         List<vec2>& GetUV3() { return m_uvs3; }
         List<mat4>& GetInstances() { return m_instances; }
 
+        void SetNormalsEnabled(bool enabled) { SetAttribEnabled(CX_MESH_NORMALS, enabled); }
+        void SetUV0Enabled(bool enabled) { SetAttribEnabled(CX_MESH_UV0, enabled); }
+        void SetUV1Enabled(bool enabled) { SetAttribEnabled(CX_MESH_UV1, enabled); }
+        void SetUV2Enabled(bool enabled) { SetAttribEnabled(CX_MESH_UV2, enabled); }
+        void SetUV3Enabled(bool enabled) { SetAttribEnabled(CX_MESH_UV3, enabled); }
+        void SetInstancesEnabled(bool enabled) { SetAttribEnabled(CX_MESH_INSTANCES, enabled); }
+
         void SetPrimitiveType(PrimitiveType type) { m_primitiveType = type; }
 
     private:
@@ -52,9 +63,12 @@ namespace Calyx {
         List<vec2> m_uvs2;
         List<vec2> m_uvs3;
         List<mat4> m_instances;
+        std::bitset<CX_MESH_NUM_ATTRIBS> m_enabledAttribs{ 0xFFFF };
         Ref<VertexArray> m_vertexArray;
 
         void CreateVAO();
+
+        void SetAttribEnabled(uint32 index, bool enable);
 
         static Mesh* Create(const String& file);
 

@@ -22,7 +22,8 @@ namespace Calyx {
     class CALYX_API Scene : public Asset<Scene> {
 
         template<typename T>
-        friend class Component;
+        friend
+        class Component;
         friend class GameObject;
         friend class SceneManager;
         friend class SceneRenderer;
@@ -37,12 +38,15 @@ namespace Calyx {
         Scene(const Scene& other);
         ~Scene() override = default;
 
-        GameObject* CreateGameObject(const String& name = "Game Object", GameObject* parent = nullptr, const UUID& id = UUID());
+        GameObject*
+        CreateGameObject(const String& name = "Game Object", GameObject* parent = nullptr, const UUID& id = UUID());
         void DeleteGameObject(GameObject* gameObject);
 
         GameObject* GetGameObject(const UUID& id) const;
 
         const Set<GameObject*>& GetRootGameObjects() const { return m_rootGameObjects; }
+
+        bool Load(const String& path) override;
 
     private:
         bool m_firstFrame = true;
@@ -56,7 +60,6 @@ namespace Calyx {
         void DeleteGameObjectInternal(entt::entity id, bool eraseFromParent);
         void DeleteGameObjects();
 
-        bool Load(const String& path);
         void Clear();
 
         void Copy(const Scene& other);

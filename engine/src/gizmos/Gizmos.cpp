@@ -13,6 +13,8 @@ namespace Calyx {
         m_lineMesh->SetPrimitiveType(PrimitiveType::LINE);
         m_lineMesh->GetInstances().resize(1);
         m_lineMesh->GetInstances()[0] = glm::identity<mat4>();
+        m_lineMesh->SetUV2Enabled(false);
+        m_lineMesh->SetUV3Enabled(false);
     }
 
     void Gizmos::_DrawWireSphere(const vec3& center, float radius) {
@@ -85,7 +87,11 @@ namespace Calyx {
             "Call to DrawLine() outside of gizmo frame!"
         );
         m_lineMesh->GetVertices().push_back(start);
+        m_lineMesh->GetUV0().emplace_back(m_gizmoColor.x, m_gizmoColor.y);
+        m_lineMesh->GetUV1().emplace_back(m_gizmoColor.z, m_gizmoColor.w);
         m_lineMesh->GetVertices().push_back(end);
+        m_lineMesh->GetUV0().emplace_back(m_gizmoColor.x, m_gizmoColor.y);
+        m_lineMesh->GetUV1().emplace_back(m_gizmoColor.z, m_gizmoColor.w);
     }
 
     void Gizmos::_DrawRay(const vec3& point, const vec3& direction) {
@@ -155,12 +161,16 @@ namespace Calyx {
         m_gizmoShader->Bind();
         m_gizmoShader->SetMat4("view", view);
         m_gizmoShader->SetFloat3("viewPos", viewPos);
+        m_gizmoShader->SetBool("useMeshColors", false);
 
         m_lineMesh->GetVertices().clear();
+        m_lineMesh->GetUV0().clear();
+        m_lineMesh->GetUV1().clear();
     }
 
     void Gizmos::DrawLines() {
         m_gizmoShader->SetBool("enableNormals", false);
+        m_gizmoShader->SetBool("useMeshColors", true);
         const auto nVertices = m_lineMesh->GetVertices().size();
         m_lineMesh->GetNormals().resize(nVertices);
         m_lineMesh->Rebuild();

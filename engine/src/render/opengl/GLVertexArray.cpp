@@ -117,6 +117,7 @@ namespace Calyx {
     }
 
     void GLVertexArray::SetVertexBufferEnabled(uint32 index, bool enabled) {
+        glBindVertexArray(m_vertexArrayID);
         if (enabled) {
             glEnableVertexAttribArray(index);
         } else {

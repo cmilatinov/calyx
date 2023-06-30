@@ -1,7 +1,5 @@
 #pragma once
 
-#include "assets/Assembly.h"
-
 namespace Calyx::Editor {
 
     struct ProjectInfo {
@@ -13,7 +11,6 @@ namespace Calyx::Editor {
             Path build;
             Path cmake;
         } directories;
-        List<Ref<Assembly>> assemblies;
     };
 
 }

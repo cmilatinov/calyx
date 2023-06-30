@@ -64,6 +64,9 @@ namespace Calyx {
     void Application::Run() {
         Time::Init();
         while (m_running) {
+            // Hot-reload assets
+            AssetRegistry::ReloadAssets();
+
             // Time measurements
             Time::GetInstance().UpdateTime();
 

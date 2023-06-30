@@ -8,7 +8,7 @@ namespace Calyx {
 
     class Scene;
 
-    class CALYX_API IComponent : public IAsset {
+    class CALYX_API IComponent {
         CX_ASSET_REGISTRY_FRIEND();
         CX_BEGIN_REFLECT();
 
@@ -16,7 +16,7 @@ namespace Calyx {
         friend class Scene;
 
     public:
-        ~IComponent() override = default;
+        virtual ~IComponent() = default;
 
         virtual String GetDisplayName() const = 0;
         virtual String GetClassName() const = 0;
@@ -66,10 +66,6 @@ namespace Calyx {
                 type = entt::resolve<T>();
             }
             return type.id();
-        }
-
-        AssetType GetAssetType() const override {
-            return entt::resolve<T>().id();
         }
 
         template<typename C>

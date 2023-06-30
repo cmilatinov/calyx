@@ -10,6 +10,8 @@ namespace Calyx {
         explicit GLShaderDefinition(const String& file);
         ~GLShaderDefinition() override;
 
+        bool Load(const String& file) override;
+
     private:
         String m_name;
         String m_content;

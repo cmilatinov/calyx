@@ -27,11 +27,11 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     target_compile_options(Assembly{{ assembly.name }} PRIVATE "-fno-gnu-unique")
 endif()
 
-## if length(assembly.source_headers) > 0
+## if length(assembly.header_files) > 0
 # Assembly '{{ assembly.name }}' reflection
 add_reflected_target(Assembly{{ assembly.name }})
 add_reflected_headers(Assembly{{ assembly.name }} "${ASSET_DIR}"
-## for source_header in assembly.source_headers
+## for source_header in assembly.header_files
     "{{ source_header }}"
 ## endfor
 )

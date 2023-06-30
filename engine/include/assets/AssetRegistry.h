@@ -93,6 +93,8 @@ namespace Calyx {
             return s_instance->_RegisterAssetType<T, Ext...>(extensions...);
         }
 
+        CX_SINGLETON_EXPOSE_METHOD(_ReloadAssets, void ReloadAssets());
+
         CX_SINGLETON_EXPOSE_METHOD(_LoadAsset, Ref<IAsset> LoadAsset(const UUID& id), id);
         CX_SINGLETON_EXPOSE_METHOD(_UnloadAll, void UnloadAll());
         CX_SINGLETON_EXPOSE_METHOD(_AddSearchPath, void AddSearchPath(const String& path), path);
@@ -104,7 +106,11 @@ namespace Calyx {
         );
         CX_SINGLETON_EXPOSE_METHOD(
             _SearchComponents,
-            void SearchComponents(const String& query, const Set<AssetType>& excluded, List<AssetMeta>& outList),
+            void SearchComponents(
+            const String& query,
+            const Set<AssetType>& excluded,
+                List<AssetMeta>&outList
+        ),
             query, excluded, outList
         );
 
@@ -144,6 +150,8 @@ namespace Calyx {
         void InitAssetTypes();
 
     private:
+        void _ReloadAssets();
+
         template<typename T, typename ...Args>
         Ref<T> _CreateAsset(const String& name, Args&& ... args) {
             static_assert(std::is_base_of_v<IAsset, T>, "T must be an asset type!");
@@ -261,6 +269,8 @@ namespace Calyx {
         Map<UUID, WeakRef<IAsset>> m_loadedAssets{};
         Map<String, UUID> m_assetNames_IDs;
         Map<const IAsset*, UUID> m_assetPointers_IDs;
+
+        Set<UUID> m_dirtyAssets;
 
     };
 

@@ -11,14 +11,10 @@ namespace Calyx::Editor {
         : m_project(projectInfo) {}
 
     void AssemblyBuilder::BuildAssemblies() {
-        bool regenerateCMake = UpdateAssemblies();
-        Path assembliesCMake = m_project.directories.cmake / "assemblies.cmake";
-        regenerateCMake |= !FileSystem::exists(assembliesCMake) || !FileSystem::is_regular_file(assembliesCMake);
+        LoadAssemblyDefinitions();
 
-        if (regenerateCMake) {
-            CX_CORE_INFO("Generating assemblies CMake file ...");
-            GenerateAssembliesCMake();
-        }
+        CX_CORE_INFO("Generating assemblies CMake file ...");
+        GenerateAssembliesCMake();
 
         CX_CORE_INFO("Configuring CMake project ...");
         ConfigureBuildSystem();
@@ -46,7 +42,7 @@ namespace Calyx::Editor {
         m_loadedAssemblies.clear();
 
         CX_CORE_INFO("Loading built assemblies ...");
-        for (const auto& assembly: m_project.assemblies) {
+        for (const auto& assembly: m_assemblies) {
             auto fileName = assembly->GetBinaryName();
             Path binary = m_project.directories.build / fileName;
             if (FileSystem::exists(binary) && FileSystem::is_regular_file(binary)) {
@@ -60,25 +56,34 @@ namespace Calyx::Editor {
         }
     }
 
-    bool AssemblyBuilder::UpdateAssemblies() {
-        bool regenerate = false;
-        for (const auto& assembly: m_project.assemblies) {
-            auto sourceFileList = FileUtils::GlobRecursive(m_project.directories.assets, assembly->GetSources());
-            Set<String> sourceFileSet;
-            std::transform(
-                sourceFileList.begin(), sourceFileList.end(),
-                std::inserter(sourceFileSet, sourceFileSet.begin()),
-                [this](const auto& sourceFile) {
-                    return FileSystem::relative(sourceFile, m_project.directories.project).string();
-                }
-            );
-            if (assembly->GetSourceFiles() != sourceFileSet) {
-                assembly->SetSourceFiles(m_project.directories.project, sourceFileSet);
-                assembly->WriteFile();
-                regenerate = true;
+    void AssemblyBuilder::LoadAssemblyDefinitions() {
+        m_assemblies.clear();
+        m_assemblies.insert(CreateRef<AssemblyDefinition>("default", m_project.directories.assets));
+        m_sourceFileAssemblies.clear();
+        m_assemblyFiles.clear();
+        auto assemblyFiles = FileUtils::GlobRecursive(m_project.directories.assets, { "**.cxasm" });
+        for (const auto& file: assemblyFiles) {
+            String assemblyAsset = FileSystem::relative(file, m_project.directories.assets);
+            auto assembly = AssetRegistry::LoadAsset<AssemblyDefinition>(assemblyAsset);
+            if (assembly) {
+                m_assemblies.insert(std::forward<Ref<AssemblyDefinition>>(assembly));
             }
         }
-        return regenerate;
+
+        auto sources = FileUtils::GlobRecursive(m_project.directories.assets, { "**.cpp", "**.h", "**.hpp" });
+        for (const auto& file: sources) {
+            Ref<AssemblyDefinition> closest;
+            for (const auto& assembly: m_assemblies) {
+                auto& dir = assembly->GetDirectory();
+                if (FileUtils::IsInDirectory(dir, file) &&
+                    (!closest || dir.string().length() > closest->GetDirectory().string().length())) {
+                    closest = assembly;
+                }
+            }
+            auto src = FileSystem::relative(file, m_project.directories.project).string();
+            m_sourceFileAssemblies[src] = closest.get();
+            m_assemblyFiles[closest.get()].insert(file);
+        }
     }
 
     void AssemblyBuilder::GenerateAssembliesCMake() {
@@ -86,10 +91,25 @@ namespace Calyx::Editor {
         std::ofstream assemblies(assembliesCMake);
         if (!assemblies.is_open()) return;
         json assemblyList = json::array();
-        for (const auto& assembly: m_project.assemblies) {
-            if (!assembly->GetSourceFiles().empty()) {
-                assemblyList.push_back(assembly->ToJSON());
+        for (const auto& assembly: m_assemblies) {
+            json sourceFiles = json::array();
+            json headerFiles = json::array();
+            for (const auto& file: m_assemblyFiles[assembly.get()]) {
+                if (file.ends_with(".cpp")) {
+                    sourceFiles.push_back(file);
+                } else if (file.ends_with(".h") || file.ends_with(".hpp")) {
+                    headerFiles.push_back(file);
+                }
             }
+            assemblyList.push_back(
+                json::object(
+                    {
+                        { CX_ASSEMBLY_NAME, assembly->GetName() },
+                        { CX_ASSEMBLY_SOURCE_FILES, sourceFiles },
+                        { CX_ASSEMBLY_HEADER_FILES, headerFiles }
+                    }
+                )
+            );
         }
         inja::Environment env;
         inja::Template templ = env.parse(TEMPLATE_ASSEMBLIES_CMAKE);

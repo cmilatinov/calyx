@@ -65,7 +65,6 @@ add_reflected_target("CalyxEngine")
 add_reflected_headers("CalyxEngine" "include"
         "include/assets/Asset.h"
         "include/assets/Mesh.h"
-        "include/assets/Assembly.h"
         "include/render/Camera.h"
         "include/render/objects/Shader.h"
         "include/render/objects/ShaderDefinition.h"
