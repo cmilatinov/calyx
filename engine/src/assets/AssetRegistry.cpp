@@ -100,7 +100,7 @@ namespace Calyx {
         m_searchPaths.push_back(
             {
                 .path = normalizedPath,
-                .watch = m_assetWatcher->addWatch(normalizedPath.string(), this),
+                .watch = m_assetWatcher->addWatch(normalizedPath.string(), this, true),
                 .assets = {},
             }
         );

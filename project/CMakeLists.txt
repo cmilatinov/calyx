@@ -1,6 +1,6 @@
 # Required packages
 find_package(inja REQUIRED)
-find_package(Boost CONFIG REQUIRED COMPONENTS system filesystem)
+find_package(Boost REQUIRED COMPONENTS system filesystem)
 
 # Clump source files from src
 file(GLOB_RECURSE PROJECT_SRC "src/**.cpp")

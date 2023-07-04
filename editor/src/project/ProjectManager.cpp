@@ -35,7 +35,7 @@ namespace Calyx::Editor {
                 m_assemblyBuilder.BuildAssemblies();
             }
         );
-        
+
         return true;
     }
 

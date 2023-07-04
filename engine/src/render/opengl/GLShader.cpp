@@ -146,6 +146,7 @@ namespace Calyx {
 
         // Delete shaders
         for (auto shader: shaders) {
+            glDetachShader(m_shaderProgramID, shader);
             glDeleteShader(shader);
         }
 
